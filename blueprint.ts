@@ -304,12 +304,15 @@ export class Blueprint {
     return response.url;
   }
 
-  // TODO: check if is browser
   /**
    * Directly starts a download of the ZKeys in the browser.
    * Must be called within a user action, like a button click.
    */
   async startZKeyDownload() {
+    if (!window && !document) {
+      throw Error("startZKeyDownload can only be used in a browser");
+    }
+
     let url: string;
     try {
       url = await this.getZKeyDownloadLink();
