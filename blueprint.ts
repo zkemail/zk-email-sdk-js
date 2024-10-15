@@ -10,13 +10,15 @@ import {
 import { get, post } from "./utils";
 
 // TODO: replace with prod version
-const BASE_URL = "localhost:8080";
+const BASE_URL = "http://localhost:8080";
 
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
  */
 export class Blueprint {
   props: BlueprintProps;
+
+  private lastCheckedStatus: Date;
 
   constructor(props: BlueprintProps) {
     this.props = {
@@ -44,9 +46,7 @@ export class Blueprint {
   public static async getBlueprintById(id: string): Promise<Blueprint> {
     let blueprintResponse: BlueprintResponse;
     try {
-      blueprintResponse = await get<BlueprintResponse>(
-        `${BASE_URL}/blueprint/${id}`
-      );
+      blueprintResponse = await get<BlueprintResponse>(`${BASE_URL}/blueprint/${id}`);
     } catch (err) {
       console.error("Failed calling /blueprint/:id in getBlueprintById: ", err);
       throw err;
@@ -60,9 +60,7 @@ export class Blueprint {
   }
 
   // Maps the blueprint API response to the BlueprintProps
-  private static responseToBlueprintProps(
-    response: BlueprintResponse
-  ): BlueprintProps {
+  private static responseToBlueprintProps(response: BlueprintResponse): BlueprintProps {
     const props: BlueprintProps = {
       id: response.id,
       title: response.title,
@@ -169,10 +167,7 @@ export class Blueprint {
 
     let response: BlueprintResponse;
     try {
-      response = await post<BlueprintResponse>(
-        `${BASE_URL}/blueprint`,
-        requestData
-      );
+      response = await post<BlueprintResponse>(`${BASE_URL}/blueprint`, requestData);
     } catch (err) {
       console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
       throw err;
@@ -186,15 +181,14 @@ export class Blueprint {
    * This does not compile the circuits yet and you will still be able to make changes.
    * @returns A promise. Once it resolves, `getId` can be called.
    */
-  public static async listBlueprints(
-    options?: ListBlueprintsOptions
-  ): Promise<Blueprint[]> {
+  public static async listBlueprints(options?: ListBlueprintsOptions): Promise<Blueprint[]> {
     const requestOptions: ListBlueprintsOptionsRequest = {
       skip: options?.skip,
       limit: options?.limit,
       sort: options?.sort,
       status: options?.status,
       is_public: options?.isPublic,
+      search: options?.search,
     };
 
     let response: { blueprints: BlueprintResponse[] };
@@ -209,10 +203,77 @@ export class Blueprint {
     }
 
     return response.blueprints.map((blueprintResponse) => {
-      const blueprintProps =
-        Blueprint.responseToBlueprintProps(blueprintResponse);
+      const blueprintProps = Blueprint.responseToBlueprintProps(blueprintResponse);
       return new Blueprint(blueprintProps);
     });
+  }
+
+  /**
+   * Submits a blueprint. This will save the blueprint if it didn't exist before
+   * and start the compilation.
+   */
+  async submit() {
+    // If the blueprint wasn't save yet, we save it first to db
+    if (!this.props.id) {
+      try {
+        await this.submitDraft();
+      } catch (err) {
+        console.error("Failed to create blueprint: ", err);
+        throw err;
+      }
+    }
+
+    // Submit compile request
+    let response: { status: Status };
+    try {
+      response = await post<{ status: Status }>(`${BASE_URL}/blueprint/compile/${this.props.id}`);
+    } catch (err) {
+      // We don't set the status here, since the api call can't fail due to the actual job failing
+      // It can only due to connectivity issues or the job runner not being available
+      console.error("Failed calling POST on /blueprint/compile in submit: ", err);
+      throw err;
+    }
+  }
+
+  // TODO: Add "debounce" so user can put this in a while loop
+  /**
+   * Checks the status of blueprint.
+   * @returns A promise with the Status.
+   */
+  async checkStatus(): Promise<Status> {
+    // Blueprint wasn't saved yet, return default status
+    if (!this.props.id) {
+      return this.props.status!;
+    }
+
+    if (this.props.status === Status.Done) {
+      return this.props.status;
+    }
+
+    // Waits for a fixed period of time before you can call checkStatus again
+    // This enables you to put checkStatus in a while(await checkStatu()) loop
+    if (!this.lastCheckedStatus) {
+      this.lastCheckedStatus = new Date();
+    } else {
+      // TODO: change for prod to one minute
+      const waitTime = 0.5 * 1_000; // one minute;
+      const sinceLastChecked = new Date().getTime() - this.lastCheckedStatus.getTime();
+      if (sinceLastChecked < waitTime) {
+        await new Promise((r) => setTimeout(r, waitTime - sinceLastChecked));
+      }
+    }
+
+    // Submit compile request
+    let response: { status: Status };
+    try {
+      response = await get<{ status: Status }>(`${BASE_URL}/blueprint/status/${this.props.id}`);
+    } catch (err) {
+      console.error("Failed calling GET /blueprint/status in getStatus(): ", err);
+      throw err;
+    }
+
+    this.props.status = response.status;
+    return response.status;
   }
 
   /**
@@ -221,6 +282,48 @@ export class Blueprint {
    */
   getId(): string | null {
     return this.props.id || null;
+  }
+
+  /**
+   * Returns a download link for the ZKeys of the blueprint.
+   * @returns The the url to download the ZKeys.
+   */
+  async getZKeyDownloadLink(): Promise<string> {
+    if (this.props.status !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(`${BASE_URL}/blueprint/zkey/${this.props.id}`);
+    } catch (err) {
+      console.error("Failed calling GET on /blueprint/zkey/:id in getZKeyDownloadLink: ", err);
+      throw err;
+    }
+
+    return response.url;
+  }
+
+  // TODO: check if is browser
+  /**
+   * Directly starts a download of the ZKeys in the browser.
+   * Must be called within a user action, like a button click.
+   */
+  async startZKeyDownload() {
+    let url: string;
+    try {
+      url = await this.getZKeyDownloadLink();
+    } catch (err) {
+      console.error("Failed to start download of ZKeys: ", err);
+      throw err;
+    }
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "ZKeys.txt"; // Set the desired filename
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }
 

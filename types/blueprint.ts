@@ -47,11 +47,13 @@ export enum ZkFramework {
   Circom = "circom",
 }
 
+// According to protobufs
 export enum Status {
-  Draft = "Draft",
-  InProgress = "InProgress",
-  Done = "Done",
-  Failed = "Failed",
+  None,
+  Draft,
+  InProgress,
+  Done,
+  Failed,
 }
 
 export type VerifierContract = {
@@ -153,9 +155,10 @@ export type DecomposedRegexPartResponse = {
 export type ListBlueprintsOptions = {
   skip?: number;
   limit?: number;
-  sort: -1 | 1;
-  status: Status;
-  isPublic: boolean;
+  sort?: -1 | 1;
+  status?: Status;
+  isPublic?: boolean;
+  search?: string;
 };
 
 export type ListBlueprintsOptionsRequest = {
@@ -164,4 +167,5 @@ export type ListBlueprintsOptionsRequest = {
   sort?: -1 | 1;
   status?: Status;
   is_public?: boolean;
+  search?: string;
 };

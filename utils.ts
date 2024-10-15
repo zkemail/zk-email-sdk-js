@@ -1,15 +1,20 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
 
-export async function post<T>(url: string, data: object): Promise<T> {
+export async function post<T>(url: string, data?: object): Promise<T> {
   try {
-    const response = await fetch(url, {
+    const request: RequestInit = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-api-key": PUBLIC_SDK_KEY,
       },
-      body: JSON.stringify(data),
-    });
+    };
+
+    if (data) {
+      request.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(url, request);
 
     const body = await response.json();
 

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blueprint SDK Test (ES Module)</title>
+  </head>
+  <body>
+    <button id="downloadButton">Download ZKeys</button>
+
+    <script type="module">
+      import { createBlueprint } from "../dist/index.js";
+
+      function getBlueprintProps(title = "Twitter", slug = "zkemail/twitter") {
+        return {
+          title,
+          slug,
+          decomposedRegexes: [
+            {
+              parts: [
+                {
+                  isPublic: true,
+                  regexDef: "(a-zA-Z0-9_)+",
+                },
+              ],
+              name: "body",
+              maxLength: 256,
+              location: "body",
+            },
+          ],
+        };
+      }
+
+      const props = getBlueprintProps();
+      const blueprint = createBlueprint(props);
+      blueprint.props.id = "some-id-1";
+      blueprint.props.status = 3;
+
+      window.startZKeyDownload = () => blueprint.startZKeyDownload().catch(console.error);
+      document.getElementById("downloadButton").addEventListener("click", window.startZKeyDownload);
+    </script>
+  </body>
+</html>
