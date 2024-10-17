@@ -19,9 +19,7 @@ export async function post<T>(url: string, data?: object): Promise<T> {
     const body = await response.json();
 
     if (!response.ok) {
-      throw new Error(
-        `HTTP error! status: ${response.status}, message: ${body}`
-      );
+      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
     }
 
     return body;

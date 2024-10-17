@@ -1,3 +1,4 @@
+import { Prover } from "./prover";
 import {
   BlueprintProps,
   BlueprintRequest,
@@ -21,6 +22,7 @@ export class Blueprint {
   private lastCheckedStatus: Date;
 
   constructor(props: BlueprintProps) {
+    // Use defaults for unset fields
     this.props = {
       ignoreBodyHashCheck: false,
       enableHeaderMasking: false,
@@ -163,6 +165,10 @@ export class Blueprint {
    * @returns A promise. Once it resolves, `getId` can be called.
    */
   public async submitDraft() {
+    if (this.props.id) {
+      throw new Error("Blueprint was already saved");
+    }
+
     const requestData = this.blueprintPropsToRequest();
 
     let response: BlueprintResponse;
@@ -235,9 +241,10 @@ export class Blueprint {
     }
   }
 
-  // TODO: Add "debounce" so user can put this in a while loop
   /**
    * Checks the status of blueprint.
+   * checkStatus can be used in a while(await checkStatus()) loop, since it will wait a fixed
+   * amount of time the second time you call it.
    * @returns A promise with the Status.
    */
   async checkStatus(): Promise<Status> {
@@ -246,17 +253,17 @@ export class Blueprint {
       return this.props.status!;
     }
 
-    if (this.props.status === Status.Done) {
-      return this.props.status;
+    if ([Status.Failed, Status.Done].includes(this.props.status!)) {
+      return this.props.status!;
     }
 
     // Waits for a fixed period of time before you can call checkStatus again
-    // This enables you to put checkStatus in a while(await checkStatu()) loop
+    // This enables you to put checkStatus in a while(await checkStatus()) loop
     if (!this.lastCheckedStatus) {
       this.lastCheckedStatus = new Date();
     } else {
       // TODO: change for prod to one minute
-      const waitTime = 0.5 * 1_000; // one minute;
+      const waitTime = 0.5 * 1_000; // TODO: should be one minute;
       const sinceLastChecked = new Date().getTime() - this.lastCheckedStatus.getTime();
       if (sinceLastChecked < waitTime) {
         await new Promise((r) => setTimeout(r, waitTime - sinceLastChecked));
@@ -327,6 +334,14 @@ export class Blueprint {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  /**
+   * Creates an instance of Prover with which you can create proofs.
+   * @returns An instance of Prover.
+   */
+  createProver() {
+    return new Prover(this);
   }
 }
 
