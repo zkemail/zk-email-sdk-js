@@ -9,10 +9,16 @@ export async function getBlueprint(id: string): Promise<Blueprint> {
   return Blueprint.getBlueprintById(id);
 }
 
-export async function listBlueprints(
-  options?: ListBlueprintsOptions
-): Promise<Blueprint[]> {
+export async function listBlueprints(options?: ListBlueprintsOptions): Promise<Blueprint[]> {
   return Blueprint.listBlueprints(options);
 }
 
+// TODO: implement
+export function parseEmail(eml: string): string {
+  return eml;
+}
+
+// TODO: Get prover from blueprintId
+
 export * from "./blueprint";
+export * from "./proof";
