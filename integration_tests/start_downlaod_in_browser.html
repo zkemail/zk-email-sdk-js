@@ -6,10 +6,11 @@
     <title>Blueprint SDK Test (ES Module)</title>
   </head>
   <body>
-    <button id="downloadButton">Download ZKeys</button>
+    <button id="downloadButtonBlueprint">Download ZKeys</button>
+    <button id="downloadButtonProof">Download Proof Files</button>
 
     <script type="module">
-      import { createBlueprint } from "../dist/index.js";
+      import { createBlueprint, Proof } from "../dist/index.js";
 
       function getBlueprintProps(title = "Twitter", slug = "zkemail/twitter") {
         return {
@@ -37,7 +38,16 @@
       blueprint.props.status = 3;
 
       window.startZKeyDownload = () => blueprint.startZKeyDownload().catch(console.error);
-      document.getElementById("downloadButton").addEventListener("click", window.startZKeyDownload);
+      document
+        .getElementById("downloadButtonBlueprint")
+        .addEventListener("click", window.startZKeyDownload);
+
+      // Proof download
+      const proof = new Proof(blueprint, { id: "some-id-1", status: 2 });
+      window.startProofFilesDownload = () => proof.startFilesDownload().catch(console.error);
+      document
+        .getElementById("downloadButtonProof")
+        .addEventListener("click", window.startProofFilesDownload);
     </script>
   </body>
 </html>

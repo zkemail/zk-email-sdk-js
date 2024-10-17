@@ -18,5 +18,8 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@zk-email/zk-regex-apis": "^2.1.1"
   }
 }

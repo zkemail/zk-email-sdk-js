@@ -9,6 +9,8 @@ import {
   Status,
 } from "..";
 
+//TODO: test while (await checkStatu())
+
 function getBlueprintProps(
   title = "Twitter",
   slug = "zkemail/twitter",
@@ -36,24 +38,22 @@ function getBlueprintProps(
   };
 }
 
-describe("Blueprint test suite", () => {
+describe("Blueprint test suite", async () => {
   let db: pg.Client;
   const blueprintIds: string[] = [];
 
-  beforeAll(async () => {
-    console.log("Setting up user database...");
-    const { Client } = pg;
-    const client = new Client({
-      user: "emailwallet",
-      password: "p@ssw0rd",
-      host: "localhost",
-      port: 5432,
-      database: "sdk",
-    });
-    await client.connect();
-    db = client;
-    console.log("Database setup done");
+  console.log("Setting up user database...");
+  const { Client } = pg;
+  const client = new Client({
+    user: "emailwallet",
+    password: "p@ssw0rd",
+    host: "localhost",
+    port: 5432,
+    database: "sdk",
   });
+  await client.connect();
+  db = client;
+  console.log("Database setup done");
 
   afterAll(async () => {
     try {
@@ -106,8 +106,6 @@ describe("Blueprint test suite", () => {
       test("Submitted blueprints are listed", async () => {
         expect(blueprints.length).toBeGreaterThanOrEqual(3);
         const listedBlueprintIds = blueprints.map((bp) => bp.getId());
-        console.log("listedBlueprintIds : ", listedBlueprintIds);
-        console.log("localBlueprintIds: ", localBlueprintIds);
 
         // Check if
         for (const localBlueprintId of localBlueprintIds) {
@@ -205,7 +203,6 @@ describe("Blueprint test suite", () => {
         await new Promise((r) => setTimeout(r, 300));
 
         const status = await blueprint.checkStatus();
-        console.log("status: ", status);
 
         expect(status).not.toBeNull();
         expect(status).toBe(Status.InProgress);
