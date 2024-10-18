@@ -7,7 +7,7 @@ import {
   getBlueprint,
   listBlueprints,
   Status,
-} from "..";
+} from "../src";
 
 //TODO: test while (await checkStatu())
 

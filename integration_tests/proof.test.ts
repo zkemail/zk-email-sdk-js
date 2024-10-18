@@ -2,7 +2,7 @@ import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import pg from "pg";
 import { Blueprint, BlueprintProps, createBlueprint, Status } from "../src";
 import emlTxt from "./airbnb_eml";
-import { ProofStatus } from "../types/proof";
+import { ProofStatus } from "../src/types/proof";
 import { Proof } from "../src/proof";
 
 function getBlueprintProps(
