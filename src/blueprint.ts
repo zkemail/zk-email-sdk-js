@@ -1,3 +1,4 @@
+import { Proof } from "viem/_types/types/proof";
 import { Prover } from "./prover";
 import {
   BlueprintProps,
@@ -9,6 +10,7 @@ import {
   ZkFramework,
 } from "./types/blueprint";
 import { get, post } from "./utils";
+import { verifyProofOnChain } from "./chain";
 
 // TODO: replace with prod version
 const BASE_URL = "http://localhost:8080";
@@ -19,7 +21,7 @@ const BASE_URL = "http://localhost:8080";
 export class Blueprint {
   props: BlueprintProps;
 
-  private lastCheckedStatus: Date;
+  private lastCheckedStatus: Date | null = null;
 
   constructor(props: BlueprintProps) {
     // Use defaults for unset fields
@@ -342,6 +344,22 @@ export class Blueprint {
    */
   createProver() {
     return new Prover(this);
+  }
+
+  /**
+   * Verifies a proof on chain.
+   * @param proof - The generated proof you want to verify.
+   * @returns A true if the verification was successfull, false if it failed.
+   */
+  async verifyProofOnChain(proof: Proof): Promise<boolean> {
+    try {
+      const result = await verifyProofOnChain();
+      console.log("result: ", result);
+    } catch (err) {
+      console.error("Failed to verify proof on chain: ", err);
+      return false;
+    }
+    return true;
   }
 }
 
