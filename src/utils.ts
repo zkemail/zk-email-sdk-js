@@ -1,4 +1,14 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
+// import initWasm, {
+//   parseEmail as zkEamilParseEmail,
+//   extractSubstrIdxes,
+// } from "@zk-email/relayer-utils";
+
+// initWasm()
+//   .then(() => console.log("wasm initialized"))
+//   .catch((err) => {
+//     console.log("Failed to init wasm: ", err);
+//   });
 
 export async function post<T>(url: string, data?: object): Promise<T> {
   try {
@@ -91,3 +101,29 @@ export async function get<T>(url: string, queryParams?: object): Promise<T> {
     throw error;
   }
 }
+
+// // Provisional type, delete once libary types
+// type ParsedEmail = {
+//   canonicalized_header: string;
+//   canonicalized_body: string;
+//   signature: number[];
+//   public_key: any[];
+//   cleaned_body: string;
+//   headers: Map<string, string[]>;
+// };
+
+// export async function parseEmail(eml: string): Promise<ParsedEmail> {
+//   try {
+//     const parsedEmail = await zkEamilParseEmail(eml);
+//     console.log("In actual utils function: ", parsedEmail);
+//     return parsedEmail as ParsedEmail;
+//   } catch (err) {
+//     console.error("Failed to parse email: ", err);
+//     throw err;
+//   }
+// }
+
+// export function testDecomposedRegex(eml: string, decomposedRegex: any): any {
+//   const result = extractSubstrIdxes(eml, decomposedRegex);
+//   return result;
+// }
