@@ -120,7 +120,6 @@ export async function parseEmail(eml: string): Promise<ParsedEmail> {
   }
 }
 
-// TODO: Should take maxLength and location into consideration
 export async function testDecomposedRegex(
   eml: string,
   decomposedRegex: DecomposedRegex,
@@ -142,6 +141,10 @@ export async function testDecomposedRegex(
     inputStr = parsedEmail.canonicalized_header;
   } else {
     throw Error(`Unsupported location ${decomposedRegex.location}`);
+  }
+
+  if (inputStr.length > decomposedRegex.maxLength) {
+    throw new Error(`Max length of ${decomposedRegex.maxLength} was exceeded`);
   }
 
   const result = extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);

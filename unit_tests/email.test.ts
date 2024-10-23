@@ -47,6 +47,28 @@ describe("Email utils test suite", async () => {
     expect(Bun.deepEquals(result, ["ZK Email"])).toBeTrue();
   });
 
+  test("Should fail if maxLength is exceeded", async () => {
+    const decomposedRegex: DecomposedRegex = {
+      name: "Hello Pattern",
+      maxLength: 100,
+      location: "body",
+      parts: [
+        {
+          isPublic: true,
+          regexDef: "Hello ",
+        },
+      ],
+    };
+
+    try {
+      await testDecomposedRegex(helloTestEmail, decomposedRegex, false);
+    } catch (err) {
+      expect(err.message).toBe("Max length of 100 was exceeded");
+      return;
+    }
+    throw new Error("Did not fail although maxLength was exceeded");
+  });
+
   test("Can test a decomposed regex on a raw email, reveals on isPublic true", async () => {
     const decomposedRegex: DecomposedRegex = {
       name: "Hello Pattern",
@@ -105,7 +127,7 @@ describe("Email utils test suite", async () => {
   test("Should find email in header in testDecomposedRegex", async () => {
     const decomposedRegex: DecomposedRegex = {
       name: "Find sender Pattern",
-      maxLength: 300,
+      maxLength: 500,
       location: "header",
       parts: [
         {
