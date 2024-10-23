@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "bun build ../src/index.ts --outdir ./dist"
+    "build": "bun build ./src/index.ts --outdir ./dist"
   },
   "keywords": [],
   "author": "",
@@ -20,8 +20,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@zk-email/relayer-utils": "^0.3.8",
-    "@zk-email/zk-regex-apis": "^2.1.1",
+    "@zk-email/relayer-utils": "^0.4.2",
     "viem": "^2.21.29"
   }
 }
