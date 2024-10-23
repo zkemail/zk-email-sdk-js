@@ -22,3 +22,4 @@ export function parseEmail(eml: string): string {
 
 export * from "./blueprint";
 export * from "./proof";
+export { testDecomposedRegex } from "./utils";

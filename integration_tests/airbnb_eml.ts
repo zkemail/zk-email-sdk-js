@@ -191,9 +191,7 @@ Update your email preferences
 NfbWVzc2FnaW5nL25ld19tZXNzYWdl&euid=3D7e892d74-33f4-ebf8-ef9a-cba7f9c2c579]
 to choose which emails you get or unsubscribe
 [https://www.airbnb.co.uk/account-settings/email-unsubscribe?email_type=3Df=
-alse&mac=3DQJmdxe1CU5PXPvaEGjcsQ6TT5b4%3D&token=3DeyJncmFudWxhcl9jYXRlZ29ye=
-SI6Ik1FU1NBR0VTIiwiY2F0ZWdvcnkiOm51bGwsInRlbXBsYXRlIjpudWxsLCJ1dWlkIjoiN2U4=
-OTJkNzQtMzNmNC1lYmY4LWVmOWEtY2JhN2Y5YzJjNTc5In0%3D]
+alse&mac=3DQJmdxe1CU5PXPvaEGjcsQ6TT5b4%3D&token=]
 from this type of email.
 
 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0=
@@ -1135,9 +1133,7 @@ W5nL25ld19tZXNzYWdl&amp;euid=3D7e892d74-33f4-ebf8-ef9a-cba7f9c2c579" style=
 =3D"font-family: Cereal, Helvetica Neue, Helvetica; font-weight: 500; color=
 : #222222 !important;">email preferences</a> to choose which emails you get=
  or <a href=3D"https://www.airbnb.co.uk/account-settings/email-unsubscribe?=
-email_type=3Dfalse&amp;mac=3DQJmdxe1CU5PXPvaEGjcsQ6TT5b4%3D&amp;token=3DeyJ=
-ncmFudWxhcl9jYXRlZ29yeSI6Ik1FU1NBR0VTIiwiY2F0ZWdvcnkiOm51bGwsInRlbXBsYXRlIj=
-pudWxsLCJ1dWlkIjoiN2U4OTJkNzQtMzNmNC1lYmY4LWVmOWEtY2JhN2Y5YzJjNTc5In0%3D" s=
+email_type=3Dfalse&amp;mac=3DQJmdxe1CU5PXPvaEGjcsQ6TT5b4%3D&amp;token=" s=
 tyle=3D"font-family: Cereal, Helvetica Neue, Helvetica; font-weight: 500; c=
 olor: #222222 !important;">unsubscribe</a> from this type of email.</p></di=
 v></td></tr></tbody></table></td></tr></tbody></table></td></tr></tbody></t=

@@ -2,8 +2,26 @@
 
 With the ZK Email SDK you can easily compile zk regex circuits and directly create proofs with them.
 
+## Test a decomposed regex locally
+
+Currently only works with bun. Install Bun:
+
+`brew install oven-sh/bun/bun`.
+
+Install dependencies:
+
+`bun i`
+
+Run example:
+
+`bun example.ts`
+
+## Note
+
 This first version of this SDK does not support compiling the circuits and running the proofs without our infra,
 but it is our priority to make this work with your own ifra easily, too.
+
+## Setup
 
 This project uses bun. So to install packages use `bun i`.
 

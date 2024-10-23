@@ -1,4 +1,12 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
+import initWasm, { parseEmail as zkEamilParseEmail, extractSubstr } from "@zk-email/relayer-utils";
+import { DecomposedRegexPart } from "./blueprint";
+
+initWasm()
+  .then(() => console.log("wasm initialized"))
+  .catch((err) => {
+    console.log("Failed to init wasm: ", err);
+  });
 
 export async function post<T>(url: string, data?: object): Promise<T> {
   try {
@@ -90,4 +98,41 @@ export async function get<T>(url: string, queryParams?: object): Promise<T> {
     console.error("GET Error:", error);
     throw error;
   }
+}
+
+// Provisional type, delete once libary types
+type ParsedEmail = {
+  canonicalized_header: string;
+  canonicalized_body: string;
+  signature: number[];
+  public_key: any[];
+  cleaned_body: string;
+  headers: Map<string, string[]>;
+};
+
+export async function parseEmail(eml: string): Promise<ParsedEmail> {
+  try {
+    const parsedEmail = await zkEamilParseEmail(eml);
+    return parsedEmail as ParsedEmail;
+  } catch (err) {
+    console.error("Failed to parse email: ", err);
+    throw err;
+  }
+}
+
+// TODO: Should take maxLength and location into consideration
+export function testDecomposedRegex(
+  eml: string,
+  decomposedRegex: any,
+  revealPrivate = false
+): string[] {
+  const inputDecomposedRegex = {
+    parts: decomposedRegex.parts.map((p: DecomposedRegexPart) => ({
+      is_public: p.isPublic,
+      regex_def: p.regexDef,
+    })),
+  };
+
+  const result = extractSubstr(eml, inputDecomposedRegex, revealPrivate);
+  return result;
 }
