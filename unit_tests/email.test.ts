@@ -1,7 +1,7 @@
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import helloTestEmail from "./hello_eml";
 import { parseEmail, testDecomposedRegex } from "../src/utils";
-import { DecomposedRegex, DecomposedRegexPart } from "../src";
+import { DecomposedRegex, DecomposedRegexJson, DecomposedRegexPart } from "../src";
 
 describe("Email utils test suite", async () => {
   // Wait for wasm to initialize
@@ -39,6 +39,31 @@ describe("Email utils test suite", async () => {
         {
           isPublic: false,
           regexDef: "!",
+        },
+      ],
+    };
+
+    const result = await testDecomposedRegex(helloTestEmail, decomposedRegex, false);
+    expect(Bun.deepEquals(result, ["ZK Email"])).toBeTrue();
+  });
+
+  test("Can test a decomposed regex with snake case fields", async () => {
+    const decomposedRegex: DecomposedRegexJson = {
+      name: "Hello Pattern",
+      max_length: 4000,
+      location: "body",
+      parts: [
+        {
+          is_public: false,
+          regex_def: "Hello ",
+        },
+        {
+          is_public: true,
+          regex_def: "[^,]+",
+        },
+        {
+          is_public: false,
+          regex_def: "!",
         },
       ],
     };

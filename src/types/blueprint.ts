@@ -39,6 +39,18 @@ export type DecomposedRegexPart = {
   regexDef: string;
 };
 
+export type DecomposedRegexJson = {
+  parts: DecomposedRegexPartJson[];
+  name: string;
+  max_length: number;
+  location: "body" | "header";
+};
+
+export type DecomposedRegexPartJson = {
+  is_public: boolean;
+  regex_def: string;
+};
+
 export type ExternalInput = {
   name: string;
   maxLength: number;

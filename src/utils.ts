@@ -1,6 +1,11 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
 import initWasm, { parseEmail as zkEamilParseEmail, extractSubstr } from "@zk-email/relayer-utils";
-import { DecomposedRegex, DecomposedRegexPart } from "./blueprint";
+import {
+  DecomposedRegex,
+  DecomposedRegexJson,
+  DecomposedRegexPart,
+  DecomposedRegexPartJson,
+} from "./blueprint";
 
 initWasm()
   .then(() => console.log("wasm initialized"))
@@ -122,15 +127,15 @@ export async function parseEmail(eml: string): Promise<ParsedEmail> {
 
 export async function testDecomposedRegex(
   eml: string,
-  decomposedRegex: DecomposedRegex,
+  decomposedRegex: DecomposedRegex | DecomposedRegexJson,
   revealPrivate = false
 ): Promise<string[]> {
   const parsedEmail = await parseEmail(eml);
 
   const inputDecomposedRegex = {
-    parts: decomposedRegex.parts.map((p: DecomposedRegexPart) => ({
-      is_public: p.isPublic,
-      regex_def: p.regexDef,
+    parts: decomposedRegex.parts.map((p: DecomposedRegexPart | DecomposedRegexPartJson) => ({
+      is_public: "isPublic" in p ? p.isPublic : p.is_public,
+      regex_def: "regexDef" in p ? p.regexDef : p.regex_def,
     })),
   };
 
@@ -143,8 +148,10 @@ export async function testDecomposedRegex(
     throw Error(`Unsupported location ${decomposedRegex.location}`);
   }
 
-  if (inputStr.length > decomposedRegex.maxLength) {
-    throw new Error(`Max length of ${decomposedRegex.maxLength} was exceeded`);
+  const maxLength =
+    "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
+  if (inputStr.length > maxLength) {
+    throw new Error(`Max length of ${maxLength} was exceeded`);
   }
 
   const result = extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
