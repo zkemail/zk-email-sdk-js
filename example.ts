@@ -1,4 +1,4 @@
-import { DecomposedRegex, testDecomposedRegex } from "./src";
+import { DecomposedRegex, DecomposedRegexJson, testDecomposedRegex } from "./src";
 import helloTestEmail from "./unit_tests/hello_eml";
 
 async function testEmailBody() {
@@ -36,14 +36,15 @@ async function testEmailHeader() {
   // Wait for wasm to initialize
   await new Promise((r) => setTimeout(r, 300));
 
-  const decomposedRegex: DecomposedRegex = {
+  // You can also use the snake case version
+  const decomposedRegex: DecomposedRegexJson = {
     name: "Find sender Pattern",
-    maxLength: 300,
+    max_length: 3000,
     location: "header",
     parts: [
       {
-        isPublic: true,
-        regexDef: "dimi.zktest@gmail.com",
+        is_public: true,
+        regex_def: "dimi.zktest@gmail.com",
       },
     ],
   };
