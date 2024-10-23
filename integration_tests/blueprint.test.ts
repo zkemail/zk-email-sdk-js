@@ -14,13 +14,13 @@ import {
 
 function getBlueprintProps(
   title = "Twitter",
-  slug = "zkemail/twitter",
+  slug?: string,
   description?: string,
   tags?: string
 ): BlueprintProps {
   return {
     title,
-    slug,
+    slug: slug || ("zkemail/twitter" + Math.random()).replace("0.", ""),
     description,
     tags,
     decomposedRegexes: [
@@ -74,6 +74,7 @@ describe("Blueprint test suite", async () => {
       const blueprintId = blueprint.getId();
       expect(blueprintId).not.toBeNull();
       blueprintIds.push(blueprintId!);
+      expect(blueprint.props.version).toBe(1);
     });
 
     test("Can get existing blueprint", async () => {
@@ -88,6 +89,78 @@ describe("Blueprint test suite", async () => {
       const retreivedBlueprintId = retreivedBlueprint.getId();
       expect(retreivedBlueprintId).not.toBeNull();
       expect(retreivedBlueprintId).toBe(blueprintId);
+    });
+
+    test("Can create a new version of a blueprint as draft", async () => {
+      const props = getBlueprintProps();
+      const blueprint = createBlueprint(props);
+      await blueprint.submitDraft();
+      const blueprintId = blueprint.getId();
+      expect(blueprintId).not.toBeNull();
+      blueprintIds.push(blueprintId!);
+      expect(blueprint.props.version).toBe(1);
+
+      const savedProps = blueprint.getClonedProps();
+      expect(savedProps).not.toBeUndefined();
+      savedProps.title = "Twitter 2";
+
+      await blueprint.submitNewVersionDraft(savedProps);
+      const newBlueprintId = blueprint.getId();
+      expect(newBlueprintId).not.toBeNull();
+      expect(newBlueprintId).not.toBe(blueprintId);
+      blueprintIds.push(newBlueprintId!);
+      expect(blueprint.props.title).toBe("Twitter 2");
+      expect(blueprint.props.version).toBe(2);
+    });
+
+    test("Can update blueprint in draft", async () => {
+      const props = getBlueprintProps();
+      const blueprint = createBlueprint(props);
+      await blueprint.submitDraft();
+      const blueprintId = blueprint.getId();
+      expect(blueprintId).not.toBeNull();
+      blueprintIds.push(blueprintId!);
+      expect(blueprint.props.version).toBe(1);
+
+      const savedProps = blueprint.getClonedProps();
+      expect(savedProps).not.toBeUndefined();
+      savedProps.title = "Twitter 2";
+
+      await blueprint.update(savedProps);
+      const newBlueprintId = blueprint.getId();
+      expect(newBlueprintId).not.toBeNull();
+      expect(newBlueprintId).toBe(blueprintId);
+      expect(blueprint.props.title).toBe("Twitter 2");
+      expect(blueprint.props.version).toBe(1);
+    });
+
+    test("List versions of blueprint from Blueprint Class", async () => {
+      const props = getBlueprintProps();
+      const blueprint = createBlueprint(props);
+      await blueprint.submitDraft();
+      const blueprintId = blueprint.getId();
+      expect(blueprintId).not.toBeNull();
+      blueprintIds.push(blueprintId!);
+      expect(blueprint.props.version).toBe(1);
+
+      const allBps: Blueprint[] = [structuredClone(blueprint)];
+
+      for (let i = 2; i < 5; i++) {
+        const savedProps = blueprint.getClonedProps();
+        expect(savedProps).not.toBeUndefined();
+        savedProps.title = `Twitter ${i}`;
+
+        await blueprint.submitNewVersionDraft(savedProps);
+        const newBlueprintId = blueprint.getId();
+        expect(newBlueprintId).not.toBeNull();
+        expect(newBlueprintId).not.toBe(blueprintId);
+        expect(blueprint.props.title).toBe(`Twitter ${i}`);
+        expect(blueprint.props.version).toBe(i);
+        allBps.push(structuredClone(blueprint));
+      }
+
+      const allVersions = await blueprint.listAllVersions();
+      expect(Bun.deepEquals(allVersions, allBps)).toBeTrue();
     });
 
     describe("Can list blueprints", async () => {
@@ -108,7 +181,6 @@ describe("Blueprint test suite", async () => {
         expect(blueprints.length).toBeGreaterThanOrEqual(3);
         const listedBlueprintIds = blueprints.map((bp) => bp.getId());
 
-        // Check if
         for (const localBlueprintId of localBlueprintIds) {
           expect(localBlueprintId).not.toBeNull();
           const included = listedBlueprintIds.includes(localBlueprintId!);
@@ -120,6 +192,33 @@ describe("Blueprint test suite", async () => {
         for (const blueprint of blueprints) {
           expect(blueprint instanceof Blueprint).toBe(true);
         }
+      });
+
+      test("Only latest versions of blueprints are listed", async () => {
+        // Prevent race condition with normal listing test, since we are changin the same blueprints
+        await new Promise((r) => setTimeout(r, 300));
+        const blueprint = blueprints[0];
+        const blueprintId = blueprint.getId();
+
+        const newProps = blueprint.getClonedProps();
+        newProps.title = "Twitter 3";
+
+        // Create new version
+        await blueprint.submitNewVersionDraft(newProps);
+        const newBlueprintId = blueprint.getId();
+        expect(newBlueprintId).not.toBeNull();
+        expect(newBlueprintId).not.toBe(blueprintId);
+        blueprintIds.push(newBlueprintId!);
+        expect(blueprint.props.title).toBe("Twitter 3");
+        expect(blueprint.props.version).toBe(2);
+
+        // List blueprints should now include the new blueprintId but not the old one
+        const newBlueprints = await listBlueprints();
+        const newBlueprintIds = newBlueprints.map((bp) => bp.getId());
+        const includesNew = newBlueprintIds.includes(newBlueprintId);
+        expect(includesNew).toBeTrue();
+        const includesOld = newBlueprintIds.includes(blueprintId);
+        expect(includesOld).toBeFalse();
       });
     });
 
@@ -217,6 +316,29 @@ describe("Blueprint test suite", async () => {
 
         expect(status).not.toBeNull();
         expect(status).toBe(Status.Done);
+      });
+
+      test("Can't update compiled blueprint", async () => {
+        // Avoid race conditions
+        await new Promise((r) => setTimeout(r, 1_300));
+
+        const status = await blueprint.checkStatus();
+
+        expect(status).not.toBeNull();
+        expect(status).toBe(Status.Done);
+
+        const savedProps = blueprint.getClonedProps();
+        expect(savedProps).not.toBeUndefined();
+        savedProps.title = "Twitter 2";
+
+        try {
+          await blueprint.update(savedProps);
+        } catch (err) {
+          expect(err).not.toBeUndefined();
+          return;
+        }
+
+        throw Error("Didn't fail updating a compiled blueprint");
       });
     });
   });

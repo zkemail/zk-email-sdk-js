@@ -29,6 +29,35 @@ export async function post<T>(url: string, data?: object): Promise<T> {
   }
 }
 
+export async function patch<T>(url: string, data?: object): Promise<T> {
+  try {
+    const request: RequestInit = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": PUBLIC_SDK_KEY,
+      },
+    };
+
+    if (data) {
+      request.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(url, request);
+
+    const body = await response.json();
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
+    }
+
+    return body;
+  } catch (error) {
+    console.error("PATCH Error:", error);
+    throw error;
+  }
+}
+
 export async function get<T>(url: string, queryParams?: object): Promise<T> {
   try {
     let fullUrl = url;

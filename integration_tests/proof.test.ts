@@ -102,7 +102,6 @@ describe("Proof test suite", async () => {
       test("Download files", async () => {
         proof.props.id = "some-id-1";
         const url = await proof.getProofDataDownloadLink();
-        console.log("download url: ", url);
         expect(url).not.toBeNull();
       });
     });

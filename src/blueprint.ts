@@ -9,7 +9,7 @@ import {
   Status,
   ZkFramework,
 } from "./types/blueprint";
-import { get, post } from "./utils";
+import { get, patch, post } from "./utils";
 import { verifyProofOnChain } from "./chain";
 
 // TODO: replace with prod version
@@ -19,6 +19,7 @@ const BASE_URL = "http://localhost:8080";
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
  */
 export class Blueprint {
+  // TODO: Implement getter and setter pattern
   props: BlueprintProps;
 
   private lastCheckedStatus: Date | null = null;
@@ -110,41 +111,42 @@ export class Blueprint {
         address: response.verifier_contract_address,
         chain: response.verifier_contract_chain,
       },
+      version: response.version,
     };
 
     return props;
   }
 
   // Maps the BlueprintProps to the BlueprintResponse
-  private blueprintPropsToRequest(): BlueprintRequest {
+  private static blueprintPropsToRequest(props: BlueprintProps): BlueprintRequest {
     const response: BlueprintRequest = {
-      id: this.props.id,
-      title: this.props.title,
-      description: this.props.description,
-      slug: this.props.slug,
-      tags: this.props.tags,
-      email_query: this.props.emailQuery,
-      use_new_sdk: this.props.useNewSdk,
-      circuit_name: this.props.circuitName,
-      ignore_body_hash_check: this.props.ignoreBodyHashCheck,
-      sha_precompute_selector: this.props.shaPrecomputeSelector,
-      email_body_max_length: this.props.emailBodyMaxLength,
-      sender_domain: this.props.senderDomain,
-      dkim_selector: this.props.dkimSelector,
-      reveal_header_subject: this.props.revealHeaderFields?.subject,
-      reveal_header_timestamp: this.props.revealHeaderFields?.timestamp,
-      reveal_header_from: this.props.revealHeaderFields?.from,
-      reveal_header_to: this.props.revealHeaderFields?.to,
-      ignore_body_hash_check_prop: this.props.ignoreBodyHashCheckProp,
-      enable_header_masking: this.props.enableHeaderMasking,
-      enable_body_masking: this.props.enableBodyMasking,
-      zk_framework: this.props.zkFramework,
-      is_public: this.props.isPublic,
-      external_inputs: this.props.externalInputs?.map((input) => ({
+      id: props.id,
+      title: props.title,
+      description: props.description,
+      slug: props.slug,
+      tags: props.tags,
+      email_query: props.emailQuery,
+      use_new_sdk: props.useNewSdk,
+      circuit_name: props.circuitName,
+      ignore_body_hash_check: props.ignoreBodyHashCheck,
+      sha_precompute_selector: props.shaPrecomputeSelector,
+      email_body_max_length: props.emailBodyMaxLength,
+      sender_domain: props.senderDomain,
+      dkim_selector: props.dkimSelector,
+      reveal_header_subject: props.revealHeaderFields?.subject,
+      reveal_header_timestamp: props.revealHeaderFields?.timestamp,
+      reveal_header_from: props.revealHeaderFields?.from,
+      reveal_header_to: props.revealHeaderFields?.to,
+      ignore_body_hash_check_prop: props.ignoreBodyHashCheckProp,
+      enable_header_masking: props.enableHeaderMasking,
+      enable_body_masking: props.enableBodyMasking,
+      zk_framework: props.zkFramework,
+      is_public: props.isPublic,
+      external_inputs: props.externalInputs?.map((input) => ({
         name: input.name,
         max_length: input.maxLength,
       })),
-      decomposed_regexes: this.props.decomposedRegexes?.map((regex) => ({
+      decomposed_regexes: props.decomposedRegexes?.map((regex) => ({
         parts: regex.parts.map((part) => ({
           is_public: part.isPublic,
           regex_def: part.regexDef,
@@ -153,9 +155,8 @@ export class Blueprint {
         max_length: regex.maxLength,
         location: regex.location,
       })),
-      status: this.props.status,
-      verifier_contract_address: this.props.verifierContract?.address,
-      verifier_contract_chain: this.props.verifierContract?.chain,
+      verifier_contract_address: props.verifierContract?.address,
+      verifier_contract_chain: props.verifierContract?.chain,
     };
 
     return response;
@@ -171,7 +172,7 @@ export class Blueprint {
       throw new Error("Blueprint was already saved");
     }
 
-    const requestData = this.blueprintPropsToRequest();
+    const requestData = Blueprint.blueprintPropsToRequest(this.props);
 
     let response: BlueprintResponse;
     try {
@@ -185,8 +186,51 @@ export class Blueprint {
   }
 
   /**
-   * Submits a new RegexBlueprint to the registry as draft.
+   * Submits a new version of the RegexBlueprint to the registry as draft.
    * This does not compile the circuits yet and you will still be able to make changes.
+   * @param newProps - The updated blueprint props.
+   * @returns A promise. Once it resolves, the current Blueprint will be replaced with the new one.
+   */
+  public async submitNewVersionDraft(newProps: BlueprintProps) {
+    const requestData = Blueprint.blueprintPropsToRequest(newProps);
+
+    let response: BlueprintResponse;
+    try {
+      response = await post<BlueprintResponse>(`${BASE_URL}/blueprint`, requestData);
+    } catch (err) {
+      console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
+      throw err;
+    }
+
+    this.props = Blueprint.responseToBlueprintProps(response);
+  }
+
+  /**
+   * Submits a new version of the blueprint. This will save the new blueprint version
+   * and start the compilation.
+   * This will also overwrite the current Blueprint with its new version, even if the last
+   * version was not compiled yet.
+   * @param newProps - The updated blueprint props.
+   */
+  async submitNewVersion(newProps: BlueprintProps) {
+    await this.submitNewVersionDraft(newProps);
+
+    // We don't check the status here, since we are compiling directly after submiting the draft.
+
+    // Submit compile request
+    try {
+      await post<{ status: Status }>(`${BASE_URL}/blueprint/compile/${this.props.id}`);
+    } catch (err) {
+      // We don't set the status here, since the api call can't fail due to the actual job failing
+      // It can only due to connectivity issues or the job runner not being available
+      console.error("Failed calling POST on /blueprint/compile in submit: ", err);
+      throw err;
+    }
+  }
+
+  /**
+   * Lists blueblueprints, only including the latest version per unique slug.
+   * @param options - Options to filter the blueprints by.
    * @returns A promise. Once it resolves, `getId` can be called.
    */
   public static async listBlueprints(options?: ListBlueprintsOptions): Promise<Blueprint[]> {
@@ -231,16 +275,39 @@ export class Blueprint {
       }
     }
 
+    const status = await this._checkStatus();
+
+    // TODO: Should we allow retry on failed?
+    if (Status.Done === status) {
+      throw new Error("The circuits are already compiled.");
+    }
+    if (Status.InProgress === status) {
+      throw new Error("The circuits already being compiled, please wait.");
+    }
+
     // Submit compile request
-    let response: { status: Status };
     try {
-      response = await post<{ status: Status }>(`${BASE_URL}/blueprint/compile/${this.props.id}`);
+      await post<{ status: Status }>(`${BASE_URL}/blueprint/compile/${this.props.id}`);
     } catch (err) {
       // We don't set the status here, since the api call can't fail due to the actual job failing
       // It can only due to connectivity issues or the job runner not being available
       console.error("Failed calling POST on /blueprint/compile in submit: ", err);
       throw err;
     }
+  }
+
+  // Request status from server and updates props.status
+  private async _checkStatus(): Promise<Status> {
+    let response: { status: Status };
+    try {
+      response = await get<{ status: Status }>(`${BASE_URL}/blueprint/status/${this.props.id}`);
+    } catch (err) {
+      console.error("Failed calling GET /blueprint/status in getStatus(): ", err);
+      throw err;
+    }
+
+    this.props.status = response.status;
+    return response.status;
   }
 
   /**
@@ -272,17 +339,9 @@ export class Blueprint {
       }
     }
 
-    // Submit compile request
-    let response: { status: Status };
-    try {
-      response = await get<{ status: Status }>(`${BASE_URL}/blueprint/status/${this.props.id}`);
-    } catch (err) {
-      console.error("Failed calling GET /blueprint/status in getStatus(): ", err);
-      throw err;
-    }
+    const status = await this._checkStatus();
 
-    this.props.status = response.status;
-    return response.status;
+    return status;
   }
 
   /**
@@ -354,12 +413,84 @@ export class Blueprint {
   async verifyProofOnChain(proof: Proof): Promise<boolean> {
     try {
       const result = await verifyProofOnChain();
-      console.log("result: ", result);
     } catch (err) {
       console.error("Failed to verify proof on chain: ", err);
       return false;
     }
     return true;
+  }
+
+  /**
+   * Returns a deep cloned version of the Blueprints props.
+   * This can be used to update properties and then to use them with createNewVersion.
+   * @param proof - The generated proof you want to verify.
+   * @returns A true if the verification was successfull, false if it failed.
+   */
+  getClonedProps(): BlueprintProps {
+    const cloned = JSON.parse(JSON.stringify(this.props));
+
+    // Conver date strings
+    if (cloned.createdAt) {
+      cloned.createdAt = new Date(cloned.createdAt);
+    }
+    if (cloned.updatedAt) {
+      cloned.updatedAt = new Date(cloned.updatedAt);
+    }
+
+    return cloned;
+  }
+
+  /**
+   * Returns true if the blueprint can be updated. A blueprint can be updated if the circuits
+   * haven't beed compiled yet, i.e. the status is not Done. The blueprint also must be saved
+   * already before it can be updated.
+   * @returns true if it can be updated
+   */
+  canUpdate(): boolean {
+    return !!(this.props.status !== Status.Done && this.props.id);
+  }
+
+  /**
+   * Updates an existing blueprint that is not compiled yet.
+   * @param newProps - The props the blueprint should be updated to.
+   * @returns a promise.
+   */
+  async update(newProps: BlueprintProps) {
+    if (!this.canUpdate()) {
+      throw new Error("Blueprint already compied, cannot update");
+    }
+
+    const requestData = Blueprint.blueprintPropsToRequest(newProps);
+
+    let response: BlueprintResponse;
+    try {
+      response = await patch<BlueprintResponse>(
+        `${BASE_URL}/blueprint/${this.props.id}`,
+        requestData
+      );
+    } catch (err) {
+      console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
+      throw err;
+    }
+
+    this.props = Blueprint.responseToBlueprintProps(response);
+  }
+
+  async listAllVersions(): Promise<Blueprint[]> {
+    let response: { blueprints: BlueprintResponse[] };
+    try {
+      response = await get<{ blueprints: BlueprintResponse[] }>(
+        `${BASE_URL}/blueprint/versions/${encodeURIComponent(this.props.slug)}`
+      );
+    } catch (err) {
+      console.error("Failed calling GET on /blueprint/versions/:slug in listAllVersions: ", err);
+      throw err;
+    }
+
+    return response.blueprints.map((blueprintResponse) => {
+      const blueprintProps = Blueprint.responseToBlueprintProps(blueprintResponse);
+      return new Blueprint(blueprintProps);
+    });
   }
 }
 

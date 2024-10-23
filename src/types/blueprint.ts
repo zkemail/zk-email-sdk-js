@@ -24,6 +24,7 @@ export type BlueprintProps = {
   decomposedRegexes: DecomposedRegex[];
   status?: Status;
   verifierContract?: VerifierContract;
+  version?: number;
 };
 
 export type DecomposedRegex = {
@@ -96,6 +97,7 @@ export type BlueprintRequest = {
   status?: string;
   verifier_contract_address?: string;
   verifier_contract_chain?: number;
+  version?: number;
 };
 
 export type BlueprintResponse = {
@@ -125,9 +127,10 @@ export type BlueprintResponse = {
   updated_at: ServerDate;
   external_inputs: ExternalInputResponse[];
   decomposed_regexes: DecomposedRegexResponse[];
-  status: string;
+  status: number;
   verifier_contract_address: string;
   verifier_contract_chain: number;
+  version: number;
 };
 
 export type ServerDate = {

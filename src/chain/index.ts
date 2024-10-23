@@ -26,7 +26,6 @@ export async function verifyProofOnChain() {
       functionName: "totalSupply",
     });
 
-    console.log(`Total WETH supply: ${totalSupply}`);
     return totalSupply;
   } catch (error) {
     console.error("Error fetching WETH total supply:", error);
