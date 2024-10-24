@@ -3,7 +3,7 @@ export type BlueprintProps = {
   title: string;
   description?: string;
   slug: string;
-  tags?: string;
+  tags?: string[];
   emailQuery?: string;
   useNewSdk?: boolean;
   circuitName?: string;
@@ -86,7 +86,7 @@ export type BlueprintRequest = {
   title: string;
   description?: string;
   slug: string;
-  tags?: string;
+  tags?: string[];
   email_query?: string;
   use_new_sdk?: boolean;
   circuit_name?: string;
@@ -117,7 +117,7 @@ export type BlueprintResponse = {
   title: string;
   description: string;
   slug: string;
-  tags: string;
+  tags: string[];
   email_query: string;
   use_new_sdk: boolean;
   circuit_name: string;
