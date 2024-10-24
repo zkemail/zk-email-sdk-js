@@ -5,11 +5,13 @@ export type BlueprintProps = {
   slug: string;
   tags?: string[];
   emailQuery?: string;
-  useNewSdk?: boolean;
   circuitName?: string;
   ignoreBodyHashCheck?: boolean;
   shaPrecomputeSelector?: string;
   emailBodyMaxLength?: number;
+  emailHeaderMaxLength?: number;
+  removeSoftLinebreaks?: boolean;
+  githubUsername?: string;
   senderDomain?: string;
   dkimSelector?: string;
   revealHeaderFields?: RevealHeaderFields;
@@ -88,11 +90,14 @@ export type BlueprintRequest = {
   slug: string;
   tags?: string[];
   email_query?: string;
-  use_new_sdk?: boolean;
   circuit_name?: string;
   ignore_body_hash_check?: boolean;
   sha_precompute_selector?: string;
   email_body_max_length?: number;
+  email_header_max_length?: number;
+  remove_soft_linebreaks?: boolean;
+  // TODO: Make non ? after login with github
+  github_username?: string;
   sender_domain?: string;
   dkim_selector?: string;
   reveal_header_subject?: boolean;
@@ -119,11 +124,13 @@ export type BlueprintResponse = {
   slug: string;
   tags: string[];
   email_query: string;
-  use_new_sdk: boolean;
   circuit_name: string;
   ignore_body_hash_check: boolean;
   sha_precompute_selector: string;
   email_body_max_length: number;
+  email_header_max_length?: number;
+  remove_soft_linebreaks?: boolean;
+  github_username?: string;
   sender_domain: string;
   dkim_selector: string;
   reveal_header_subject: boolean;
