@@ -350,18 +350,6 @@ describe("Blueprint test suite", async () => {
       });
     });
   });
-
-  describe("Download zkeys", () => {
-    test("getZKeyDownloadLink on dummy id should return a download url", async () => {
-      const props = getBlueprintProps();
-      const blueprint = createBlueprint(props);
-      // Set dummy id for the file download
-      blueprint.props.id = "some-id-1";
-      blueprint.props.status = Status.Done;
-      const url = await blueprint.getZKeyDownloadLink();
-      expect(url).not.toBeNull();
-    });
-  });
 });
 
 describe("On chain verification", () => {
@@ -373,5 +361,17 @@ describe("On chain verification", () => {
     blueprint.props.status = Status.Done;
     const proof = {} as Proof;
     await blueprint.verifyProofOnChain(proof);
+  });
+});
+
+describe("Download zkeys", () => {
+  test("getZKeyDownloadLink on dummy id should return a download url", async () => {
+    const props = getBlueprintProps();
+    const blueprint = createBlueprint(props);
+    // Set dummy id for the file download
+    blueprint.props.id = "some-id-1";
+    blueprint.props.status = Status.Done;
+    const url = await blueprint.getZKeyDownloadLink();
+    expect(url).not.toBeNull();
   });
 });
