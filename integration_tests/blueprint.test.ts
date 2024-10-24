@@ -16,7 +16,7 @@ function getBlueprintProps(
   title = "Twitter",
   slug?: string,
   description?: string,
-  tags?: string
+  tags?: string[]
 ): BlueprintProps {
   return {
     title,
@@ -78,7 +78,8 @@ describe("Blueprint test suite", async () => {
     });
 
     test("Can get existing blueprint", async () => {
-      const props = getBlueprintProps();
+      const tags = ["massive", "slug", "blueprint"];
+      const props = getBlueprintProps("Twitter", "Massive/Slug", "Got a massive slug", tags);
       const blueprint = createBlueprint(props);
       await blueprint.submitDraft();
       const blueprintId = blueprint.getId();
@@ -89,6 +90,7 @@ describe("Blueprint test suite", async () => {
       const retreivedBlueprintId = retreivedBlueprint.getId();
       expect(retreivedBlueprintId).not.toBeNull();
       expect(retreivedBlueprintId).toBe(blueprintId);
+      expect(Bun.deepEquals(retreivedBlueprint.props.tags, tags)).toBeTrue();
     });
 
     test("Can create a new version of a blueprint as draft", async () => {
@@ -165,17 +167,23 @@ describe("Blueprint test suite", async () => {
 
     describe("Can list blueprints", async () => {
       const localBlueprintIds: string[] = [];
-      for (let i = 0; i < 3; i++) {
-        const props = getBlueprintProps();
-        const blueprint = createBlueprint(props);
-        await blueprint.submitDraft();
-        const blueprintId = blueprint.getId();
-        expect(blueprintId).not.toBeNull();
-        localBlueprintIds.push(blueprintId!);
-        blueprintIds.push(blueprintId!);
-      }
+      let blueprints: Blueprint[];
+      try {
+        for (let i = 0; i < 3; i++) {
+          const props = getBlueprintProps();
+          const blueprint = createBlueprint(props);
+          await blueprint.submitDraft();
+          const blueprintId = blueprint.getId();
+          expect(blueprintId).not.toBeNull();
+          localBlueprintIds.push(blueprintId!);
+          blueprintIds.push(blueprintId!);
+        }
 
-      const blueprints = await listBlueprints();
+        blueprints = await listBlueprints();
+      } catch (err) {
+        console.error("Failed to initialzie list blueprint tests");
+        throw new Error("All list blueprint tests failed");
+      }
 
       test("Submitted blueprints are listed", async () => {
         expect(blueprints.length).toBeGreaterThanOrEqual(3);
@@ -230,19 +238,19 @@ describe("Blueprint test suite", async () => {
           "Proof of Github Username",
           "divine_economy/github",
           "Prove you own a Github username",
-          "github,username,identity"
+          ["github", "username", "identity"]
         ),
         getBlueprintProps(
           "Proof of Instagram Handle",
           "zkemail/proof-of-instagram-handle",
           "Use a password reset email to proof you own the email connected to a instagram handle.",
-          "email,identity,social"
+          ["email", "identity", "social"]
         ),
         getBlueprintProps(
           "Proof of ETH Price",
           "strobe/proof-of-price",
           "price alert emails for eth price",
-          "eth,price,oracle"
+          ["eth", "price", "oracle"]
         ),
       ];
 
@@ -262,7 +270,7 @@ describe("Blueprint test suite", async () => {
         expect(included).toBe(true);
       });
 
-      test("Text search on single text fields", async () => {
+      test("Text search on tags only", async () => {
         const blueprints = await listBlueprints({ search: "oracle" });
         const listedBlueprintIds = blueprints.map((bp) => bp.getId());
         const included = listedBlueprintIds.includes(localBlueprintIds[2]);
