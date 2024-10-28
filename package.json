@@ -11,8 +11,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/bun": "latest",
+    "@types/bun": "^1.1.12",
     "@types/pg": "^8.11.10",
+    "open": "^10.1.0",
     "pg": "^8.13.0",
     "prettier": "^3.3.3"
   },

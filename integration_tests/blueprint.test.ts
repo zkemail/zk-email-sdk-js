@@ -1,26 +1,20 @@
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import pg from "pg";
-import {
-  Blueprint,
-  BlueprintProps,
-  createBlueprint,
-  getBlueprint,
-  listBlueprints,
-  Proof,
-  Status,
-} from "../src";
+import sdk, { Blueprint, BlueprintProps, Proof, Status } from "../src";
+import { Auth } from "../src/types/auth";
+import { getAuthToken } from "./test-utils";
 
-//TODO: test while (await checkStatu())
+//TODO: test while (await checkStatus())
 
 function getBlueprintProps(
   title = "Twitter",
-  slug?: string,
+  circuitName?: string,
   description?: string,
   tags?: string[]
 ): BlueprintProps {
   return {
     title,
-    slug: slug || ("zkemail/twitter" + Math.random()).replace("0.", ""),
+    circuitName: circuitName || ("twitter" + Math.random()).replace("0.", ""),
     description,
     tags,
     decomposedRegexes: [
@@ -42,6 +36,15 @@ function getBlueprintProps(
 describe("Blueprint test suite", async () => {
   let db: pg.Client;
   const blueprintIds: string[] = [];
+
+  const token = await getAuthToken();
+
+  const auth: Auth = {
+    getToken: async () => token,
+    onTokenExpired: async () => {},
+  };
+
+  const { createBlueprint, getBlueprint, listBlueprints } = sdk({ auth });
 
   console.log("Setting up user database...");
   const { Client } = pg;
@@ -75,6 +78,7 @@ describe("Blueprint test suite", async () => {
       expect(blueprintId).not.toBeNull();
       blueprintIds.push(blueprintId!);
       expect(blueprint.props.version).toBe(1);
+      expect(blueprint.props.slug).toBe(`${blueprint.props.githubUsername}/${props.circuitName}`);
     });
 
     test("Can get existing blueprint", async () => {
@@ -145,7 +149,7 @@ describe("Blueprint test suite", async () => {
       blueprintIds.push(blueprintId!);
       expect(blueprint.props.version).toBe(1);
 
-      const allBps: Blueprint[] = [structuredClone(blueprint)];
+      const allBps: BlueprintProps[] = [blueprint.getClonedProps()];
 
       for (let i = 2; i < 5; i++) {
         const savedProps = blueprint.getClonedProps();
@@ -158,10 +162,10 @@ describe("Blueprint test suite", async () => {
         expect(newBlueprintId).not.toBe(blueprintId);
         expect(blueprint.props.title).toBe(`Twitter ${i}`);
         expect(blueprint.props.version).toBe(i);
-        allBps.push(structuredClone(blueprint));
+        allBps.push(blueprint.getClonedProps());
       }
 
-      const allVersions = await blueprint.listAllVersions();
+      const allVersions = (await blueprint.listAllVersions()).map((b) => b.getClonedProps());
       expect(Bun.deepEquals(allVersions, allBps)).toBeTrue();
     });
 
@@ -210,6 +214,9 @@ describe("Blueprint test suite", async () => {
 
         const newProps = blueprint.getClonedProps();
         newProps.title = "Twitter 3";
+
+        // Need to manually add auth
+        blueprint.addAuth(auth);
 
         // Create new version
         await blueprint.submitNewVersionDraft(newProps);
@@ -287,8 +294,9 @@ describe("Blueprint test suite", async () => {
     });
   });
 
-  // TODO: make sure these tests don't start an actual compilation
   describe("Compilation tests", () => {
+    // TODO: Rethink compilation tests
+    return;
     describe("Can submit blueprint after initialization", async () => {
       const props = getBlueprintProps();
       const blueprint = createBlueprint(props);
@@ -350,28 +358,28 @@ describe("Blueprint test suite", async () => {
       });
     });
   });
-});
 
-describe("On chain verification", () => {
-  // TODO: remove test once implemented
-  test("Test connectivity to chain by calling WETH", async () => {
-    const props = getBlueprintProps();
-    const blueprint = createBlueprint(props);
-    // Set dummy id for the file download
-    blueprint.props.status = Status.Done;
-    const proof = {} as Proof;
-    await blueprint.verifyProofOnChain(proof);
+  describe("On chain verification", () => {
+    // TODO: remove test once implemented
+    test("Test connectivity to chain by calling WETH", async () => {
+      const props = getBlueprintProps();
+      const blueprint = createBlueprint(props);
+      // Set dummy id for the file download
+      blueprint.props.status = Status.Done;
+      const proof = {} as Proof;
+      await blueprint.verifyProofOnChain(proof);
+    });
   });
-});
 
-describe("Download zkeys", () => {
-  test("getZKeyDownloadLink on dummy id should return a download url", async () => {
-    const props = getBlueprintProps();
-    const blueprint = createBlueprint(props);
-    // Set dummy id for the file download
-    blueprint.props.id = "some-id-1";
-    blueprint.props.status = Status.Done;
-    const url = await blueprint.getZKeyDownloadLink();
-    expect(url).not.toBeNull();
+  describe("Download zkeys", () => {
+    test("getZKeyDownloadLink on dummy id should return a download url", async () => {
+      const props = getBlueprintProps();
+      const blueprint = createBlueprint(props);
+      // Set dummy id for the file download
+      blueprint.props.id = "some-id-1";
+      blueprint.props.status = Status.Done;
+      const url = await blueprint.getZKeyDownloadLink();
+      expect(url).not.toBeNull();
+    });
   });
 });

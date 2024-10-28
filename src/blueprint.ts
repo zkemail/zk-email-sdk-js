@@ -11,6 +11,7 @@ import {
 } from "./types/blueprint";
 import { get, patch, post } from "./utils";
 import { verifyProofOnChain } from "./chain";
+import { Auth } from "./types/auth";
 
 // TODO: replace with prod version
 const BASE_URL = "http://localhost:8080";
@@ -21,10 +22,11 @@ const BASE_URL = "http://localhost:8080";
 export class Blueprint {
   // TODO: Implement getter and setter pattern
   props: BlueprintProps;
+  auth?: Auth;
 
   private lastCheckedStatus: Date | null = null;
 
-  constructor(props: BlueprintProps) {
+  constructor(props: BlueprintProps, auth?: Auth) {
     // Use defaults for unset fields
     this.props = {
       ignoreBodyHashCheck: false,
@@ -33,14 +35,13 @@ export class Blueprint {
       isPublic: true,
       status: Status.Draft,
       ...props,
-      revealHeaderFields: {
-        subject: false,
-        timestamp: false,
-        from: false,
-        to: false,
-        ...props.revealHeaderFields,
-      },
     };
+
+    this.auth = auth;
+  }
+
+  addAuth(auth: Auth) {
+    this.auth = auth;
   }
 
   /**
@@ -81,14 +82,6 @@ export class Blueprint {
       removeSoftLinebreaks: response.remove_soft_linebreaks,
       githubUsername: response.github_username,
       senderDomain: response.sender_domain,
-      dkimSelector: response.dkim_selector,
-      revealHeaderFields: {
-        subject: response.reveal_header_subject,
-        timestamp: response.reveal_header_timestamp,
-        from: response.reveal_header_from,
-        to: response.reveal_header_to,
-      },
-      ignoreBodyHashCheckProp: response.ignore_body_hash_check_prop,
       enableHeaderMasking: response.enable_header_masking,
       enableBodyMasking: response.enable_body_masking,
       zkFramework: response.zk_framework as ZkFramework,
@@ -136,12 +129,6 @@ export class Blueprint {
       remove_soft_linebreaks: props.removeSoftLinebreaks,
       github_username: props.githubUsername,
       sender_domain: props.senderDomain,
-      dkim_selector: props.dkimSelector,
-      reveal_header_subject: props.revealHeaderFields?.subject,
-      reveal_header_timestamp: props.revealHeaderFields?.timestamp,
-      reveal_header_from: props.revealHeaderFields?.from,
-      reveal_header_to: props.revealHeaderFields?.to,
-      ignore_body_hash_check_prop: props.ignoreBodyHashCheckProp,
       enable_header_masking: props.enableHeaderMasking,
       enable_body_masking: props.enableBodyMasking,
       zk_framework: props.zkFramework,
@@ -172,6 +159,10 @@ export class Blueprint {
    * @returns A promise. Once it resolves, `getId` can be called.
    */
   public async submitDraft() {
+    if (!this.auth) {
+      throw new Error("auth is required, add it with Blueprint.addAuth(auth)");
+    }
+
     if (this.props.id) {
       throw new Error("Blueprint was already saved");
     }
@@ -180,7 +171,7 @@ export class Blueprint {
 
     let response: BlueprintResponse;
     try {
-      response = await post<BlueprintResponse>(`${BASE_URL}/blueprint`, requestData);
+      response = await post<BlueprintResponse>(`${BASE_URL}/blueprint`, requestData, this.auth);
     } catch (err) {
       console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
       throw err;
@@ -196,11 +187,15 @@ export class Blueprint {
    * @returns A promise. Once it resolves, the current Blueprint will be replaced with the new one.
    */
   public async submitNewVersionDraft(newProps: BlueprintProps) {
+    if (!this.auth) {
+      throw new Error("auth is required, add it with Blueprint.addAuth(auth)");
+    }
+
     const requestData = Blueprint.blueprintPropsToRequest(newProps);
 
     let response: BlueprintResponse;
     try {
-      response = await post<BlueprintResponse>(`${BASE_URL}/blueprint`, requestData);
+      response = await post<BlueprintResponse>(`${BASE_URL}/blueprint`, requestData, this.auth);
     } catch (err) {
       console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
       throw err;
@@ -217,13 +212,21 @@ export class Blueprint {
    * @param newProps - The updated blueprint props.
    */
   async submitNewVersion(newProps: BlueprintProps) {
+    if (!this.auth) {
+      throw new Error("auth is required, add it with Blueprint.addAuth(auth)");
+    }
+
     await this.submitNewVersionDraft(newProps);
 
     // We don't check the status here, since we are compiling directly after submiting the draft.
 
     // Submit compile request
     try {
-      await post<{ status: Status }>(`${BASE_URL}/blueprint/compile/${this.props.id}`);
+      await post<{ status: Status }>(
+        `${BASE_URL}/blueprint/compile/${this.props.id}`,
+        null,
+        this.auth
+      );
     } catch (err) {
       // We don't set the status here, since the api call can't fail due to the actual job failing
       // It can only due to connectivity issues or the job runner not being available
@@ -269,6 +272,10 @@ export class Blueprint {
    * and start the compilation.
    */
   async submit() {
+    if (!this.auth) {
+      throw new Error("auth is required, add it with Blueprint.addAuth(auth)");
+    }
+
     // If the blueprint wasn't save yet, we save it first to db
     if (!this.props.id) {
       try {
@@ -291,7 +298,11 @@ export class Blueprint {
 
     // Submit compile request
     try {
-      await post<{ status: Status }>(`${BASE_URL}/blueprint/compile/${this.props.id}`);
+      await post<{ status: Status }>(
+        `${BASE_URL}/blueprint/compile/${this.props.id}`,
+        null,
+        this.auth
+      );
     } catch (err) {
       // We don't set the status here, since the api call can't fail due to the actual job failing
       // It can only due to connectivity issues or the job runner not being available
@@ -460,6 +471,10 @@ export class Blueprint {
    * @returns a promise.
    */
   async update(newProps: BlueprintProps) {
+    if (!this.auth) {
+      throw new Error("auth is required, add it with Blueprint.addAuth(auth)");
+    }
+
     if (!this.canUpdate()) {
       throw new Error("Blueprint already compied, cannot update");
     }
@@ -470,7 +485,8 @@ export class Blueprint {
     try {
       response = await patch<BlueprintResponse>(
         `${BASE_URL}/blueprint/${this.props.id}`,
-        requestData
+        requestData,
+        this.auth
       );
     } catch (err) {
       console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);

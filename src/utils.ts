@@ -6,20 +6,24 @@ import {
   DecomposedRegexPart,
   DecomposedRegexPartJson,
 } from "./blueprint";
+import { Auth } from "./types/auth";
+import { getTokenFromAuth } from "./auth";
 
+// TODO: test this with node and in the browser
 initWasm()
   .then(() => console.log("wasm initialized"))
   .catch((err) => {
     console.log("Failed to init wasm: ", err);
   });
 
-export async function post<T>(url: string, data?: object): Promise<T> {
+export async function post<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
   try {
     const request: RequestInit = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-api-key": PUBLIC_SDK_KEY,
+        ...(!auth ? {} : { Authorization: await getTokenFromAuth(auth) }),
       },
     };
 
@@ -37,18 +41,20 @@ export async function post<T>(url: string, data?: object): Promise<T> {
 
     return body;
   } catch (error) {
+    // TODO: Handle token expired
     console.error("POST Error:", error);
     throw error;
   }
 }
 
-export async function patch<T>(url: string, data?: object): Promise<T> {
+export async function patch<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
   try {
     const request: RequestInit = {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         "x-api-key": PUBLIC_SDK_KEY,
+        ...(!auth ? {} : { Authorization: await getTokenFromAuth(auth) }),
       },
     };
 
@@ -71,7 +77,7 @@ export async function patch<T>(url: string, data?: object): Promise<T> {
   }
 }
 
-export async function get<T>(url: string, queryParams?: object): Promise<T> {
+export async function get<T>(url: string, queryParams?: object | null, auth?: Auth): Promise<T> {
   try {
     let fullUrl = url;
     if (queryParams) {
@@ -91,6 +97,7 @@ export async function get<T>(url: string, queryParams?: object): Promise<T> {
       headers: {
         "Content-Type": "application/json",
         "x-api-key": PUBLIC_SDK_KEY,
+        ...(!auth ? {} : { Authorization: await getTokenFromAuth(auth) }),
       },
     });
 
