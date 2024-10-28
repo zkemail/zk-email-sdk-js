@@ -2,10 +2,10 @@ export type BlueprintProps = {
   id?: string;
   title: string;
   description?: string;
-  slug: string;
+  slug?: string;
   tags?: string[];
   emailQuery?: string;
-  circuitName?: string;
+  circuitName: string;
   ignoreBodyHashCheck?: boolean;
   shaPrecomputeSelector?: string;
   emailBodyMaxLength?: number;
