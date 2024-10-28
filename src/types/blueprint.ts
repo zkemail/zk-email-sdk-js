@@ -13,9 +13,6 @@ export type BlueprintProps = {
   removeSoftLinebreaks?: boolean;
   githubUsername?: string;
   senderDomain?: string;
-  dkimSelector?: string;
-  revealHeaderFields?: RevealHeaderFields;
-  ignoreBodyHashCheckProp?: boolean;
   enableHeaderMasking?: boolean;
   enableBodyMasking?: boolean;
   zkFramework?: ZkFramework;
@@ -76,13 +73,6 @@ export type VerifierContract = {
   chain: number;
 };
 
-export type RevealHeaderFields = {
-  subject: boolean;
-  timestamp: boolean;
-  from: boolean;
-  to: boolean;
-};
-
 export type BlueprintRequest = {
   id?: string;
   title: string;
@@ -99,12 +89,6 @@ export type BlueprintRequest = {
   // TODO: Make non ? after login with github
   github_username?: string;
   sender_domain?: string;
-  dkim_selector?: string;
-  reveal_header_subject?: boolean;
-  reveal_header_timestamp?: boolean;
-  reveal_header_from?: boolean;
-  reveal_header_to?: boolean;
-  ignore_body_hash_check_prop?: boolean;
   enable_header_masking?: boolean;
   enable_body_masking?: boolean;
   zk_framework?: string;
@@ -132,12 +116,6 @@ export type BlueprintResponse = {
   remove_soft_linebreaks?: boolean;
   github_username?: string;
   sender_domain: string;
-  dkim_selector: string;
-  reveal_header_subject: boolean;
-  reveal_header_timestamp: boolean;
-  reveal_header_from: boolean;
-  reveal_header_to: boolean;
-  ignore_body_hash_check_prop: boolean;
   enable_header_masking?: boolean;
   enable_body_masking?: boolean;
   zk_framework: string;
