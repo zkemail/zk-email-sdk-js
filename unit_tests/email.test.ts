@@ -5,7 +5,7 @@ import { DecomposedRegex, DecomposedRegexJson, DecomposedRegexPart } from "../sr
 
 describe("Email utils test suite", async () => {
   // Wait for wasm to initialize
-  await new Promise((r) => setTimeout(r, 100));
+  // await new Promise((r) => setTimeout(r, 100));
 
   test("Can parse an email", async () => {
     const parsedEmail = await parseEmail(helloTestEmail);

@@ -1,5 +1,5 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
-import initWasm, { parseEmail as zkEamilParseEmail, extractSubstr } from "@zk-email/relayer-utils";
+
 import {
   DecomposedRegex,
   DecomposedRegexJson,
@@ -9,12 +9,27 @@ import {
 import { Auth } from "./types/auth";
 import { getTokenFromAuth } from "./auth";
 
-// TODO: test this with node and in the browser
-initWasm()
-  .then(() => console.log("wasm initialized"))
-  .catch((err) => {
-    console.log("Failed to init wasm: ", err);
-  });
+let relayerUtils: any;
+// @ts-ignore
+if (typeof window === "undefined" || typeof Deno !== "undefined") {
+  console.log("Initializing for node");
+  import("@dimidumo/relayer-utils/node")
+    .then((rl) => {
+      relayerUtils = rl;
+    })
+    .catch((err) => console.log("failed to init WASM on node: ", err));
+} else {
+  throw new Error("The SDK is cannot be used in the browser yet");
+  // try {
+  //   const rl = await import("@dimidumo/relayer-utils/web");
+  //   // @ts-ignore
+  //   await rl.default();
+  //   relayerUtils = rl;
+  //   console.log("Initialized WASM for browser");
+  // } catch (err) {
+  //   console.log("Failed to init WASM: ", err);
+  // }
+}
 
 export async function post<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
   try {
@@ -124,7 +139,8 @@ type ParsedEmail = {
 
 export async function parseEmail(eml: string): Promise<ParsedEmail> {
   try {
-    const parsedEmail = await zkEamilParseEmail(eml);
+    console.log("parsing");
+    const parsedEmail = await relayerUtils.parseEmail(eml);
     return parsedEmail as ParsedEmail;
   } catch (err) {
     console.error("Failed to parse email: ", err);
@@ -161,6 +177,6 @@ export async function testDecomposedRegex(
     throw new Error(`Max length of ${maxLength} was exceeded`);
   }
 
-  const result = extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
+  const result = relayerUtils.extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
   return result;
 }
