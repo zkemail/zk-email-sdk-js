@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Parse Email Test</title>
+  </head>
+  <body>
+    <h1>Parse Email Test</h1>
+    <div id="output"></div>
+
+    <script type="module">
+      // Capture console output to display on page
+      const output = document.getElementById("output");
+      function log(...args) {
+        console.log(...args);
+        output.innerHTML +=
+          args
+            .map((arg) => (typeof arg === "object" ? JSON.stringify(arg, null, 2) : arg))
+            .join(" ") + "<br>";
+      }
+
+      try {
+        const { default: helloTestEmail } = await import("./hello_eml.js");
+        const { parseEmail } = await import("../dist/index.js");
+
+        async function main() {
+          try {
+            const parsedEmail = await parseEmail(helloTestEmail);
+            log("parsedEmail: ", parsedEmail);
+
+            // Remove expect since we're in browser
+            if (!parsedEmail) {
+              throw new Error("Parsed email is null or undefined");
+            }
+            log("Test passed successfully!");
+          } catch (err) {
+            log("Error parsing email:", err.message);
+            throw err;
+          }
+        }
+
+        main().catch((err) => {
+          log("Fatal error:", err);
+          output.innerHTML += `<div style="color: red">Fatal error: ${err.message}</div>`;
+        });
+      } catch (err) {
+        log("Import error:", err);
+        output.innerHTML += `<div style="color: red">Import error: ${err.message}</div>`;
+      }
+    </script>
+  </body>
+</html>
