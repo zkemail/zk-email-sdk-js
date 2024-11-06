@@ -291,6 +291,12 @@ describe("Blueprint test suite", async () => {
         const included = listedBlueprintIds.every((bId) => localBlueprintIds.includes(bId!));
         expect(included).toBe(true);
       });
+
+      test("Text search creates empty result", async () => {
+        const blueprints = await listBlueprints({ search: "asdfasdfasdfasdfasdfasdfasdfasdf" });
+
+        expect(blueprints.length).toBe(0);
+      });
     });
   });
 

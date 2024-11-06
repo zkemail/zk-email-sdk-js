@@ -8,27 +8,37 @@ import {
 } from "./blueprint";
 import { Auth } from "./types/auth";
 import { getTokenFromAuth } from "./auth";
+import type * as NodeUtils from "@dimidumo/relayer-utils/node";
+import type * as WebUtils from "@dimidumo/relayer-utils/web";
 
-let relayerUtils: any;
+type RelayerUtilsType = typeof NodeUtils | typeof WebUtils;
+
+let relayerUtilsResolver: (value: any) => void;
+const relayerUtils: Promise<RelayerUtilsType> = new Promise((resolve) => {
+  relayerUtilsResolver = resolve;
+});
+
 // @ts-ignore
 if (typeof window === "undefined" || typeof Deno !== "undefined") {
-  console.log("Initializing for node");
-  import("@dimidumo/relayer-utils/node")
-    .then((rl) => {
-      relayerUtils = rl;
-    })
-    .catch((err) => console.log("failed to init WASM on node: ", err));
+  console.warn("Relayer utils won't work when used server side");
+  // console.log("Initializing for node");
+  // import("@dimidumo/relayer-utils/node")
+  //   .then((rl) => {
+  //     relayerUtilsResolver(rl);
+  //   })
+  //   .catch((err) => console.log("failed to init WASM on node: ", err));
 } else {
-  throw new Error("The SDK is cannot be used in the browser yet");
-  // try {
-  //   const rl = await import("@dimidumo/relayer-utils/web");
-  //   // @ts-ignore
-  //   await rl.default();
-  //   relayerUtils = rl;
-  //   console.log("Initialized WASM for browser");
-  // } catch (err) {
-  //   console.log("Failed to init WASM: ", err);
-  // }
+  try {
+    import("@dimidumo/relayer-utils/web")
+      .then(async (rl) => {
+        // @ts-ignore
+        await rl.default();
+        relayerUtilsResolver(rl);
+      })
+      .catch((err) => {
+        console.log("Failed to init WASM: ", err);
+      });
+  } catch (err) {}
 }
 
 export async function post<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
@@ -140,7 +150,8 @@ type ParsedEmail = {
 export async function parseEmail(eml: string): Promise<ParsedEmail> {
   try {
     console.log("parsing");
-    const parsedEmail = await relayerUtils.parseEmail(eml);
+    const utils = await relayerUtils;
+    const parsedEmail = await utils.parseEmail(eml);
     return parsedEmail as ParsedEmail;
   } catch (err) {
     console.error("Failed to parse email: ", err);
@@ -177,6 +188,7 @@ export async function testDecomposedRegex(
     throw new Error(`Max length of ${maxLength} was exceeded`);
   }
 
-  const result = relayerUtils.extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
+  const utils = await relayerUtils;
+  const result = utils.extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
   return result;
 }

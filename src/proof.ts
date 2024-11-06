@@ -11,7 +11,7 @@ const BASE_URL = "http://localhost:8080";
 export class Proof {
   blueprint: Blueprint;
   props: ProofProps;
-  private lastCheckedStatus: Date;
+  private lastCheckedStatus: Date | null = null;
 
   constructor(blueprint: Blueprint, props: ProofProps) {
     if (!(blueprint instanceof Blueprint)) {
