@@ -1,0 +1,32 @@
+# Ignore everything by default
+*
+*/**
+
+# Allow dist folder and its contents
+!dist/
+!dist/**
+
+# Allow specific files
+!README.md
+!LICENSE
+!CHANGELOG.md
+!package.json
+
+# Still ignore any potential unwanted files even in allowed directories
+**/*.test.*
+**/*.spec.*
+**/test/
+**/tests/
+**/__tests__/
+**/*.map
+**/.DS_Store
+**/tsconfig.json
+**/tsconfig.*.json
+**/.gitignore
+**/.npmignore
+**/jest.config.*
+**/babel.config.*
+**/.editorconfig
+**/.prettierrc
+**/.eslintrc
+**/tsup.config.ts

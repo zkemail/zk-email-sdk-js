@@ -49,7 +49,7 @@ export class Blueprint {
    * @param {string} id - Id of the RegexBlueprint.
    * @returns A promise that resolves to a new instance of RegexBlueprint.
    */
-  public static async getBlueprintById(id: string): Promise<Blueprint> {
+  public static async getBlueprintById(id: string, auth?: Auth): Promise<Blueprint> {
     let blueprintResponse: BlueprintResponse;
     try {
       blueprintResponse = await get<BlueprintResponse>(`${BASE_URL}/blueprint/${id}`);
@@ -60,7 +60,7 @@ export class Blueprint {
 
     const blueprintProps = this.responseToBlueprintProps(blueprintResponse);
 
-    const blueprint = new Blueprint(blueprintProps);
+    const blueprint = new Blueprint(blueprintProps, auth);
 
     return blueprint;
   }
@@ -240,7 +240,10 @@ export class Blueprint {
    * @param options - Options to filter the blueprints by.
    * @returns A promise. Once it resolves, `getId` can be called.
    */
-  public static async listBlueprints(options?: ListBlueprintsOptions): Promise<Blueprint[]> {
+  public static async listBlueprints(
+    options?: ListBlueprintsOptions,
+    auth?: Auth
+  ): Promise<Blueprint[]> {
     const requestOptions: ListBlueprintsOptionsRequest = {
       skip: options?.skip,
       limit: options?.limit,
@@ -250,9 +253,9 @@ export class Blueprint {
       search: options?.search,
     };
 
-    let response: { blueprints: BlueprintResponse[] };
+    let response: { blueprints?: BlueprintResponse[] };
     try {
-      response = await get<{ blueprints: BlueprintResponse[] }>(
+      response = await get<{ blueprints?: BlueprintResponse[] }>(
         `${BASE_URL}/blueprint`,
         requestOptions
       );
@@ -261,9 +264,13 @@ export class Blueprint {
       throw err;
     }
 
+    if (!response.blueprints) {
+      return [];
+    }
+
     return response.blueprints.map((blueprintResponse) => {
       const blueprintProps = Blueprint.responseToBlueprintProps(blueprintResponse);
-      return new Blueprint(blueprintProps);
+      return new Blueprint(blueprintProps, auth);
     });
   }
 
@@ -462,7 +469,7 @@ export class Blueprint {
    * @returns true if it can be updated
    */
   canUpdate(): boolean {
-    return !!(this.props.status !== Status.Done && this.props.id);
+    return !!(this.props.id && ![Status.Done, Status.InProgress].includes(this.props.status!));
   }
 
   /**
@@ -497,10 +504,13 @@ export class Blueprint {
   }
 
   async listAllVersions(): Promise<Blueprint[]> {
+    if (!this.props.id) {
+      throw new Error("Blueprint was not saved yet");
+    }
     let response: { blueprints: BlueprintResponse[] };
     try {
       response = await get<{ blueprints: BlueprintResponse[] }>(
-        `${BASE_URL}/blueprint/versions/${encodeURIComponent(this.props.slug)}`
+        `${BASE_URL}/blueprint/versions/${encodeURIComponent(this.props.slug!)}`
       );
     } catch (err) {
       console.error("Failed calling GET on /blueprint/versions/:slug in listAllVersions: ", err);

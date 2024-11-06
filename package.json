@@ -1,27 +1,49 @@
 {
   "name": "@dimidumo/zk-email-sdk-ts",
-  "version": "1.0.5",
-  "description": "",
-  "main": "src/index.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "bun build ./src/index.ts --outdir ./dist"
+  "version": "1.0.13",
+  "description": "ZK Email SDK for TypeScript",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    }
   },
-  "keywords": [],
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "bunx tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "bun run build",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "zk",
+    "email",
+    "sdk",
+    "typescript"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/bun": "^1.1.12",
     "@types/pg": "^8.11.10",
     "open": "^10.1.0",
     "pg": "^8.13.0",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "tsup": "^8.3.5"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@dimidumo/relayer-utils": "^0.4.9",
+    "@dimidumo/relayer-utils": "^0.4.12",
     "viem": "^2.21.29"
   }
 }

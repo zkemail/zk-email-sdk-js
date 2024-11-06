@@ -77,7 +77,7 @@ export type BlueprintRequest = {
   id?: string;
   title: string;
   description?: string;
-  slug: string;
+  slug?: string;
   tags?: string[];
   email_query?: string;
   circuit_name?: string;
