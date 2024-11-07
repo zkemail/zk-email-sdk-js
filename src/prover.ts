@@ -1,8 +1,14 @@
 import { Blueprint } from "./blueprint";
 import { Proof } from "./proof";
-import { ProofProps, ProofRequest, ProofResponse, ProofStatus } from "./types/proof";
+import {
+  GenerateProofInputsParams,
+  ProofProps,
+  ProofRequest,
+  ProofResponse,
+  ProofStatus,
+} from "./types/proof";
 import { ProverOptions } from "./types/prover";
-import { post } from "./utils";
+import { generateProofInputs, post } from "./utils";
 
 // TODO: replace with prod version
 const BASE_URL = "http://localhost:8080";
@@ -40,7 +46,9 @@ export class Prover {
    * Done or Failed.
    */
   async generateProof(eml: string): Promise<Proof> {
+    console.log("starting generate proof");
     const proof = await this.generateProofRequest(eml);
+    console.log("got proof: ", proof);
 
     // Wait for proof to finish
     while (![ProofStatus.Done, ProofStatus.Failed].includes(await proof.checkStatus())) {}
@@ -60,11 +68,34 @@ export class Prover {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
     }
 
+    let input: string;
+    try {
+      // TODO: Do we use defaults?
+      const params: GenerateProofInputsParams = {
+        emailHeaderMaxLength: this.blueprint.props.emailHeaderMaxLength || 256,
+        emailBodyMaxLength: this.blueprint.props.emailBodyMaxLength || 2560,
+        ignoreBodyHashCheck: this.blueprint.props.ignoreBodyHashCheck || false,
+        removeSoftLinebreaks: this.blueprint.props.removeSoftLinebreaks || true,
+        shaPrecomputeSelector: this.blueprint.props.shaPrecomputeSelector,
+      };
+      console.log("generating proof inputs");
+      input = await generateProofInputs(
+        eml,
+        this.blueprint.props.decomposedRegexes,
+        this.blueprint.props.externalInputs || [],
+        params
+      );
+    } catch (err) {
+      console.error("Failed to generate inputs for proof");
+      throw err;
+    }
+
+    console.log("got proof input");
     let response: ProofResponse;
     try {
       const requestData: ProofRequest = {
         blueprint_id: blueprintId,
-        circuit_input: eml,
+        input,
       };
 
       response = await post<ProofResponse>(`${BASE_URL}/proof`, requestData);

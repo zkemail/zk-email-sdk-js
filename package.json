@@ -1,6 +1,6 @@
 {
-  "name": "@dimidumo/zk-email-sdk-ts",
-  "version": "1.0.13",
+  "name": "@zk-email/sdk",
+  "version": "0.0.2",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -21,7 +21,8 @@
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublishOnly": "bun run build",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "publish": "npm publish --access public"
   },
   "keywords": [
     "zk",
@@ -43,7 +44,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@dimidumo/relayer-utils": "^0.4.12",
+    "@dimidumo/relayer-utils": "^0.4.15",
     "viem": "^2.21.29"
   }
 }

@@ -1,7 +1,13 @@
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import helloTestEmail from "./hello_eml";
-import { parseEmail, testDecomposedRegex } from "../src/utils";
-import { DecomposedRegex, DecomposedRegexJson, DecomposedRegexPart } from "../src";
+import { generateProofInputs, parseEmail, testDecomposedRegex } from "../src/utils";
+import {
+  DecomposedRegex,
+  DecomposedRegexJson,
+  DecomposedRegexPart,
+  GenerateProofInputsParams,
+} from "../src";
+import { readFile } from "fs/promises";
 
 describe("Email utils test suite", async () => {
   // Wait for wasm to initialize
@@ -164,5 +170,38 @@ describe("Email utils test suite", async () => {
 
     const result = await testDecomposedRegex(helloTestEmail, decomposedRegex, true);
     expect(Bun.deepEquals(result, ["dimi.zktest@gmail.com"])).toBeTrue();
+  });
+
+  test("Can create proof inputs", async () => {
+    const helloEml = await readFile("unit_tests/test.eml", "utf-8");
+
+    const decomposedRegexes: DecomposedRegex[] = [
+      {
+        parts: [
+          {
+            isPublic: true,
+            regexDef: "Hi",
+          },
+          {
+            isPublic: true,
+            regexDef: "!",
+          },
+        ],
+        name: "hi",
+        maxLength: 64,
+        location: "body",
+      },
+    ];
+
+    const params: GenerateProofInputsParams = {
+      emailHeaderMaxLength: 2816,
+      emailBodyMaxLength: 1024,
+      ignoreBodyHashCheck: false,
+      removeSoftLinebreaks: true,
+    };
+
+    const inputs = await generateProofInputs(helloEml, decomposedRegexes, [], params);
+    console.log("inputs: ", inputs);
+    expect(inputs).toBeDefined();
   });
 });

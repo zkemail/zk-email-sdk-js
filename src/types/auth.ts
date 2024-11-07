@@ -1,7 +1,7 @@
 /**
  * Interface for authentication for creating and updating blueprints
  */
-export interface Auth {
+export type Auth = {
   /**
    * Retrieves the authentication token
    * e.g. from a req for next.js or the localstorage for frontend
@@ -14,4 +14,4 @@ export interface Auth {
    * @returns Promise that resolves when expired token is handled
    */
   onTokenExpired: () => Promise<void>;
-}
+};

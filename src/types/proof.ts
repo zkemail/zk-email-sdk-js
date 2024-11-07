@@ -10,22 +10,43 @@ export enum ProofStatus {
 
 export type ProofProps = {
   id: string;
+  blueprintId: string;
+  input: string;
+  proof?: string;
+  public?: string;
   status?: ProofStatus;
-  circuitInput?: string;
   startedAt?: Date;
-  provenAt?: Date;
+  provedAt?: Date;
 };
 
 export type ProofResponse = {
   id: string;
   blueprint_id: string;
-  circuit_input: string;
+  input: string;
+  proof?: string;
+  public?: string;
   started_at: ServerDate;
-  proven_at?: ServerDate;
-  status: string;
+  proved_at?: ServerDate;
+  status: number;
 };
 
 export type ProofRequest = {
   blueprint_id: string;
-  circuit_input: string;
+  input: string;
+};
+
+export type GenerateProofInputsParams = {
+  emailHeaderMaxLength: number;
+  emailBodyMaxLength: number;
+  ignoreBodyHashCheck: boolean;
+  removeSoftLinebreaks: boolean;
+  shaPrecomputeSelector?: string;
+};
+
+export type GenerateProofInputsParamsInternal = {
+  maxHeaderLength: number;
+  maxBodyLength: number;
+  ignoreBodyHashCheck: boolean;
+  removeSoftLinesBreaks: boolean;
+  shaPrecomputeSelector?: string;
 };

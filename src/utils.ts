@@ -10,6 +10,11 @@ import { Auth } from "./types/auth";
 import { getTokenFromAuth } from "./auth";
 import type * as NodeUtils from "@dimidumo/relayer-utils/node";
 import type * as WebUtils from "@dimidumo/relayer-utils/web";
+import {
+  ExternalInput,
+  GenerateProofInputsParams,
+  GenerateProofInputsParamsInternal,
+} from "./types";
 
 type RelayerUtilsType = typeof NodeUtils | typeof WebUtils;
 
@@ -19,7 +24,8 @@ const relayerUtils: Promise<RelayerUtilsType> = new Promise((resolve) => {
 });
 
 // @ts-ignore
-if (typeof window === "undefined" || typeof Deno !== "undefined") {
+// if (typeof window === "undefined" || typeof Deno !== "undefined") {
+if (false) {
   console.warn("Relayer utils won't work when used server side");
   // console.log("Initializing for node");
   // import("@dimidumo/relayer-utils/node")
@@ -28,6 +34,7 @@ if (typeof window === "undefined" || typeof Deno !== "undefined") {
   //   })
   //   .catch((err) => console.log("failed to init WASM on node: ", err));
 } else {
+  console.log("frontend wasm");
   try {
     import("@dimidumo/relayer-utils/web")
       .then(async (rl) => {
@@ -149,7 +156,6 @@ type ParsedEmail = {
 
 export async function parseEmail(eml: string): Promise<ParsedEmail> {
   try {
-    console.log("parsing");
     const utils = await relayerUtils;
     const parsedEmail = await utils.parseEmail(eml);
     return parsedEmail as ParsedEmail;
@@ -191,4 +197,42 @@ export async function testDecomposedRegex(
   const utils = await relayerUtils;
   const result = utils.extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
   return result;
+}
+
+export async function generateProofInputs(
+  eml: string,
+  decomposedRegexes: DecomposedRegex[],
+  externalInputs: ExternalInput[],
+  params: GenerateProofInputsParams
+): Promise<string> {
+  try {
+    const internalParams: GenerateProofInputsParamsInternal = {
+      maxHeaderLength: params.emailHeaderMaxLength,
+      maxBodyLength: params.emailBodyMaxLength,
+      ignoreBodyHashCheck: params.ignoreBodyHashCheck,
+      removeSoftLinesBreaks: params.removeSoftLinebreaks,
+      shaPrecomputeSelector: params.shaPrecomputeSelector,
+    };
+
+    const utils = await relayerUtils;
+    console.log("got relayer utils");
+    console.log("actually creating proof inputs with params: ", internalParams);
+    const inputs = await utils.generateCircuitInputsWithDecomposedRegexesAndExternalInputs(
+      eml,
+      // TODO: add consistent casing in relayer_utils
+      decomposedRegexes.map((dcr) => {
+        return {
+          ...dcr,
+          parts: dcr.parts.map((p) => ({ is_public: p.isPublic, regex_def: p.regexDef })),
+        };
+      }),
+      externalInputs,
+      internalParams
+    );
+
+    return JSON.stringify(Object.fromEntries(inputs));
+  } catch (err) {
+    console.error("Failed to generate inputs for proof");
+    throw err;
+  }
 }

@@ -1,7 +1,6 @@
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import pg from "pg";
-import sdk, { Blueprint, BlueprintProps, Proof, Status } from "../src";
-import { Auth } from "../src/types/auth";
+import sdk, { Blueprint, BlueprintProps, Proof, Status, Auth } from "../src";
 import { getAuthToken } from "./test-utils";
 
 //TODO: test while (await checkStatus())

@@ -135,10 +135,13 @@ export class Proof {
   public static responseToProofProps(response: ProofResponse): ProofProps {
     const props: ProofProps = {
       id: response.id,
-      status: ProofStatus.InProgress,
-      circuitInput: response.circuit_input,
+      blueprintId: response.blueprint_id,
+      status: response.status as ProofStatus,
+      input: response.input,
+      proof: response.proof,
+      public: response.public,
       startedAt: new Date(response.started_at.seconds * 1000),
-      provenAt: response.proven_at ? new Date(response.proven_at.seconds * 1000) : undefined,
+      provedAt: response.proved_at ? new Date(response.proved_at.seconds * 1000) : undefined,
     };
     return props;
   }

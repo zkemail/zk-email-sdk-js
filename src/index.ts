@@ -6,7 +6,7 @@ export * from "./types/blueprint";
 export { Blueprint } from "./blueprint";
 export * from "./types/proof";
 export { Proof } from "./proof";
-export { Auth } from "./types/auth";
+export type { Auth } from "./types/auth";
 
 // Exports that don't need initialization or options
 export { testDecomposedRegex, parseEmail } from "./utils";

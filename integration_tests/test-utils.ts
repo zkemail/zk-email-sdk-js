@@ -13,6 +13,7 @@ export async function getAuthToken(): Promise<string> {
   const server = Bun.serve({
     port: 0,
     fetch(req) {
+      console.log("received callback request");
       const url = new URL(req.url);
       if (url.pathname === "/callback") {
         const token = url.searchParams.get("token");

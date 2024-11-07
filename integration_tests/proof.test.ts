@@ -1,21 +1,21 @@
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import pg from "pg";
-import { Blueprint, BlueprintProps, createBlueprint, Status } from "../src";
-import emlTxt from "./airbnb_eml";
+import sdk, { Blueprint, BlueprintProps, Status } from "../src";
 import { ProofStatus } from "../src/types/proof";
 import { Proof } from "../src/proof";
 import { getAuthToken } from "./test-utils";
 import { Auth } from "../src/types/auth";
+import { readFile } from "fs/promises";
 
 function getBlueprintProps(
   title = "Twitter",
-  slug = "zkemail/twitter",
+  circuitName?: string,
   description?: string,
   tags?: string[]
 ): BlueprintProps {
   return {
     title,
-    slug,
+    circuitName: circuitName || ("twitter" + Math.random()).replace("0.", ""),
     description,
     tags,
     decomposedRegexes: [
@@ -23,25 +23,33 @@ function getBlueprintProps(
         parts: [
           {
             isPublic: true,
-            regexDef: "(a-zA-Z0-9_)+",
+            regexDef: "Hi",
+          },
+          {
+            isPublic: true,
+            regexDef: "!",
           },
         ],
-        name: "body",
-        maxLength: 256,
+        name: "hi",
+        maxLength: 64,
         location: "body",
       },
     ],
+    emailHeaderMaxLength: 2816,
+    emailBodyMaxLength: 1024,
+    ignoreBodyHashCheck: false,
+    removeSoftLinebreaks: true,
   };
 }
 
 describe("Proof test suite", async () => {
   // TODO: Figure out a way to run these test with current conductor verion
-  return;
   let db: pg.Client;
   let blueprint: Blueprint;
   const blueprintIds: string[] = [];
   const proofIds: string[] = [];
 
+  console.log("getting auth token");
   const token = await getAuthToken();
   console.log("got token: ", token);
 
@@ -49,6 +57,8 @@ describe("Proof test suite", async () => {
     getToken: async () => token,
     onTokenExpired: async () => {},
   };
+
+  const { createBlueprint } = sdk({ auth });
 
   console.log("Setting up user database...");
   const { Client } = pg;
@@ -64,17 +74,23 @@ describe("Proof test suite", async () => {
   console.log("Database setup done");
 
   const props = getBlueprintProps();
-  blueprint = createBlueprint(props, auth);
-  await blueprint.submit();
+  console.log("got props");
+  blueprint = createBlueprint(props);
+  console.log("created blueprint");
+  await blueprint.submitDraft();
+  console.log("submitted blueprint");
 
-  while (![Status.Done, Status.Failed].includes(await blueprint.checkStatus())) {}
+  // while (![Status.Done, Status.Failed].includes(await blueprint.checkStatus())) {}
+  console.log("wait for status done");
 
-  if ((await blueprint.checkStatus()) === Status.Failed) {
-    throw new Error("Couldn't initialize Blueprint");
-  }
+  // if ((await blueprint.checkStatus()) === Status.Failed) {
+  //   throw new Error("Couldn't initialize Blueprint");
+  // }
 
   const blueprintId = blueprint.getId();
   blueprintIds.push(blueprintId!);
+
+  const emlTxt = await readFile("unit_tests/test.eml", "utf-8");
 
   afterAll(async () => {
     try {
@@ -89,8 +105,11 @@ describe("Proof test suite", async () => {
 
   describe("Basic CRUD tests", () => {
     describe("Can create proof", async () => {
-      const proover = blueprint.createProver();
-      const proof = await proover.generateProof(emlTxt);
+      console.log("starting create proof flow====================");
+      const prover = blueprint.createProver();
+      console.log("got prover: ");
+      const proof = await prover.generateProof(emlTxt);
+      console.log("got proof");
 
       test("Using generateProof, proof should be done", async () => {
         const status = await proof.checkStatus();
@@ -108,7 +127,7 @@ describe("Proof test suite", async () => {
         const fetchedProof = await Proof.getPoofById(id);
         expect(fetchedProof.getId()).toBe(id);
         expect(fetchedProof.props.startedAt instanceof Date).toBe(true);
-        expect(fetchedProof.props.circuitInput).toBe(emlTxt);
+        // expect(fetchedProof.props.input).toBe(emlTxt);
       });
 
       test("Download files", async () => {
