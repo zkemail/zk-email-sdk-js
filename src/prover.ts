@@ -10,9 +10,6 @@ import {
 import { ProverOptions } from "./types/prover";
 import { generateProofInputs, post } from "./utils";
 
-// TODO: replace with prod version
-const BASE_URL = "http://localhost:8080";
-
 /**
  * Represents a Prover generated from a blueprint that can generate Proofs
  */
@@ -98,7 +95,7 @@ export class Prover {
         input,
       };
 
-      response = await post<ProofResponse>(`${BASE_URL}/proof`, requestData);
+      response = await post<ProofResponse>(`${this.blueprint.baseUrl}/proof`, requestData);
     } catch (err) {
       console.error("Failed calling POST on /proof/ in generateProofRequest: ", err);
       throw err;

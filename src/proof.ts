@@ -2,9 +2,6 @@ import { Blueprint, Status } from "./blueprint";
 import { ProofProps, ProofResponse, ProofStatus } from "./types/proof";
 import { get } from "./utils";
 
-// TODO: replace with prod version
-const BASE_URL = "http://localhost:8080";
-
 /**
  * A generated proof. You get get proof data and verify proofs on chain.
  */
@@ -44,7 +41,9 @@ export class Proof {
 
     let response: { url: string };
     try {
-      response = await get<{ url: string }>(`${BASE_URL}/proof/files/${this.props.id}`);
+      response = await get<{ url: string }>(
+        `${this.blueprint.baseUrl}/proof/files/${this.props.id}`
+      );
     } catch (err) {
       console.error("Failed calling GET on /proof/files/:id in getProofDataDownloadLink: ", err);
       throw err;
@@ -97,10 +96,12 @@ export class Proof {
       }
     }
 
-    // Submit compile request
+    // Check status
     let response: { status: ProofStatus };
     try {
-      response = await get<{ status: ProofStatus }>(`${BASE_URL}/proof/status/${this.props.id}`);
+      response = await get<{ status: ProofStatus }>(
+        `${this.blueprint.baseUrl}/proof/status/${this.props.id}`
+      );
     } catch (err) {
       console.error("Failed calling GET /blueprint/status in getStatus(): ", err);
       throw err;
@@ -117,17 +118,17 @@ export class Proof {
    * @param id - Id of the Proof.
    * @returns A promise that resolves to a new instance of Proof.
    */
-  public static async getPoofById(id: string): Promise<Proof> {
+  public static async getPoofById(id: string, baseUrl: string): Promise<Proof> {
     let proofResponse: ProofResponse;
     try {
-      proofResponse = await get<ProofResponse>(`${BASE_URL}/proof/${id}`);
+      proofResponse = await get<ProofResponse>(`${baseUrl}/proof/${id}`);
     } catch (err) {
       console.error("Failed calling /proof/:id in getProofById: ", err);
       throw err;
     }
 
     const proofProps = this.responseToProofProps(proofResponse);
-    const blueprint = await Blueprint.getBlueprintById(proofResponse.blueprint_id);
+    const blueprint = await Blueprint.getBlueprintById(proofResponse.blueprint_id, baseUrl);
 
     return new Proof(blueprint, proofProps);
   }

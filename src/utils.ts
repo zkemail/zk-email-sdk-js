@@ -188,11 +188,11 @@ export async function testDecomposedRegex(
     throw Error(`Unsupported location ${decomposedRegex.location}`);
   }
 
-  const maxLength =
-    "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
-  if (inputStr.length > maxLength) {
-    throw new Error(`Max length of ${maxLength} was exceeded`);
-  }
+  // const maxLength =
+  //   "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
+  // if (inputStr.length > maxLength) {
+  //   throw new Error(`Max length of ${maxLength} was exceeded`);
+  // }
 
   const utils = await relayerUtils;
   const result = utils.extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
@@ -235,4 +235,21 @@ export async function generateProofInputs(
     console.error("Failed to generate inputs for proof");
     throw err;
   }
+}
+
+export function startJsonFileDownload(json: string, name = "data") {
+  if (!window && !document) {
+    throw Error("startFilesDownload can only be used in a browser");
+  }
+
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${name}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }

@@ -13,9 +13,6 @@ import { get, patch, post } from "./utils";
 import { verifyProofOnChain } from "./chain";
 import { Auth } from "./types/auth";
 
-// TODO: replace with prod version
-const BASE_URL = "http://localhost:8080";
-
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
  */
@@ -23,10 +20,11 @@ export class Blueprint {
   // TODO: Implement getter and setter pattern
   props: BlueprintProps;
   auth?: Auth;
+  baseUrl: string;
 
   private lastCheckedStatus: Date | null = null;
 
-  constructor(props: BlueprintProps, auth?: Auth) {
+  constructor(props: BlueprintProps, baseUrl: string, auth?: Auth) {
     // Use defaults for unset fields
     this.props = {
       ignoreBodyHashCheck: false,
@@ -37,6 +35,7 @@ export class Blueprint {
       ...props,
     };
 
+    this.baseUrl = baseUrl;
     this.auth = auth;
   }
 
@@ -49,10 +48,14 @@ export class Blueprint {
    * @param {string} id - Id of the RegexBlueprint.
    * @returns A promise that resolves to a new instance of RegexBlueprint.
    */
-  public static async getBlueprintById(id: string, auth?: Auth): Promise<Blueprint> {
+  public static async getBlueprintById(
+    id: string,
+    baseUrl: string,
+    auth?: Auth
+  ): Promise<Blueprint> {
     let blueprintResponse: BlueprintResponse;
     try {
-      blueprintResponse = await get<BlueprintResponse>(`${BASE_URL}/blueprint/${id}`);
+      blueprintResponse = await get<BlueprintResponse>(`${baseUrl}/blueprint/${id}`);
     } catch (err) {
       console.error("Failed calling /blueprint/:id in getBlueprintById: ", err);
       throw err;
@@ -60,7 +63,7 @@ export class Blueprint {
 
     const blueprintProps = this.responseToBlueprintProps(blueprintResponse);
 
-    const blueprint = new Blueprint(blueprintProps, auth);
+    const blueprint = new Blueprint(blueprintProps, baseUrl, auth);
 
     return blueprint;
   }
@@ -139,8 +142,10 @@ export class Blueprint {
       })),
       decomposed_regexes: props.decomposedRegexes?.map((regex) => ({
         parts: regex.parts.map((part) => ({
-          is_public: part.isPublic,
-          regex_def: part.regexDef,
+          // @ts-ignore
+          is_public: part.isPublic || part.is_public,
+          // @ts-ignore
+          regex_def: part.regexDef || part.regex_def,
         })),
         name: regex.name,
         max_length: regex.maxLength,
@@ -171,7 +176,7 @@ export class Blueprint {
 
     let response: BlueprintResponse;
     try {
-      response = await post<BlueprintResponse>(`${BASE_URL}/blueprint`, requestData, this.auth);
+      response = await post<BlueprintResponse>(`${this.baseUrl}/blueprint`, requestData, this.auth);
     } catch (err) {
       console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
       throw err;
@@ -195,7 +200,7 @@ export class Blueprint {
 
     let response: BlueprintResponse;
     try {
-      response = await post<BlueprintResponse>(`${BASE_URL}/blueprint`, requestData, this.auth);
+      response = await post<BlueprintResponse>(`${this.baseUrl}/blueprint`, requestData, this.auth);
     } catch (err) {
       console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
       throw err;
@@ -223,7 +228,7 @@ export class Blueprint {
     // Submit compile request
     try {
       await post<{ status: Status }>(
-        `${BASE_URL}/blueprint/compile/${this.props.id}`,
+        `${this.baseUrl}/blueprint/compile/${this.props.id}`,
         null,
         this.auth
       );
@@ -241,6 +246,7 @@ export class Blueprint {
    * @returns A promise. Once it resolves, `getId` can be called.
    */
   public static async listBlueprints(
+    baseUrl: string,
     options?: ListBlueprintsOptions,
     auth?: Auth
   ): Promise<Blueprint[]> {
@@ -256,7 +262,7 @@ export class Blueprint {
     let response: { blueprints?: BlueprintResponse[] };
     try {
       response = await get<{ blueprints?: BlueprintResponse[] }>(
-        `${BASE_URL}/blueprint`,
+        `${baseUrl}/blueprint`,
         requestOptions
       );
     } catch (err) {
@@ -270,7 +276,7 @@ export class Blueprint {
 
     return response.blueprints.map((blueprintResponse) => {
       const blueprintProps = Blueprint.responseToBlueprintProps(blueprintResponse);
-      return new Blueprint(blueprintProps, auth);
+      return new Blueprint(blueprintProps, baseUrl, auth);
     });
   }
 
@@ -306,7 +312,7 @@ export class Blueprint {
     // Submit compile request
     try {
       await post<{ status: Status }>(
-        `${BASE_URL}/blueprint/compile/${this.props.id}`,
+        `${this.baseUrl}/blueprint/compile/${this.props.id}`,
         null,
         this.auth
       );
@@ -322,7 +328,7 @@ export class Blueprint {
   private async _checkStatus(): Promise<Status> {
     let response: { status: Status };
     try {
-      response = await get<{ status: Status }>(`${BASE_URL}/blueprint/status/${this.props.id}`);
+      response = await get<{ status: Status }>(`${this.baseUrl}/blueprint/status/${this.props.id}`);
     } catch (err) {
       console.error("Failed calling GET /blueprint/status in getStatus(): ", err);
       throw err;
@@ -385,7 +391,7 @@ export class Blueprint {
 
     let response: { url: string };
     try {
-      response = await get<{ url: string }>(`${BASE_URL}/blueprint/zkey/${this.props.id}`);
+      response = await get<{ url: string }>(`${this.baseUrl}/blueprint/zkey/${this.props.id}`);
     } catch (err) {
       console.error("Failed calling GET on /blueprint/zkey/:id in getZKeyDownloadLink: ", err);
       throw err;
@@ -491,7 +497,7 @@ export class Blueprint {
     let response: BlueprintResponse;
     try {
       response = await patch<BlueprintResponse>(
-        `${BASE_URL}/blueprint/${this.props.id}`,
+        `${this.baseUrl}/blueprint/${this.props.id}`,
         requestData,
         this.auth
       );
@@ -510,7 +516,7 @@ export class Blueprint {
     let response: { blueprints: BlueprintResponse[] };
     try {
       response = await get<{ blueprints: BlueprintResponse[] }>(
-        `${BASE_URL}/blueprint/versions/${encodeURIComponent(this.props.slug!)}`
+        `${this.baseUrl}/blueprint/versions/${encodeURIComponent(this.props.slug!)}`
       );
     } catch (err) {
       console.error("Failed calling GET on /blueprint/versions/:slug in listAllVersions: ", err);
@@ -519,7 +525,7 @@ export class Blueprint {
 
     return response.blueprints.map((blueprintResponse) => {
       const blueprintProps = Blueprint.responseToBlueprintProps(blueprintResponse);
-      return new Blueprint(blueprintProps);
+      return new Blueprint(blueprintProps, this.baseUrl, this.auth);
     });
   }
 }
