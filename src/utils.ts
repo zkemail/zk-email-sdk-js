@@ -217,15 +217,28 @@ export async function generateProofInputs(
     const utils = await relayerUtils;
     console.log("got relayer utils");
     console.log("actually creating proof inputs with params: ", internalParams);
+
+    const decomposedRegexesCleaned = decomposedRegexes.map((dcr) => {
+      return {
+        ...dcr,
+        parts: dcr.parts.map((p) => ({
+          // @ts-ignore
+          is_public: p.isPublic || p.is_public,
+          // @ts-ignore
+          regex_def: p.regexDef || p.regex_def,
+        })),
+      };
+    });
+
+    console.log("calling generateCircuitInputsWithDecomposedRegexesAndExternalInputs with");
+    console.log("eml: ", eml);
+    console.log("decomposedRegex: ", decomposedRegexesCleaned);
+    console.log("externalInputs: ", externalInputs);
+    console.log("params: ", params);
+
     const inputs = await utils.generateCircuitInputsWithDecomposedRegexesAndExternalInputs(
       eml,
-      // TODO: add consistent casing in relayer_utils
-      decomposedRegexes.map((dcr) => {
-        return {
-          ...dcr,
-          parts: dcr.parts.map((p) => ({ is_public: p.isPublic, regex_def: p.regexDef })),
-        };
-      }),
+      decomposedRegexesCleaned,
       externalInputs,
       internalParams
     );
