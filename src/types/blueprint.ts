@@ -169,3 +169,5 @@ export type ListBlueprintsOptionsRequest = {
   is_public?: boolean;
   search?: string;
 };
+
+export type DownloadUrls = Record<string, string>;

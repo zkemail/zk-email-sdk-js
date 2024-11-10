@@ -4,6 +4,7 @@ import {
   BlueprintProps,
   BlueprintRequest,
   BlueprintResponse,
+  DownloadUrls,
   ListBlueprintsOptions,
   ListBlueprintsOptionsRequest,
   Status,
@@ -384,20 +385,23 @@ export class Blueprint {
    * Returns a download link for the ZKeys of the blueprint.
    * @returns The the url to download the ZKeys.
    */
-  async getZKeyDownloadLink(): Promise<string> {
+  async getZKeyDownloadLink(): Promise<DownloadUrls> {
     if (this.props.status !== Status.Done) {
       throw new Error("The circuits are not compiled yet, nothing to download.");
     }
 
-    let response: { url: string };
+    let response: { urls: DownloadUrls };
     try {
-      response = await get<{ url: string }>(`${this.baseUrl}/blueprint/zkey/${this.props.id}`);
+      response = await get<{ urls: DownloadUrls }>(
+        `${this.baseUrl}/blueprint/zkey/${this.props.id}`
+      );
+      console.log("response: ", response);
     } catch (err) {
       console.error("Failed calling GET on /blueprint/zkey/:id in getZKeyDownloadLink: ", err);
       throw err;
     }
 
-    return response.url;
+    return response.urls;
   }
 
   /**
@@ -409,20 +413,22 @@ export class Blueprint {
       throw Error("startZKeyDownload can only be used in a browser");
     }
 
-    let url: string;
+    let urls: DownloadUrls;
     try {
-      url = await this.getZKeyDownloadLink();
+      urls = await this.getZKeyDownloadLink();
     } catch (err) {
       console.error("Failed to start download of ZKeys: ", err);
       throw err;
     }
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "ZKeys.txt"; // Set the desired filename
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    for (const [name, url] of Object.entries(urls)) {
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = name; // Set the desired filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   }
 
   /**

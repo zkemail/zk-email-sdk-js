@@ -201,7 +201,6 @@ describe("Email utils test suite", async () => {
     };
 
     const inputs = await generateProofInputs(helloEml, decomposedRegexes, [], params);
-    console.log("inputs: ", inputs);
     expect(inputs).toBeDefined();
   });
 });

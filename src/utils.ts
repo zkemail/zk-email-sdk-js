@@ -15,6 +15,7 @@ import {
   GenerateProofInputsParams,
   GenerateProofInputsParamsInternal,
 } from "./types";
+import { log } from "console";
 
 type RelayerUtilsType = typeof NodeUtils | typeof WebUtils;
 
@@ -172,6 +173,8 @@ export async function testDecomposedRegex(
 ): Promise<string[]> {
   const parsedEmail = await parseEmail(eml);
 
+  console.log("parsedEmail: ", parsedEmail);
+
   const inputDecomposedRegex = {
     parts: decomposedRegex.parts.map((p: DecomposedRegexPart | DecomposedRegexPartJson) => ({
       is_public: "isPublic" in p ? p.isPublic : p.is_public,
@@ -188,13 +191,25 @@ export async function testDecomposedRegex(
     throw Error(`Unsupported location ${decomposedRegex.location}`);
   }
 
-  // const maxLength =
-  //   "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
+  const maxLength =
+    "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
   // if (inputStr.length > maxLength) {
   //   throw new Error(`Max length of ${maxLength} was exceeded`);
   // }
 
   const utils = await relayerUtils;
+  const privateResult = utils.extractSubstr(inputStr, inputDecomposedRegex, false);
+
+  if (privateResult.length > maxLength) {
+    throw new Error(
+      `Max length of extracted result was exceeded for decomposed regex ${decomposedRegex.name}`
+    );
+  }
+
+  if (!revealPrivate) {
+    return privateResult;
+  }
+
   const result = utils.extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
   return result;
 }
@@ -215,26 +230,26 @@ export async function generateProofInputs(
     };
 
     const utils = await relayerUtils;
-    console.log("got relayer utils");
-    console.log("actually creating proof inputs with params: ", internalParams);
+    // console.log("got relayer utils");
+    // console.log("actually creating proof inputs with params: ", internalParams);
 
     const decomposedRegexesCleaned = decomposedRegexes.map((dcr) => {
       return {
         ...dcr,
         parts: dcr.parts.map((p) => ({
           // @ts-ignore
-          is_public: p.isPublic || p.is_public,
+          is_public: p.isPublic || !!p.is_public,
           // @ts-ignore
-          regex_def: p.regexDef || p.regex_def,
+          regex_def: p.regexDef || !!p.regex_def,
         })),
       };
     });
 
-    console.log("calling generateCircuitInputsWithDecomposedRegexesAndExternalInputs with");
-    console.log("eml: ", eml);
-    console.log("decomposedRegex: ", decomposedRegexesCleaned);
-    console.log("externalInputs: ", externalInputs);
-    console.log("params: ", params);
+    // console.log("calling generateCircuitInputsWithDecomposedRegexesAndExternalInputs with");
+    // console.log("eml: ", eml);
+    // console.log("decomposedRegex: ", decomposedRegexesCleaned);
+    // console.log("externalInputs: ", externalInputs);
+    // console.log("params: ", params);
 
     const inputs = await utils.generateCircuitInputsWithDecomposedRegexesAndExternalInputs(
       eml,

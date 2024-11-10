@@ -43,7 +43,10 @@ describe("Blueprint test suite", async () => {
     onTokenExpired: async () => {},
   };
 
-  const { createBlueprint, getBlueprint, listBlueprints } = sdk({ auth });
+  const { createBlueprint, getBlueprint, listBlueprints } = sdk({
+    auth,
+    baseUrl: "http://localhost:8080",
+  });
 
   console.log("Setting up user database...");
   const { Client } = pg;
@@ -381,10 +384,10 @@ describe("Blueprint test suite", async () => {
       const props = getBlueprintProps();
       const blueprint = createBlueprint(props);
       // Set dummy id for the file download
-      blueprint.props.id = "some-id-1";
+      blueprint.props.id = "04561e11-8015-4a0c-9543-c9e5568e0254";
       blueprint.props.status = Status.Done;
-      const url = await blueprint.getZKeyDownloadLink();
-      expect(url).not.toBeNull();
+      const urls = await blueprint.getZKeyDownloadLink();
+      expect(Object.entries(urls).length).toBe(4);
     });
   });
 });

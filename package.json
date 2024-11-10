@@ -1,6 +1,6 @@
 {
   "name": "@zk-email/sdk",
-  "version": "0.0.15",
+  "version": "0.0.21",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -44,7 +44,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@dimidumo/relayer-utils": "^0.4.17",
+    "@dimidumo/relayer-utils": "^0.4.20",
     "viem": "^2.21.29"
   }
 }
