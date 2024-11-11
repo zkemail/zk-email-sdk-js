@@ -10,7 +10,12 @@ export { Proof } from "./proof";
 export type { Auth } from "./types/auth";
 
 // Exports that don't need initialization or options
-export { testDecomposedRegex, parseEmail, startJsonFileDownload } from "./utils";
+export {
+  testDecomposedRegex,
+  parseEmail,
+  startJsonFileDownload,
+  generateProofInputs,
+} from "./utils";
 export { getLoginWithGithubUrl } from "./auth";
 
 // Exported sdk, functions that need initialization

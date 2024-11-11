@@ -1,6 +1,7 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
 
 import {
+  Blueprint,
   DecomposedRegex,
   DecomposedRegexJson,
   DecomposedRegexPart,
@@ -11,6 +12,7 @@ import { getTokenFromAuth } from "./auth";
 import type * as NodeUtils from "@dimidumo/relayer-utils/node";
 import type * as WebUtils from "@dimidumo/relayer-utils/web";
 import {
+  BlueprintProps,
   ExternalInput,
   GenerateProofInputsParams,
   GenerateProofInputsParamsInternal,
@@ -166,15 +168,41 @@ export async function parseEmail(eml: string): Promise<ParsedEmail> {
   }
 }
 
-export async function testDecomposedRegex(
+export async function testBlueprint(
   eml: string,
+  blueprint: BlueprintProps,
+  revealPrivate = false
+): Promise<string[][]> {
+  const parsedEmail = await parseEmail(eml);
+
+  if (blueprint.emailBodyMaxLength === undefined || blueprint.emailHeaderMaxLength === undefined) {
+    throw new Error("emailBodyMaxLength and emailHeaderMaxLength must be provided");
+  }
+
+  const body =
+    parsedEmail.canonicalized_body.length > blueprint.emailBodyMaxLength
+      ? parsedEmail.canonicalized_body.substring(0, blueprint.emailBodyMaxLength)
+      : parsedEmail.canonicalized_body;
+  const header =
+    parsedEmail.canonicalized_header.length > blueprint.emailHeaderMaxLength
+      ? parsedEmail.canonicalized_header.substring(0, blueprint.emailHeaderMaxLength)
+      : parsedEmail.canonicalized_header;
+
+  const output = await Promise.all(
+    blueprint.decomposedRegexes.map((dcr: DecomposedRegex) =>
+      testDecomposedRegex(body, header, dcr, revealPrivate)
+    )
+  );
+
+  return output;
+}
+
+export async function testDecomposedRegex(
+  body: string,
+  header: string,
   decomposedRegex: DecomposedRegex | DecomposedRegexJson,
   revealPrivate = false
 ): Promise<string[]> {
-  const parsedEmail = await parseEmail(eml);
-
-  console.log("parsedEmail: ", parsedEmail);
-
   const inputDecomposedRegex = {
     parts: decomposedRegex.parts.map((p: DecomposedRegexPart | DecomposedRegexPartJson) => ({
       is_public: "isPublic" in p ? p.isPublic : p.is_public,
@@ -184,23 +212,20 @@ export async function testDecomposedRegex(
 
   let inputStr: string;
   if (decomposedRegex.location === "body") {
-    inputStr = parsedEmail.canonicalized_body;
+    inputStr = body;
   } else if (decomposedRegex.location === "header") {
-    inputStr = parsedEmail.canonicalized_header;
+    inputStr = header;
   } else {
     throw Error(`Unsupported location ${decomposedRegex.location}`);
   }
 
   const maxLength =
     "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
-  // if (inputStr.length > maxLength) {
-  //   throw new Error(`Max length of ${maxLength} was exceeded`);
-  // }
 
   const utils = await relayerUtils;
   const privateResult = utils.extractSubstr(inputStr, inputDecomposedRegex, false);
 
-  if (privateResult.length > maxLength) {
+  if (privateResult[0].length > maxLength) {
     throw new Error(
       `Max length of extracted result was exceeded for decomposed regex ${decomposedRegex.name}`
     );
@@ -245,11 +270,11 @@ export async function generateProofInputs(
       };
     });
 
-    // console.log("calling generateCircuitInputsWithDecomposedRegexesAndExternalInputs with");
-    // console.log("eml: ", eml);
-    // console.log("decomposedRegex: ", decomposedRegexesCleaned);
-    // console.log("externalInputs: ", externalInputs);
-    // console.log("params: ", params);
+    console.log("calling generateCircuitInputsWithDecomposedRegexesAndExternalInputs with");
+    console.log("eml: ", eml);
+    console.log("decomposedRegex: ", decomposedRegexesCleaned);
+    console.log("externalInputs: ", externalInputs);
+    console.log("params: ", params);
 
     const inputs = await utils.generateCircuitInputsWithDecomposedRegexesAndExternalInputs(
       eml,
