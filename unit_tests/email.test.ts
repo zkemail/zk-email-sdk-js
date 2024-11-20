@@ -297,10 +297,10 @@ describe("testBlueprint", () => {
     throw new Error("Did not throw an error on max length exceeded");
   });
 
-  test("Should cut off body if max length is exceeded", async () => {
+  test("Should fail if body max length is exceeded", async () => {
     const decomposedRegex: DecomposedRegex = {
       name: "Hello Pattern",
-      maxLength: 25,
+      maxLength: 10,
       location: "body",
       parts: [
         {
@@ -332,38 +332,6 @@ describe("testBlueprint", () => {
       return;
     }
     throw new Error("Matched a pattern in a cut off body");
-  });
-
-  test("Should match body in cut off pattern", async () => {
-    const decomposedRegex: DecomposedRegex = {
-      name: "Hello Pattern",
-      maxLength: 25,
-      location: "body",
-      parts: [
-        {
-          isPublic: false,
-          regexDef: "Hello ",
-        },
-        {
-          isPublic: true,
-          regexDef: "[^,]+",
-        },
-        {
-          isPublic: false,
-          regexDef: "!",
-        },
-      ],
-    };
-
-    // @ts-ignore
-    const blueprintProps: BlueprintProps = {
-      emailBodyMaxLength: 92,
-      emailHeaderMaxLength: 1024,
-      decomposedRegexes: [decomposedRegex],
-    };
-
-    const results = await testBlueprint(helloTestEmail, blueprintProps, false);
-    expect(results[0][0]).toBe("ZK Email");
   });
 
   test("Should cut off header if max length is exceeded", async () => {

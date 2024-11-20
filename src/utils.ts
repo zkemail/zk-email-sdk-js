@@ -16,8 +16,8 @@ import {
   ExternalInput,
   GenerateProofInputsParams,
   GenerateProofInputsParamsInternal,
+  ParsedEmail,
 } from "./types";
-import { log } from "console";
 
 type RelayerUtilsType = typeof NodeUtils | typeof WebUtils;
 
@@ -26,16 +26,16 @@ const relayerUtils: Promise<RelayerUtilsType> = new Promise((resolve) => {
   relayerUtilsResolver = resolve;
 });
 
+// TODO: comment back in
 // @ts-ignore
-// if (typeof window === "undefined" || typeof Deno !== "undefined") {
-if (false) {
-  console.warn("Relayer utils won't work when used server side");
-  // console.log("Initializing for node");
-  // import("@dimidumo/relayer-utils/node")
-  //   .then((rl) => {
-  //     relayerUtilsResolver(rl);
-  //   })
-  //   .catch((err) => console.log("failed to init WASM on node: ", err));
+if (typeof window === "undefined" || typeof Deno !== "undefined") {
+  // if (false) {
+  console.warn("Relayer utils won't work when used server side with bundlers, Next.js etc.");
+  import("@dimidumo/relayer-utils/node")
+    .then((rl) => {
+      relayerUtilsResolver(rl);
+    })
+    .catch((err) => console.log("failed to init WASM on node: ", err));
 } else {
   console.log("frontend wasm");
   try {
@@ -147,16 +147,6 @@ export async function get<T>(url: string, queryParams?: object | null, auth?: Au
   }
 }
 
-// Provisional type, delete once libary types
-type ParsedEmail = {
-  canonicalized_header: string;
-  canonicalized_body: string;
-  signature: number[];
-  public_key: any[];
-  cleaned_body: string;
-  headers: Map<string, string[]>;
-};
-
 export async function parseEmail(eml: string): Promise<ParsedEmail> {
   try {
     const utils = await relayerUtils;
@@ -168,6 +158,7 @@ export async function parseEmail(eml: string): Promise<ParsedEmail> {
   }
 }
 
+// TODO: move out functionality to testDecomposedRegex so it can used seperately
 export async function testBlueprint(
   eml: string,
   blueprint: BlueprintProps,
@@ -175,18 +166,27 @@ export async function testBlueprint(
 ): Promise<string[][]> {
   const parsedEmail = await parseEmail(eml);
 
-  if (blueprint.emailBodyMaxLength === undefined || blueprint.emailHeaderMaxLength === undefined) {
+  if (
+    (blueprint.emailBodyMaxLength === undefined && !blueprint.ignoreBodyHashCheck) ||
+    blueprint.emailHeaderMaxLength === undefined
+  ) {
     throw new Error("emailBodyMaxLength and emailHeaderMaxLength must be provided");
   }
 
-  const body =
-    parsedEmail.canonicalized_body.length > blueprint.emailBodyMaxLength
-      ? parsedEmail.canonicalized_body.substring(0, blueprint.emailBodyMaxLength)
-      : parsedEmail.canonicalized_body;
-  const header =
-    parsedEmail.canonicalized_header.length > blueprint.emailHeaderMaxLength
-      ? parsedEmail.canonicalized_header.substring(0, blueprint.emailHeaderMaxLength)
-      : parsedEmail.canonicalized_header;
+  let body = parsedEmail.canonicalized_body;
+  if (blueprint.shaPrecomputeSelector) {
+    const splitEmail = body.split(blueprint.shaPrecomputeSelector)[1];
+    if (!splitEmail) {
+      throw new Error(
+        `Precompute selector was not found in email, selector: ${blueprint.shaPrecomputeSelector}`
+      );
+    }
+    body = splitEmail;
+  }
+
+  const header = parsedEmail.canonicalized_header;
+
+  await checkInputLengths(header, body, blueprint);
 
   const output = await Promise.all(
     blueprint.decomposedRegexes.map((dcr: DecomposedRegex) =>
@@ -195,6 +195,33 @@ export async function testBlueprint(
   );
 
   return output;
+}
+
+async function checkInputLengths(header: string, body: string, blueprint: BlueprintProps) {
+  const utils = await relayerUtils;
+  const encoder = new TextEncoder();
+  const headerData = encoder.encode(header);
+  const headerLength = (await utils.sha256Pad(headerData, blueprint.emailHeaderMaxLength!)).get(
+    "messageLength"
+  );
+  if (headerLength > blueprint.emailHeaderMaxLength!) {
+    throw new Error(`emailHeaderMaxLength of ${blueprint.emailHeaderMaxLength} was exceeded`);
+  }
+
+  if (!blueprint.ignoreBodyHashCheck) {
+    const bodyData = encoder.encode(body);
+
+    const bodyShaLength = ((body.length + 63 + 65) / 64) * 64;
+
+    const maxShaBytes = Math.max(bodyShaLength, blueprint.emailBodyMaxLength!);
+
+    const bodyLength = (await utils.sha256Pad(bodyData, maxShaBytes)).get("messageLength");
+    const res = await utils.sha256Pad(bodyData, maxShaBytes);
+
+    if (bodyLength > blueprint.emailBodyMaxLength!) {
+      throw new Error(`emailBodyMaxLength of ${blueprint.emailBodyMaxLength} was exceeded`);
+    }
+  }
 }
 
 export async function testDecomposedRegex(
@@ -255,8 +282,6 @@ export async function generateProofInputs(
     };
 
     const utils = await relayerUtils;
-    // console.log("got relayer utils");
-    // console.log("actually creating proof inputs with params: ", internalParams);
 
     const decomposedRegexesCleaned = decomposedRegexes.map((dcr) => {
       return {
@@ -269,12 +294,6 @@ export async function generateProofInputs(
         })),
       };
     });
-
-    console.log("calling generateCircuitInputsWithDecomposedRegexesAndExternalInputs with");
-    console.log("eml: ", eml);
-    console.log("decomposedRegex: ", decomposedRegexesCleaned);
-    console.log("externalInputs: ", externalInputs);
-    console.log("params: ", params);
 
     const inputs = await utils.generateCircuitInputsWithDecomposedRegexesAndExternalInputs(
       eml,

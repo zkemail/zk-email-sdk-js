@@ -299,6 +299,14 @@ describe("Blueprint test suite", async () => {
 
         expect(blueprints.length).toBe(0);
       });
+
+      test("List by filtering multiple status", async () => {
+        console.log("in list blueprints test===============================");
+        const blueprints = await listBlueprints({ status: [Status.InProgress, Status.Done] });
+        console.log("blueprints: ", blueprints);
+
+        expect(blueprints.length).toBe(0);
+      });
     });
   });
 

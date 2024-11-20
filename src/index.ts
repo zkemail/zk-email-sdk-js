@@ -8,6 +8,7 @@ export { Blueprint } from "./blueprint";
 export * from "./types/proof";
 export { Proof } from "./proof";
 export type { Auth } from "./types/auth";
+export type { ParsedEmail } from "./types/utils";
 
 // Exports that don't need initialization or options
 export {
@@ -15,6 +16,7 @@ export {
   parseEmail,
   startJsonFileDownload,
   generateProofInputs,
+  testBlueprint,
 } from "./utils";
 export { getLoginWithGithubUrl } from "./auth";
 
@@ -29,14 +31,17 @@ export default (sdkOptions?: SdkOptions) => {
       const blueprint = new Blueprint(props, baseUrl, sdkOptions!.auth);
       return blueprint;
     },
-    async getBlueprint(id: string): Promise<Blueprint> {
+    async getBlueprint(slug: string): Promise<Blueprint> {
+      return Blueprint.getBlueprintBySlug(slug, baseUrl, sdkOptions?.auth);
+    },
+    async getBlueprintById(id: string): Promise<Blueprint> {
       return Blueprint.getBlueprintById(id, baseUrl, sdkOptions?.auth);
     },
     async listBlueprints(options?: ListBlueprintsOptions): Promise<Blueprint[]> {
       return Blueprint.listBlueprints(baseUrl, options, sdkOptions?.auth);
     },
     async getProof(id: string): Promise<Proof> {
-      return Proof.getPoofById(id, baseUrl);
+      return Proof.getProofById(id, baseUrl);
     },
   };
 };

@@ -43,9 +43,7 @@ export class Prover {
    * Done or Failed.
    */
   async generateProof(eml: string): Promise<Proof> {
-    console.log("starting generate proof");
     const proof = await this.generateProofRequest(eml);
-    console.log("got proof: ", proof);
 
     // Wait for proof to finish
     while (![ProofStatus.Done, ProofStatus.Failed].includes(await proof.checkStatus())) {}

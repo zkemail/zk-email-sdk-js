@@ -12,8 +12,8 @@ export type ProofProps = {
   id: string;
   blueprintId: string;
   input: string;
-  proof?: string;
-  public?: string;
+  proofData?: string;
+  publicData?: string;
   status?: ProofStatus;
   startedAt?: Date;
   provedAt?: Date;

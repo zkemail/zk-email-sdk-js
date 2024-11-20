@@ -69,6 +69,46 @@ export class Blueprint {
     return blueprint;
   }
 
+  /**
+   * Fetches an existing RegexBlueprint by slug from the database.
+   * @param slug - Slug of the blueprint. Must include version, e.g. "slug:v1"
+   * @param version - Version of the slug.
+   * @returns A promise that resolves to a new instance of RegexBlueprint.
+   */
+  public static async getBlueprintBySlug(
+    slug: string,
+    baseUrl: string,
+    auth?: Auth
+  ): Promise<Blueprint> {
+    const parts = slug.split("@");
+
+    if (!parts || !(parts.length > 1)) {
+      throw new Error("You must provide the blueprint version, e.g. 'user/slug@v1");
+    }
+    const version = parts.pop()!.replace("v", "");
+
+    slug = encodeURIComponent(parts.join(""));
+
+    if (!version) {
+      throw new Error("You must provide the blueprint version, e.g. 'user/slug@v1");
+    }
+
+    let blueprintResponse: BlueprintResponse;
+    try {
+      const url = `${baseUrl}/blueprint/by-slug/${slug}/${version}`;
+      blueprintResponse = await get<BlueprintResponse>(url);
+    } catch (err) {
+      console.error("Failed calling /blueprint/by-slug/:slug/:id in getBlueprintById: ", err);
+      throw err;
+    }
+
+    const blueprintProps = this.responseToBlueprintProps(blueprintResponse);
+
+    const blueprint = new Blueprint(blueprintProps, baseUrl, auth);
+
+    return blueprint;
+  }
+
   // Maps the blueprint API response to the BlueprintProps
   private static responseToBlueprintProps(response: BlueprintResponse): BlueprintProps {
     const props: BlueprintProps = {

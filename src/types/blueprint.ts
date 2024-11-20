@@ -156,7 +156,7 @@ export type ListBlueprintsOptions = {
   skip?: number;
   limit?: number;
   sort?: -1 | 1;
-  status?: Status;
+  status?: Status[];
   isPublic?: boolean;
   search?: string;
 };
@@ -165,7 +165,7 @@ export type ListBlueprintsOptionsRequest = {
   skip?: number;
   limit?: number;
   sort?: -1 | 1;
-  status?: Status;
+  status?: Status[];
   is_public?: boolean;
   search?: string;
 };

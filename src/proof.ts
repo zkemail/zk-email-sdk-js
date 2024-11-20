@@ -107,8 +107,23 @@ export class Proof {
       throw err;
     }
 
+    // Update the proof to its new data
+    if (
+      [ProofStatus.InProgress, ProofStatus.Done].includes(this.props.status!) &&
+      this.props.status !== response.status
+    ) {
+      const newProof = await Proof.getProofById(this.props.id, this.blueprint.baseUrl);
+      this.props = newProof.props;
+      return this.props.status!;
+    }
+
     this.props.status = response.status;
     return response.status;
+  }
+
+  async waitForCompletion(): Promise<ProofStatus> {
+    while ((await this.checkStatus()) === ProofStatus.InProgress) {}
+    return this.props.status!;
   }
 
   async verifyOnChain() {}
@@ -118,7 +133,7 @@ export class Proof {
    * @param id - Id of the Proof.
    * @returns A promise that resolves to a new instance of Proof.
    */
-  public static async getPoofById(id: string, baseUrl: string): Promise<Proof> {
+  public static async getProofById(id: string, baseUrl: string): Promise<Proof> {
     let proofResponse: ProofResponse;
     try {
       proofResponse = await get<ProofResponse>(`${baseUrl}/proof/${id}`);
@@ -139,11 +154,21 @@ export class Proof {
       blueprintId: response.blueprint_id,
       status: response.status as ProofStatus,
       input: response.input,
-      proof: response.proof,
-      public: response.public,
+      proofData: response.proof,
+      publicData: response.public,
       startedAt: new Date(response.started_at.seconds * 1000),
       provedAt: response.proved_at ? new Date(response.proved_at.seconds * 1000) : undefined,
     };
     return props;
+  }
+
+  /**
+   * @returns The public data and proof data.
+   */
+  getProofData(): { proofData: string; publicData: string } {
+    if (this.props.status !== ProofStatus.Done) {
+      throw new Error("Cannot get proof data, proof is not Done");
+    }
+    return { proofData: this.props.proofData!, publicData: this.props.publicData! };
   }
 }
