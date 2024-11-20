@@ -33,4 +33,37 @@ describe("Blueprint prod test suite", () => {
     const blueprint = await sdk().getBlueprint("Bisht13/SuccinctZKResidencyInvite:v1");
     expect(blueprint.props.version).toBe(2);
   });
+
+  test("Should only list blueprints not Done of logged in user", async () => {
+    const blueprints = await sdk({
+      baseUrl: "http://localhost:8080",
+      auth: {
+        getToken: async () =>
+          // Token only usable locally
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzQ2NzUyMjIsImdpdGh1Yl91c2VybmFtZSI6IkRpbWlEdW1vIn0.MqrxsUWt-f3rzg8rd_agovrgaEorMGcTL_PyeX4A7To",
+        onTokenExpired: async () => {},
+      },
+    }).listBlueprints({
+      status: [Status.Draft, Status.Done],
+    });
+
+    expect(blueprints.some((bp) => bp.props.status === Status.Failed)).toBeFalse();
+    expect(blueprints.some((bp)   1=> bp.props.status === Status.Draft)).toBeTrue();
+    expect(
+      blueprints.some((bp) => bp.props.id === "839eefd4-944e-419a-993a-dc7954b5b49a")
+    ).toBeFalse();
+    expect(
+      blueprints.some((bp) => bp.props.id === "1e65293c-667b-4350-b9c0-1769c320662c")
+    ).toBeTrue();
+  });
+
+  test("Should only list blueprints Done of logged out user", async () => {
+    const blueprints = await sdk({
+      baseUrl: "http://localhost:8080",
+    }).listBlueprints({
+      status: [Status.Draft, Status.Done],
+    });
+
+    expect(blueprints.some((bp) => bp.props.status === Status.Draft)).toBeFalse();
+  });
 });

@@ -304,7 +304,8 @@ export class Blueprint {
     try {
       response = await get<{ blueprints?: BlueprintResponse[] }>(
         `${baseUrl}/blueprint`,
-        requestOptions
+        requestOptions,
+        auth
       );
     } catch (err) {
       console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
