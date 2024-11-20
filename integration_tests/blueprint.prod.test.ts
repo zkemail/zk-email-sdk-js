@@ -39,6 +39,7 @@ describe("Blueprint prod test suite", () => {
       baseUrl: "http://localhost:8080",
       auth: {
         getToken: async () =>
+          // Token only usable locally
           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzQ2NzUyMjIsImdpdGh1Yl91c2VybmFtZSI6IkRpbWlEdW1vIn0.MqrxsUWt-f3rzg8rd_agovrgaEorMGcTL_PyeX4A7To",
         onTokenExpired: async () => {},
       },
@@ -47,7 +48,7 @@ describe("Blueprint prod test suite", () => {
     });
 
     expect(blueprints.some((bp) => bp.props.status === Status.Failed)).toBeFalse();
-    expect(blueprints.some((bp) => bp.props.status === Status.Draft)).toBeTrue();
+    expect(blueprints.some((bp)   1=> bp.props.status === Status.Draft)).toBeTrue();
     expect(
       blueprints.some((bp) => bp.props.id === "839eefd4-944e-419a-993a-dc7954b5b49a")
     ).toBeFalse();
