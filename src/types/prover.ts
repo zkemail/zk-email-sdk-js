@@ -5,5 +5,5 @@ export type ProverOptions = {
 export type ExternalInputInput = {
   name: string;
   value: string;
-  maxLength: string;
+  maxLength: number;
 };
