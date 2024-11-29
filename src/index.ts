@@ -7,6 +7,7 @@ export * from "./types/blueprint";
 export { Blueprint } from "./blueprint";
 export * from "./types/proof";
 export { Proof } from "./proof";
+export * from "./types/prover";
 export type { Auth } from "./types/auth";
 export type { ParsedEmail } from "./types/utils";
 

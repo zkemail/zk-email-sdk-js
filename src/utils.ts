@@ -9,47 +9,34 @@ import {
 } from "./blueprint";
 import { Auth } from "./types/auth";
 import { getTokenFromAuth } from "./auth";
-import type * as NodeUtils from "@dimidumo/relayer-utils/node";
-import type * as WebUtils from "@dimidumo/relayer-utils/web";
 import {
   BlueprintProps,
-  ExternalInput,
   GenerateProofInputsParams,
   GenerateProofInputsParamsInternal,
   ParsedEmail,
+  ExternalInputInput,
 } from "./types";
 
-type RelayerUtilsType = typeof NodeUtils | typeof WebUtils;
+import {
+  init,
+  parseEmail as parseEmailUtils,
+  sha256Pad,
+  extractSubstr,
+  generateCircuitInputsWithDecomposedRegexesAndExternalInputs,
+} from "@dimidumo/relayer-utils";
 
 let relayerUtilsResolver: (value: any) => void;
-const relayerUtils: Promise<RelayerUtilsType> = new Promise((resolve) => {
+const relayerUtilsInit: Promise<void> = new Promise((resolve) => {
   relayerUtilsResolver = resolve;
 });
 
-// TODO: comment back in
-// @ts-ignore
-if (typeof window === "undefined" || typeof Deno !== "undefined") {
-  // if (false) {
-  console.warn("Relayer utils won't work when used server side with bundlers, Next.js etc.");
-  import("@dimidumo/relayer-utils/node")
-    .then((rl) => {
-      relayerUtilsResolver(rl);
-    })
-    .catch((err) => console.log("failed to init WASM on node: ", err));
-} else {
-  console.log("frontend wasm");
-  try {
-    import("@dimidumo/relayer-utils/web")
-      .then(async (rl) => {
-        // @ts-ignore
-        await rl.default();
-        relayerUtilsResolver(rl);
-      })
-      .catch((err) => {
-        console.log("Failed to init WASM: ", err);
-      });
-  } catch (err) {}
-}
+init()
+  .then(() => {
+    relayerUtilsResolver(null);
+  })
+  .catch((err) => {
+    console.log("Failed to initialize wasm for relayer-utils: ", err);
+  });
 
 export async function post<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
   try {
@@ -149,8 +136,8 @@ export async function get<T>(url: string, queryParams?: object | null, auth?: Au
 
 export async function parseEmail(eml: string): Promise<ParsedEmail> {
   try {
-    const utils = await relayerUtils;
-    const parsedEmail = await utils.parseEmail(eml);
+    await relayerUtilsInit;
+    const parsedEmail = await parseEmailUtils(eml);
     return parsedEmail as ParsedEmail;
   } catch (err) {
     console.error("Failed to parse email: ", err);
@@ -198,10 +185,10 @@ export async function testBlueprint(
 }
 
 async function checkInputLengths(header: string, body: string, blueprint: BlueprintProps) {
-  const utils = await relayerUtils;
+  await relayerUtilsInit;
   const encoder = new TextEncoder();
   const headerData = encoder.encode(header);
-  const headerLength = (await utils.sha256Pad(headerData, blueprint.emailHeaderMaxLength!)).get(
+  const headerLength = (await sha256Pad(headerData, blueprint.emailHeaderMaxLength!)).get(
     "messageLength"
   );
   if (headerLength > blueprint.emailHeaderMaxLength!) {
@@ -215,8 +202,8 @@ async function checkInputLengths(header: string, body: string, blueprint: Bluepr
 
     const maxShaBytes = Math.max(bodyShaLength, blueprint.emailBodyMaxLength!);
 
-    const bodyLength = (await utils.sha256Pad(bodyData, maxShaBytes)).get("messageLength");
-    const res = await utils.sha256Pad(bodyData, maxShaBytes);
+    const bodyLength = (await sha256Pad(bodyData, maxShaBytes)).get("messageLength");
+    const res = await sha256Pad(bodyData, maxShaBytes);
 
     if (bodyLength > blueprint.emailBodyMaxLength!) {
       throw new Error(`emailBodyMaxLength of ${blueprint.emailBodyMaxLength} was exceeded`);
@@ -249,8 +236,8 @@ export async function testDecomposedRegex(
   const maxLength =
     "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
 
-  const utils = await relayerUtils;
-  const privateResult = utils.extractSubstr(inputStr, inputDecomposedRegex, false);
+  await relayerUtilsInit;
+  const privateResult = extractSubstr(inputStr, inputDecomposedRegex, false);
 
   if (privateResult[0].length > maxLength) {
     throw new Error(
@@ -262,14 +249,14 @@ export async function testDecomposedRegex(
     return privateResult;
   }
 
-  const result = utils.extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
+  const result = extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
   return result;
 }
 
 export async function generateProofInputs(
   eml: string,
   decomposedRegexes: DecomposedRegex[],
-  externalInputs: ExternalInput[],
+  externalInputs: ExternalInputInput[],
   params: GenerateProofInputsParams
 ): Promise<string> {
   try {
@@ -281,7 +268,7 @@ export async function generateProofInputs(
       shaPrecomputeSelector: params.shaPrecomputeSelector,
     };
 
-    const utils = await relayerUtils;
+    await relayerUtilsInit;
 
     const decomposedRegexesCleaned = decomposedRegexes.map((dcr) => {
       return {
@@ -295,7 +282,7 @@ export async function generateProofInputs(
       };
     });
 
-    const inputs = await utils.generateCircuitInputsWithDecomposedRegexesAndExternalInputs(
+    const inputs = await generateCircuitInputsWithDecomposedRegexesAndExternalInputs(
       eml,
       decomposedRegexesCleaned,
       externalInputs,
