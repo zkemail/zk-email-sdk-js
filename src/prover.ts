@@ -1,4 +1,4 @@
-import { Blueprint } from "./blueprint";
+import { Blueprint, ExternalInput } from "./blueprint";
 import { Proof } from "./proof";
 import {
   GenerateProofInputsParams,
@@ -7,7 +7,7 @@ import {
   ProofResponse,
   ProofStatus,
 } from "./types/proof";
-import { ProverOptions } from "./types/prover";
+import { ExternalInputInput, ProverOptions } from "./types/prover";
 import { generateProofInputs, post } from "./utils";
 
 /**
@@ -42,8 +42,8 @@ export class Prover {
    * @returns A promise that resolves to a new instance of Proof. The Proof will have the status
    * Done or Failed.
    */
-  async generateProof(eml: string): Promise<Proof> {
-    const proof = await this.generateProofRequest(eml);
+  async generateProof(eml: string, externalInputs: ExternalInputInput[]): Promise<Proof> {
+    const proof = await this.generateProofRequest(eml, externalInputs);
 
     // Wait for proof to finish
     while (![ProofStatus.Done, ProofStatus.Failed].includes(await proof.checkStatus())) {}
@@ -57,10 +57,19 @@ export class Prover {
    * @returns A promise that resolves to a new instance of Proof. The Proof will have the status
    * InProgress.
    */
-  async generateProofRequest(eml: string): Promise<Proof> {
+  async generateProofRequest(
+    eml: string,
+    externalInputs: ExternalInputInput[] = []
+  ): Promise<Proof> {
     const blueprintId = this.blueprint.getId();
     if (!blueprintId) {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
+    }
+
+    if (this.blueprint.props.externalInputs?.length && !externalInputs.length) {
+      throw new Error(
+        `The ${this.blueprint.props.slug} blueprint requires external inputs: ${this.blueprint.props.externalInputs}`
+      );
     }
 
     let input: string;
@@ -77,7 +86,7 @@ export class Prover {
       input = await generateProofInputs(
         eml,
         this.blueprint.props.decomposedRegexes,
-        this.blueprint.props.externalInputs || [],
+        externalInputs,
         params
       );
     } catch (err) {

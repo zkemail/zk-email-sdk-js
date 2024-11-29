@@ -11,10 +11,10 @@ import { Auth } from "./types/auth";
 import { getTokenFromAuth } from "./auth";
 import {
   BlueprintProps,
-  ExternalInput,
   GenerateProofInputsParams,
   GenerateProofInputsParamsInternal,
   ParsedEmail,
+  ExternalInputInput,
 } from "./types";
 
 import {
@@ -256,7 +256,7 @@ export async function testDecomposedRegex(
 export async function generateProofInputs(
   eml: string,
   decomposedRegexes: DecomposedRegex[],
-  externalInputs: ExternalInput[],
+  externalInputs: ExternalInputInput[],
   params: GenerateProofInputsParams
 ): Promise<string> {
   try {
