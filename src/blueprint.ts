@@ -243,7 +243,7 @@ export class Blueprint {
     try {
       response = await post<BlueprintResponse>(`${this.baseUrl}/blueprint`, requestData, this.auth);
     } catch (err) {
-      console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
+      console.error("Failed calling POST on /blueprint/ in submitNewVersionDraft: ", err);
       throw err;
     }
 
@@ -308,7 +308,7 @@ export class Blueprint {
         auth
       );
     } catch (err) {
-      console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
+      console.error("Failed calling GET on /blueprint/ in listBlueprints: ", err);
       throw err;
     }
 

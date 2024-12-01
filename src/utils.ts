@@ -39,13 +39,22 @@ init()
   });
 
 export async function post<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
+  let authToken: string | null = null;
+  if (auth) {
+    try {
+      authToken = await getTokenFromAuth(auth);
+    } catch (err) {
+      console.error("Could not get token from auth", err);
+    }
+  }
+
   try {
     const request: RequestInit = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-api-key": PUBLIC_SDK_KEY,
-        ...(!auth ? {} : { Authorization: await getTokenFromAuth(auth) }),
+        ...(!authToken ? {} : { Authorization: authToken }),
       },
     };
 
@@ -70,13 +79,22 @@ export async function post<T>(url: string, data?: object | null, auth?: Auth): P
 }
 
 export async function patch<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
+  let authToken: string | null = null;
+  if (auth) {
+    try {
+      authToken = await getTokenFromAuth(auth);
+    } catch (err) {
+      console.warn("Could not get token from auth", err);
+    }
+  }
+
   try {
     const request: RequestInit = {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         "x-api-key": PUBLIC_SDK_KEY,
-        ...(!auth ? {} : { Authorization: await getTokenFromAuth(auth) }),
+        ...(!authToken ? {} : { Authorization: authToken }),
       },
     };
 
@@ -100,6 +118,15 @@ export async function patch<T>(url: string, data?: object | null, auth?: Auth): 
 }
 
 export async function get<T>(url: string, queryParams?: object | null, auth?: Auth): Promise<T> {
+  let authToken: string | null = null;
+  if (auth) {
+    try {
+      authToken = await getTokenFromAuth(auth);
+    } catch (err) {
+      console.warn("Could not get token from auth", err);
+    }
+  }
+
   try {
     let fullUrl = url;
     if (queryParams) {
@@ -119,7 +146,7 @@ export async function get<T>(url: string, queryParams?: object | null, auth?: Au
       headers: {
         "Content-Type": "application/json",
         "x-api-key": PUBLIC_SDK_KEY,
-        ...(!auth ? {} : { Authorization: await getTokenFromAuth(auth) }),
+        ...(!authToken ? {} : { Authorization: authToken }),
       },
     });
 
