@@ -14,6 +14,7 @@ export type ProofProps = {
   input: string;
   proofData?: string;
   publicData?: string;
+  externalInputs?: string;
   status?: ProofStatus;
   startedAt?: Date;
   provedAt?: Date;
@@ -25,6 +26,7 @@ export type ProofResponse = {
   input: string;
   proof?: string;
   public?: string;
+  external_inputs?: string;
   started_at: ServerDate;
   proved_at?: ServerDate;
   status: number;
@@ -33,6 +35,7 @@ export type ProofResponse = {
 export type ProofRequest = {
   blueprint_id: string;
   input: string;
+  external_inputs: string;
 };
 
 export type GenerateProofInputsParams = {
