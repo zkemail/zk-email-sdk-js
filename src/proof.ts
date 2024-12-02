@@ -156,6 +156,7 @@ export class Proof {
       input: response.input,
       proofData: response.proof,
       publicData: response.public,
+      externalInputs: response.external_inputs,
       startedAt: new Date(response.started_at.seconds * 1000),
       provedAt: response.proved_at ? new Date(response.proved_at.seconds * 1000) : undefined,
     };
