@@ -110,7 +110,7 @@ export class Blueprint {
   }
 
   // Maps the blueprint API response to the BlueprintProps
-  private static responseToBlueprintProps(response: BlueprintResponse): BlueprintProps {
+  static responseToBlueprintProps(response: BlueprintResponse): BlueprintProps {
     const props: BlueprintProps = {
       id: response.id,
       title: response.title,
@@ -315,6 +315,8 @@ export class Blueprint {
     if (!response.blueprints) {
       return [];
     }
+
+    // console.log("response.blueprints: ", response.blueprints);
 
     return response.blueprints.map((blueprintResponse) => {
       const blueprintProps = Blueprint.responseToBlueprintProps(blueprintResponse);
