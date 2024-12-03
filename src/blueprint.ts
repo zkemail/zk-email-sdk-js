@@ -10,7 +10,7 @@ import {
   Status,
   ZkFramework,
 } from "./types/blueprint";
-import { get, patch, post } from "./utils";
+import { del, get, patch, post } from "./utils";
 import { verifyProofOnChain } from "./chain";
 import { Auth } from "./types/auth";
 
@@ -22,6 +22,7 @@ export class Blueprint {
   props: BlueprintProps;
   auth?: Auth;
   baseUrl: string;
+  stars = 0;
 
   private lastCheckedStatus: Date | null = null;
 
@@ -289,7 +290,8 @@ export class Blueprint {
   public static async listBlueprints(
     baseUrl: string,
     options?: ListBlueprintsOptions,
-    auth?: Auth
+    auth?: Auth,
+    fetchStars = true
   ): Promise<Blueprint[]> {
     const requestOptions: ListBlueprintsOptionsRequest = {
       skip: options?.skip,
@@ -316,10 +318,16 @@ export class Blueprint {
       return [];
     }
 
-    return response.blueprints.map((blueprintResponse) => {
+    const blueprints = response.blueprints.map((blueprintResponse) => {
       const blueprintProps = Blueprint.responseToBlueprintProps(blueprintResponse);
       return new Blueprint(blueprintProps, baseUrl, auth);
     });
+
+    if (fetchStars) {
+      await Promise.all(blueprints.map((bp) => bp.getStars()));
+    }
+
+    return blueprints;
   }
 
   /**
@@ -436,7 +444,6 @@ export class Blueprint {
       response = await get<{ urls: DownloadUrls }>(
         `${this.baseUrl}/blueprint/zkey/${this.props.id}`
       );
-      console.log("response: ", response);
     } catch (err) {
       console.error("Failed calling GET on /blueprint/zkey/:id in getZKeyDownloadLink: ", err);
       throw err;
@@ -574,6 +581,55 @@ export class Blueprint {
       const blueprintProps = Blueprint.responseToBlueprintProps(blueprintResponse);
       return new Blueprint(blueprintProps, this.baseUrl, this.auth);
     });
+  }
+
+  async addStar(): Promise<number> {
+    if (!this.auth) {
+      throw new Error("Auth is required. Please login to star a blueprint.");
+    }
+
+    try {
+      await post(
+        `${this.baseUrl}/blueprint/${encodeURIComponent(this.props.slug!)}/stars`,
+        null,
+        this.auth
+      );
+      return await this.getStars();
+    } catch (err) {
+      console.error("Failed calling POST on /blueprint/${slug}/stars in addStar: ", err);
+      throw err;
+    }
+  }
+
+  async removeStar(): Promise<number> {
+    if (!this.auth) {
+      throw new Error("Auth is required. Please login to star a blueprint.");
+    }
+
+    try {
+      await del(
+        `${this.baseUrl}/blueprint/${encodeURIComponent(this.props.slug!)}/stars`,
+        null,
+        this.auth
+      );
+      return await this.getStars();
+    } catch (err) {
+      console.error("Failed calling DELETE on /blueprint/${id}/stars in addStar: ", err);
+      throw err;
+    }
+  }
+
+  async getStars(): Promise<number> {
+    try {
+      const { stars } = await get<{ stars: number }>(
+        `${this.baseUrl}/blueprint/${encodeURIComponent(this.props.slug!)}/stars`
+      );
+      this.stars = stars || 0;
+      return stars || 0;
+    } catch (err) {
+      console.error("Failed calling POST on /blueprint/${id}/stars in addStar: ", err);
+      throw err;
+    }
   }
 }
 

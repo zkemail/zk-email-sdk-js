@@ -1,6 +1,7 @@
 import { Blueprint, BlueprintProps, ListBlueprintsOptions } from "./blueprint";
 import { Proof } from "./proof";
 import { SdkOptions } from "./types/sdk";
+import { getStarredBlueprints } from "./user";
 
 // Export Types
 export * from "./types/blueprint";
@@ -43,6 +44,12 @@ export default (sdkOptions?: SdkOptions) => {
     },
     async getProof(id: string): Promise<Proof> {
       return Proof.getProofById(id, baseUrl);
+    },
+    async getStarredBlueprints(): Promise<string[]> {
+      if (!sdkOptions && !sdkOptions!.auth) {
+        throw new Error("You need to specify options.auth to use getStarredBlueprints");
+      }
+      return getStarredBlueprints(baseUrl, sdkOptions!.auth!);
     },
   };
 };
