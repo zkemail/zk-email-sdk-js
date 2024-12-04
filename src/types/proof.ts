@@ -1,3 +1,4 @@
+import { Dir } from "fs";
 import { ServerDate } from "./blueprint";
 
 // According to protobufs
@@ -14,6 +15,7 @@ export type ProofProps = {
   input: string;
   proofData?: string;
   publicData?: string;
+  publicOutputs?: string[];
   externalInputs?: string;
   status?: ProofStatus;
   startedAt?: Date;
@@ -27,6 +29,7 @@ export type ProofResponse = {
   proof?: string;
   public?: string;
   external_inputs?: string;
+  public_outputs?: string[];
   started_at: ServerDate;
   proved_at?: ServerDate;
   status: number;
@@ -52,4 +55,11 @@ export type GenerateProofInputsParamsInternal = {
   ignoreBodyHashCheck: boolean;
   removeSoftLinesBreaks: boolean;
   shaPrecomputeSelector?: string;
+};
+
+export type ProofData = {
+  pi_a: [string, string, string];
+  pi_b: [[string, string], [string, string], [string, string]];
+  pi_c: [string, string, string];
+  protocol: string;
 };

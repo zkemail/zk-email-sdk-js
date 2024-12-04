@@ -376,18 +376,6 @@ describe("Blueprint test suite", async () => {
     });
   });
 
-  describe("On chain verification", () => {
-    // TODO: remove test once implemented
-    test("Test connectivity to chain by calling WETH", async () => {
-      const props = getBlueprintProps();
-      const blueprint = createBlueprint(props);
-      // Set dummy id for the file download
-      blueprint.props.status = Status.Done;
-      const proof = {} as Proof;
-      await blueprint.verifyProofOnChain(proof);
-    });
-  });
-
   describe("Download zkeys", () => {
     test("getZKeyDownloadLink on dummy id should return a download url", async () => {
       const props = getBlueprintProps();
