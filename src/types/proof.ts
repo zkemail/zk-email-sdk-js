@@ -37,8 +37,8 @@ export type ProofResponse = {
 
 export type ProofRequest = {
   blueprint_id: string;
-  input: string;
-  external_inputs: string;
+  input: any;
+  external_inputs: any;
 };
 
 export type GenerateProofInputsParams = {
