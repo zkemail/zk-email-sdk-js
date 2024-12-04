@@ -1,4 +1,5 @@
 import { Blueprint, Status } from "./blueprint";
+import { verifyProofOnChain } from "./chain";
 import { ProofProps, ProofResponse, ProofStatus } from "./types/proof";
 import { get } from "./utils";
 
@@ -126,7 +127,14 @@ export class Proof {
     return this.props.status!;
   }
 
-  async verifyOnChain() {}
+  /**
+   * Verifies the proof on chain using the verifier contract defined in the blueprint.
+   * Will throw an error if it cannot verify the proof. If the function call succeeds,
+   * the proof was validated.
+   */
+  async verifyOnChain() {
+    await verifyProofOnChain(this);
+  }
 
   /**
    * Fetches an existing Proof from the database.
@@ -156,6 +164,7 @@ export class Proof {
       input: response.input,
       proofData: response.proof,
       publicData: response.public,
+      publicOutputs: response.public_outputs,
       externalInputs: response.external_inputs,
       startedAt: new Date(response.started_at.seconds * 1000),
       provedAt: response.proved_at ? new Date(response.proved_at.seconds * 1000) : undefined,

@@ -1,34 +1,97 @@
-import { createPublicClient, http } from "viem";
-import { baseSepolia } from "viem/chains";
+import { createPublicClient, http, Account, PublicClient } from "viem";
+import { base } from "viem/chains";
+import { Proof } from "../proof";
+import { ProofData } from "../types";
 
-const WETHContractAddress = "0x4200000000000000000000000000000000000006";
+function getVerifierContractAbi(signalLength: number) {
+  return [
+    {
+      type: "function",
+      name: "verify",
+      inputs: [
+        {
+          name: "a",
+          type: "uint256[2]",
+          internalType: "uint256[2]",
+        },
+        {
+          name: "b",
+          type: "uint256[2][2]",
+          internalType: "uint256[2][2]",
+        },
+        {
+          name: "c",
+          type: "uint256[2]",
+          internalType: "uint256[2]",
+        },
+        {
+          name: "signals",
+          type: `uint256[${signalLength}]`,
+          internalType: `uint256[${signalLength}]`,
+        },
+      ],
+      outputs: [],
+      stateMutability: "view",
+    },
+  ];
+}
 
-const WETHContractABI = [
-  {
-    constant: true,
-    inputs: [],
-    name: "totalSupply",
-    outputs: [{ name: "", type: "uint256" }],
-    type: "function",
-  },
-] as const;
+export async function verifyProofOnChain(proof: Proof) {
+  if (
+    !proof.blueprint.props.verifierContract?.chain ||
+    !proof.blueprint.props.verifierContract?.address
+  ) {
+    throw new Error("No verifier contract deployed for the blueprint of this proof");
+  }
 
-const client = createPublicClient({
-  chain: baseSepolia,
-  transport: http(),
-});
+  if (!proof.props.proofData || !proof.props.publicOutputs) {
+    throw new Error("No proof data generated yet");
+  }
 
-export async function verifyProofOnChain() {
+  // Create public client for Base Sepolia
+  const client = createPublicClient({
+    chain: base,
+    transport: http("https://sepolia.base.org"),
+  });
+
+  // TODO: this is parsed when getting the data from the backend,
+  // add propper typing from the start
+  // @ts-ignore
+  const proofData = proof.props.proofData as ProofData;
+
+  const args = [
+    [BigInt(proofData.pi_a[0]), BigInt(proofData.pi_a[1])],
+    [
+      [
+        BigInt(proofData.pi_b[0][1]), // swap coordinates
+        BigInt(proofData.pi_b[0][0]),
+      ],
+      [
+        BigInt(proofData.pi_b[1][1]), // swap coordinates
+        BigInt(proofData.pi_b[1][0]),
+      ],
+    ],
+    [BigInt(proofData.pi_c[0]), BigInt(proofData.pi_c[1])],
+    [
+      BigInt(proof.props.publicOutputs[0]),
+      BigInt(proof.props.publicOutputs[1]),
+      BigInt(proof.props.publicOutputs[2]),
+      BigInt(proof.props.publicOutputs[3]),
+    ],
+  ] as const;
+
+  console.log("Call data to verify: ", args);
+  console.log("contract address: ", proof.blueprint.props.verifierContract.address);
+
   try {
-    const totalSupply = await client.readContract({
-      address: WETHContractAddress,
-      abi: WETHContractABI,
-      functionName: "totalSupply",
+    await client.readContract({
+      address: proof.blueprint.props.verifierContract.address as `0x${string}`,
+      abi: getVerifierContractAbi(proof.props.publicOutputs.length),
+      functionName: "verify",
+      args,
     });
-
-    return totalSupply;
   } catch (error) {
-    console.error("Error fetching WETH total supply:", error);
+    console.error("Error verifying proof on chain:", error);
     throw error;
   }
 }

@@ -1,4 +1,3 @@
-import { Proof } from "viem/_types/types/proof";
 import { Prover } from "./prover";
 import {
   BlueprintProps,
@@ -13,6 +12,7 @@ import {
 import { del, get, patch, post } from "./utils";
 import { verifyProofOnChain } from "./chain";
 import { Auth } from "./types/auth";
+import { Proof } from "./proof";
 
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
@@ -494,7 +494,7 @@ export class Blueprint {
    */
   async verifyProofOnChain(proof: Proof): Promise<boolean> {
     try {
-      const result = await verifyProofOnChain();
+      await verifyProofOnChain(proof);
     } catch (err) {
       console.error("Failed to verify proof on chain: ", err);
       return false;
