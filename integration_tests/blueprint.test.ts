@@ -43,10 +43,11 @@ describe("Blueprint test suite", async () => {
     onTokenExpired: async () => {},
   };
 
-  const { createBlueprint, getBlueprint, listBlueprints } = sdk({
-    auth,
-    baseUrl: "http://localhost:8080",
-  });
+  const { createBlueprint, getBlueprint, getBlueprintById, listBlueprints, getStarredBlueprints } =
+    sdk({
+      auth,
+      baseUrl: "http://localhost:8080",
+    });
 
   console.log("Setting up user database...");
   const { Client } = pg;
@@ -396,6 +397,46 @@ describe("Blueprint test suite", async () => {
       blueprint.props.status = Status.Done;
       const urls = await blueprint.getZKeyDownloadLink();
       expect(Object.entries(urls).length).toBe(4);
+    });
+  });
+
+  describe("Blueprint Stars", () => {
+    test("add/remove stars and list", async () => {
+      // TODO: create blueprint here, don't use existing
+      const blueprintId = "fe99e333-7017-4814-9c38-ddaa386fc0f7";
+      const blueprint = await getBlueprintById(blueprintId);
+
+      expect(blueprint.stars).toBeUndefined();
+      const stars = await blueprint.getStars();
+      expect(stars).toBe(0);
+      expect(blueprint.stars).toBe(0);
+
+      expect(await blueprint.addStar()).toBe(1);
+      expect(blueprint.stars).toBe(1);
+
+      // Re-adding should do nothing
+      expect(await blueprint.addStar()).toBe(1);
+      expect(blueprint.stars).toBe(1);
+
+      // Calling listBlueprints should automatically fetch the stars as well
+      const blueprints = await listBlueprints({ limit: 1000 });
+
+      const listedBlueprint = blueprints.find((bp) => bp.props.id === blueprintId)!;
+
+      expect(listedBlueprint.stars).toBe(1);
+
+      // Check if can get users starred repos
+      const starredSlugs = await getStarredBlueprints();
+
+      expect(starredSlugs[0]).toBe(blueprint.props.slug!);
+
+      // Remove star
+      expect(await blueprint.removeStar()).toBe(0);
+      expect(blueprint.stars).toBe(0);
+
+      // Re-Removing should do nothing
+      expect(await blueprint.removeStar()).toBe(0);
+      expect(blueprint.stars).toBe(0);
     });
   });
 });

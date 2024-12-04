@@ -161,6 +161,46 @@ export async function get<T>(url: string, queryParams?: object | null, auth?: Au
   }
 }
 
+export async function del<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
+  let authToken: string | null = null;
+  if (auth) {
+    try {
+      authToken = await getTokenFromAuth(auth);
+    } catch (err) {
+      console.error("Could not get token from auth", err);
+    }
+  }
+
+  try {
+    const request: RequestInit = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": PUBLIC_SDK_KEY,
+        ...(!authToken ? {} : { Authorization: authToken }),
+      },
+    };
+
+    if (data) {
+      request.body = JSON.stringify(data);
+    }
+
+    const response = await fetch(url, request);
+
+    const body = await response.json();
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
+    }
+
+    return body;
+  } catch (error) {
+    // TODO: Handle token expired
+    console.error("DELETE Error:", error);
+    throw error;
+  }
+}
+
 export async function parseEmail(eml: string): Promise<ParsedEmail> {
   try {
     await relayerUtilsInit;
