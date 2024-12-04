@@ -3,36 +3,38 @@ import { base } from "viem/chains";
 import { Proof } from "../proof";
 import { ProofData } from "../types";
 
-const VerifierContractABI = [
-  {
-    type: "function",
-    name: "verify",
-    inputs: [
-      {
-        name: "a",
-        type: "uint256[2]",
-        internalType: "uint256[2]",
-      },
-      {
-        name: "b",
-        type: "uint256[2][2]",
-        internalType: "uint256[2][2]",
-      },
-      {
-        name: "c",
-        type: "uint256[2]",
-        internalType: "uint256[2]",
-      },
-      {
-        name: "signals",
-        type: "uint256[4]",
-        internalType: "uint256[4]",
-      },
-    ],
-    outputs: [],
-    stateMutability: "view",
-  },
-] as const;
+function getVerifierContractAbi(signalLength: number) {
+  return [
+    {
+      type: "function",
+      name: "verify",
+      inputs: [
+        {
+          name: "a",
+          type: "uint256[2]",
+          internalType: "uint256[2]",
+        },
+        {
+          name: "b",
+          type: "uint256[2][2]",
+          internalType: "uint256[2][2]",
+        },
+        {
+          name: "c",
+          type: "uint256[2]",
+          internalType: "uint256[2]",
+        },
+        {
+          name: "signals",
+          type: `uint256[${signalLength}]`,
+          internalType: `uint256[${signalLength}]`,
+        },
+      ],
+      outputs: [],
+      stateMutability: "view",
+    },
+  ];
+}
 
 export async function verifyProofOnChain(proof: Proof) {
   if (
@@ -84,7 +86,7 @@ export async function verifyProofOnChain(proof: Proof) {
   try {
     await client.readContract({
       address: proof.blueprint.props.verifierContract.address as `0x${string}`,
-      abi: VerifierContractABI,
+      abi: getVerifierContractAbi(proof.props.publicOutputs.length),
       functionName: "verify",
       args,
     });
