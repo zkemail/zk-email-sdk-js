@@ -302,4 +302,24 @@ describe("Blueprint prod test suite", () => {
     expect(blueprints.some((bp) => bp.props.status === Status.Done)).toBeTrue();
     expect(blueprints.some((bp) => bp.props.status === Status.Draft)).toBeTrue();
   });
+
+  test("Should cancel compilation", async () => {
+    const blueprintId = "023cddf2-8548-4bfa-8cc9-0531e9d0d0a8";
+    const blueprint = await zkeSdk({
+      baseUrl: "http://localhost:8080",
+      auth: {
+        getToken: async () =>
+          // Token only usable locally
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzQ2NzUyMjIsImdpdGh1Yl91c2VybmFtZSI6IkRpbWlEdW1vIn0.MqrxsUWt-f3rzg8rd_agovrgaEorMGcTL_PyeX4A7To",
+        onTokenExpired: async () => {},
+      },
+    }).getBlueprintById(blueprintId);
+
+    try {
+      const res = await blueprint.cancelCompilation();
+      console.log("res: ", res);
+    } catch (err) {
+      console.error("err: ", err);
+    }
+  });
 });
