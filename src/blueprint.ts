@@ -631,6 +631,22 @@ export class Blueprint {
       throw err;
     }
   }
+
+  async cancelCompilation(): Promise<void> {
+    if (this.props.status !== Status.InProgress) {
+      throw new Error("Can only cancel compilation of a blueprint that is in progress");
+    }
+    try {
+      await del<{ stars: number }>(
+        `${this.baseUrl}/blueprint/cancel/${this.props.id}`,
+        null,
+        this.auth
+      );
+    } catch (err) {
+      console.error("Failed calling DELETE on /blueprint/cancel/${id} in cancelCompilation: ", err);
+      throw err;
+    }
+  }
 }
 
 // export {
