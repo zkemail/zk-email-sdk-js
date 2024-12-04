@@ -100,7 +100,13 @@ export class Prover {
       const requestData: ProofRequest = {
         blueprint_id: blueprintId,
         input: JSON.parse(input),
-        external_inputs: externalInputs,
+        external_inputs: externalInputs.reduce(
+          (acc, input) => ({
+            ...acc,
+            [input.name]: input.value,
+          }),
+          {}
+        ),
       };
 
       response = await post<ProofResponse>(`${this.blueprint.baseUrl}/proof`, requestData);
