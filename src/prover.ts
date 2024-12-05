@@ -42,7 +42,7 @@ export class Prover {
    * @returns A promise that resolves to a new instance of Proof. The Proof will have the status
    * Done or Failed.
    */
-  async generateProof(eml: string, externalInputs: ExternalInputInput[]): Promise<Proof> {
+  async generateProof(eml: string, externalInputs: ExternalInputInput[] = []): Promise<Proof> {
     const proof = await this.generateProofRequest(eml, externalInputs);
 
     // Wait for proof to finish
