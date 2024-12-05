@@ -647,6 +647,22 @@ export class Blueprint {
       throw err;
     }
   }
+
+  async delete(): Promise<void> {
+    if (this.props.status !== Status.Draft) {
+      throw new Error("Can only delete a blueprint that is in draft");
+    }
+    try {
+      await del<{ success: boolean }>(
+        `${this.baseUrl}/blueprint/${this.props.id}`,
+        null,
+        this.auth
+      );
+    } catch (err) {
+      console.error("Failed calling DELETE on /blueprint/${id} in cancelCompilation: ", err);
+      throw err;
+    }
+  }
 }
 
 // export {
