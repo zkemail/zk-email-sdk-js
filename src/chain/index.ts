@@ -72,12 +72,7 @@ export async function verifyProofOnChain(proof: Proof) {
       ],
     ],
     [BigInt(proofData.pi_c[0]), BigInt(proofData.pi_c[1])],
-    [
-      BigInt(proof.props.publicOutputs[0]),
-      BigInt(proof.props.publicOutputs[1]),
-      BigInt(proof.props.publicOutputs[2]),
-      BigInt(proof.props.publicOutputs[3]),
-    ],
+    proof.props.publicOutputs.map((output) => BigInt(output)),
   ] as const;
 
   console.log("Call data to verify: ", args);
