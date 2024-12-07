@@ -23,7 +23,7 @@ import {
   sha256Pad,
   extractSubstr,
   generateCircuitInputsWithDecomposedRegexesAndExternalInputs,
-} from "@dimidumo/relayer-utils";
+} from "@zk-email/relayer-utils";
 
 let relayerUtilsResolver: (value: any) => void;
 const relayerUtilsInit: Promise<void> = new Promise((resolve) => {
