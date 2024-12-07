@@ -1,5 +1,5 @@
 import { Blueprint, Status } from "./blueprint";
-import { createCallData, verifyProofOnChain } from "./chain";
+import { verifyProofOnChain } from "./chain";
 import { ProofProps, ProofResponse, ProofStatus } from "./types/proof";
 import { get } from "./utils";
 
@@ -140,7 +140,30 @@ export class Proof {
    * Generates call data for the proof that can be used to verify the proof on chain.
    */
   async createCallData() {
-    await createCallData(this);
+    if (!this.props.proofData || !this.props.publicOutputs) {
+      throw new Error("No proof data generated yet");
+    }
+
+    // TODO: this is parsed when getting the data from the backend,
+    // add propper typing from the start
+    // @ts-ignore
+    const proofData = this.props.proofData as ProofData;
+
+    return [
+      [BigInt(proofData.pi_a[0]), BigInt(proofData.pi_a[1])],
+      [
+        [
+          BigInt(proofData.pi_b[0][1]), // swap coordinates
+          BigInt(proofData.pi_b[0][0]),
+        ],
+        [
+          BigInt(proofData.pi_b[1][1]), // swap coordinates
+          BigInt(proofData.pi_b[1][0]),
+        ],
+      ],
+      [BigInt(proofData.pi_c[0]), BigInt(proofData.pi_c[1])],
+      this.props.publicOutputs.map((output) => BigInt(output)),
+    ];
   }
 
   /**
@@ -182,10 +205,20 @@ export class Proof {
   /**
    * @returns The public data and proof data.
    */
-  getProofData(): { proofData: string; publicData: string } {
+  getProofData(): {
+    proofData: string;
+    publicData: string;
+    publicOutputs: string[];
+    externalInputs: string;
+  } {
     if (this.props.status !== ProofStatus.Done) {
       throw new Error("Cannot get proof data, proof is not Done");
     }
-    return { proofData: this.props.proofData!, publicData: this.props.publicData! };
+    return {
+      proofData: this.props.proofData!,
+      publicData: this.props.publicData!,
+      publicOutputs: this.props.publicOutputs!,
+      externalInputs: this.props.externalInputs!,
+    };
   }
 }
