@@ -227,7 +227,7 @@ export async function testBlueprint(
     throw new Error("emailBodyMaxLength and emailHeaderMaxLength must be provided");
   }
 
-  let body = parsedEmail.canonicalized_body;
+  let body = parsedEmail.cleaned_body;
   if (blueprint.shaPrecomputeSelector) {
     const splitEmail = body.split(blueprint.shaPrecomputeSelector)[1];
     if (!splitEmail) {
