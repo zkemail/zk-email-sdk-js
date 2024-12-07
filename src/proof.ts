@@ -1,5 +1,5 @@
 import { Blueprint, Status } from "./blueprint";
-import { verifyProofOnChain } from "./chain";
+import { createCallData, verifyProofOnChain } from "./chain";
 import { ProofProps, ProofResponse, ProofStatus } from "./types/proof";
 import { get } from "./utils";
 
@@ -134,6 +134,13 @@ export class Proof {
    */
   async verifyOnChain() {
     await verifyProofOnChain(this);
+  }
+
+  /**
+   * Generates call data for the proof that can be used to verify the proof on chain.
+   */
+  async createCallData() {
+    await createCallData(this);
   }
 
   /**

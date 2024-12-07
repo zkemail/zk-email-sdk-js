@@ -36,6 +36,33 @@ function getVerifierContractAbi(signalLength: number) {
   ];
 }
 
+export async function createCallData(proof: Proof) {
+  if (!proof.props.proofData || !proof.props.publicOutputs) {
+    throw new Error("No proof data generated yet");
+  }
+
+  // TODO: this is parsed when getting the data from the backend,
+  // add propper typing from the start
+  // @ts-ignore
+  const proofData = proof.props.proofData as ProofData;
+
+  return [
+    [BigInt(proofData.pi_a[0]), BigInt(proofData.pi_a[1])],
+    [
+      [
+        BigInt(proofData.pi_b[0][1]), // swap coordinates
+        BigInt(proofData.pi_b[0][0]),
+      ],
+      [
+        BigInt(proofData.pi_b[1][1]), // swap coordinates
+        BigInt(proofData.pi_b[1][0]),
+      ],
+    ],
+    [BigInt(proofData.pi_c[0]), BigInt(proofData.pi_c[1])],
+    proof.props.publicOutputs.map((output) => BigInt(output)),
+  ];
+}
+
 export async function verifyProofOnChain(proof: Proof) {
   if (
     !proof.blueprint.props.verifierContract?.chain ||
