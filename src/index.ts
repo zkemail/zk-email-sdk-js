@@ -13,13 +13,13 @@ export type { Auth } from "./types/auth";
 export type { ParsedEmail } from "./types/utils";
 
 // Exports that don't need initialization or options
+export { startJsonFileDownload } from "./utils";
 export {
   testDecomposedRegex,
   parseEmail,
-  startJsonFileDownload,
   generateProofInputs,
   testBlueprint,
-} from "./utils";
+} from "./relayerUtils";
 export { getLoginWithGithubUrl } from "./auth";
 
 // Exported sdk, functions that need initialization

@@ -1,9 +1,9 @@
 // Provisional type, should be generated from relayer-utils
 export type ParsedEmail = {
-  canonicalized_header: string;
-  canonicalized_body: string;
+  canonicalizedHeader: string;
+  canonicalizedBody: string;
   signature: number[];
-  public_key: any[];
-  cleaned_body: string;
+  publicKey: any[];
+  cleanedBody: string;
   headers: Map<string, string[]>;
 };
