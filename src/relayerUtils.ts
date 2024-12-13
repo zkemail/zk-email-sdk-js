@@ -101,7 +101,6 @@ async function checkInputLengths(header: string, body: string, blueprint: Bluepr
     const maxShaBytes = Math.max(bodyShaLength, blueprint.emailBodyMaxLength!);
 
     const bodyLength = (await sha256Pad(bodyData, maxShaBytes)).get("messageLength");
-    const res = await sha256Pad(bodyData, maxShaBytes);
 
     if (bodyLength > blueprint.emailBodyMaxLength!) {
       throw new Error(`emailBodyMaxLength of ${blueprint.emailBodyMaxLength} was exceeded`);
