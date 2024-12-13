@@ -1,6 +1,11 @@
 import { expect, test, describe, beforeAll, afterAll, it } from "bun:test";
 import helloTestEmail from "./hello_eml";
-import { generateProofInputs, parseEmail, testBlueprint, testDecomposedRegex } from "../src/utils";
+import {
+  generateProofInputs,
+  parseEmail,
+  testBlueprint,
+  testDecomposedRegex,
+} from "../src/relayerUtils";
 import {
   BlueprintProps,
   DecomposedRegex,
