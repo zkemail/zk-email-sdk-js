@@ -16,7 +16,14 @@ describe("Email utils test suite", async () => {
 
   test("Can parse an email", async () => {
     const parsedEmail = await parseEmail(helloTestEmail);
+
     expect(parsedEmail).not.toBeNil();
+    expect(parsedEmail.canonicalizedBody).not.toBeNil();
+    expect(parsedEmail.canonicalizedHeader).not.toBeNil();
+    expect(parsedEmail.cleanedBody).not.toBeNil();
+    expect(parsedEmail.headers).not.toBeNil();
+    expect(parsedEmail.publicKey).not.toBeNil();
+    expect(parsedEmail.signature).not.toBeNil();
   });
 
   test("Should fail on invalid email", async () => {
