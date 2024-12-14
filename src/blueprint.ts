@@ -649,9 +649,10 @@ export class Blueprint {
   }
 
   async delete(): Promise<void> {
-    if (this.props.status !== Status.Draft) {
-      throw new Error("Can only delete a blueprint that is in draft");
-    }
+    // TODO: add is admin check here, currently only done in registry
+    // if (this.props.status !== Status.Draft) {
+    //   throw new Error("Can only delete a blueprint that is in draft");
+    // }
     try {
       await del<{ success: boolean }>(
         `${this.baseUrl}/blueprint/${this.props.id}`,
