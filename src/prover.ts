@@ -1,14 +1,9 @@
-import { Blueprint, ExternalInput } from "./blueprint";
+import { Blueprint } from "./blueprint";
 import { Proof } from "./proof";
-import {
-  GenerateProofInputsParams,
-  ProofProps,
-  ProofRequest,
-  ProofResponse,
-  ProofStatus,
-} from "./types/proof";
+import { generateProofInputs } from "./relayerUtils";
+import { GenerateProofInputsParams, ProofRequest, ProofResponse, ProofStatus } from "./types/proof";
 import { ExternalInputInput, ProverOptions } from "./types/prover";
-import { generateProofInputs, post } from "./utils";
+import { post } from "./utils";
 
 /**
  * Represents a Prover generated from a blueprint that can generate Proofs
