@@ -1,6 +1,11 @@
 import { expect, test, describe, beforeAll, afterAll, it } from "bun:test";
 import helloTestEmail from "./hello_eml";
-import { generateProofInputs, parseEmail, testBlueprint, testDecomposedRegex } from "../src/utils";
+import {
+  generateProofInputs,
+  parseEmail,
+  testBlueprint,
+  testDecomposedRegex,
+} from "../src/relayerUtils";
 import {
   BlueprintProps,
   DecomposedRegex,
@@ -16,7 +21,14 @@ describe("Email utils test suite", async () => {
 
   test("Can parse an email", async () => {
     const parsedEmail = await parseEmail(helloTestEmail);
+
     expect(parsedEmail).not.toBeNil();
+    expect(parsedEmail.canonicalizedBody).not.toBeNil();
+    expect(parsedEmail.canonicalizedHeader).not.toBeNil();
+    expect(parsedEmail.cleanedBody).not.toBeNil();
+    expect(parsedEmail.headers).not.toBeNil();
+    expect(parsedEmail.publicKey).not.toBeNil();
+    expect(parsedEmail.signature).not.toBeNil();
   });
 
   test("Should fail on invalid email", async () => {
