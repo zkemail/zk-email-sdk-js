@@ -24,6 +24,7 @@ export type BlueprintProps = {
   status?: Status;
   verifierContract?: VerifierContract;
   version?: number;
+  stars?: number;
 };
 
 export type DecomposedRegex = {
@@ -128,6 +129,7 @@ export type BlueprintResponse = {
   verifier_contract_address: string;
   verifier_contract_chain: number;
   version: number;
+  stars: number;
 };
 
 export type ServerDate = {
@@ -156,17 +158,9 @@ export type ListBlueprintsOptions = {
   skip?: number;
   limit?: number;
   sort?: -1 | 1;
+  sortBy?: "updatedAt" | "stars";
   status?: Status[];
   isPublic?: boolean;
-  search?: string;
-};
-
-export type ListBlueprintsOptionsRequest = {
-  skip?: number;
-  limit?: number;
-  sort?: -1 | 1;
-  status?: Status[];
-  is_public?: boolean;
   search?: string;
 };
 
