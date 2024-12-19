@@ -11,16 +11,22 @@ export { Proof } from "./proof";
 export * from "./types/prover";
 export type { Auth } from "./types/auth";
 export type { ParsedEmail } from "./types/utils";
+// Re-Export zod types to avoid version mismatches if package importing this sdk has zod
+export { ValidationErrors } from "./blueprintValidation";
 
 // Exports that don't need initialization or options
-export { startJsonFileDownload } from "./utils";
+export { startJsonFileDownload, getDKIMSelector } from "./utils";
 export {
   testDecomposedRegex,
   parseEmail,
   generateProofInputs,
   testBlueprint,
+  getMaxEmailBodyLength,
+  extractEMLDetails,
 } from "./relayerUtils";
 export { getLoginWithGithubUrl } from "./auth";
+// Re-Export zod class to avoid version mismatches if package importing this sdk has zod
+export { ZodError } from "./blueprintValidation";
 
 // Exported sdk, functions that need initialization
 export default (sdkOptions?: SdkOptions) => {
