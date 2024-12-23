@@ -133,12 +133,16 @@ export async function testDecomposedRegex(
   const maxLength =
     "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
 
+  console.log("maxLength: ", maxLength);
+
   await relayerUtilsInit;
   const privateResult = extractSubstr(inputStr, inputDecomposedRegex, false);
 
+  console.log("privateResult : ", privateResult);
+
   if (privateResult[0].length > maxLength) {
     throw new Error(
-      `Max length of extracted result was exceeded for decomposed regex ${decomposedRegex.name}`
+      `Max length of ${maxLength} of extracted result was exceeded for decomposed regex ${decomposedRegex.name}`
     );
   }
 
