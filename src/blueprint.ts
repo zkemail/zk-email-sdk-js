@@ -5,7 +5,6 @@ import {
   BlueprintResponse,
   DownloadUrls,
   ListBlueprintsOptions,
-  ListBlueprintsOptionsRequest,
   Status,
   ZkFramework,
 } from "./types/blueprint";
@@ -155,6 +154,7 @@ export class Blueprint {
         chain: response.verifier_contract_chain,
       },
       version: response.version,
+      stars: response.stars,
     };
 
     return props;
@@ -293,23 +293,19 @@ export class Blueprint {
   public static async listBlueprints(
     baseUrl: string,
     options?: ListBlueprintsOptions,
-    auth?: Auth,
-    fetchStars = true
+    auth?: Auth
   ): Promise<Blueprint[]> {
-    const requestOptions: ListBlueprintsOptionsRequest = {
-      skip: options?.skip,
-      limit: options?.limit,
-      sort: options?.sort,
-      status: options?.status,
-      is_public: options?.isPublic,
-      search: options?.search,
-    };
+    if (options?.sortBy) {
+      // Backend accepts snake case only
+      // @ts-ignore
+      options.sortBy = options.sortBy === "updatedAt" ? "updated_at" : options.sortBy;
+    }
 
     let response: { blueprints?: BlueprintResponse[] };
     try {
       response = await get<{ blueprints?: BlueprintResponse[] }>(
         `${baseUrl}/blueprint`,
-        requestOptions,
+        options,
         auth
       );
     } catch (err) {
@@ -325,10 +321,6 @@ export class Blueprint {
       const blueprintProps = Blueprint.responseToBlueprintProps(blueprintResponse);
       return new Blueprint(blueprintProps, baseUrl, auth);
     });
-
-    if (fetchStars) {
-      await Promise.all(blueprints.map((bp) => bp.getStars()));
-    }
 
     return blueprints;
   }
@@ -627,7 +619,7 @@ export class Blueprint {
       const { stars } = await get<{ stars: number }>(
         `${this.baseUrl}/blueprint/${encodeURIComponent(this.props.slug!)}/stars`
       );
-      this.stars = stars || 0;
+      this.props.stars = stars || 0;
       return stars || 0;
     } catch (err) {
       console.error("Failed calling POST on /blueprint/${id}/stars in addStar: ", err);
