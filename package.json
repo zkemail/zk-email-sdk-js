@@ -45,7 +45,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@zk-email/relayer-utils": "0.4.60-1",
+    "@zk-email/relayer-utils": "0.4.60",
     "ethers": "^6.13.4",
     "viem": "^2.21.53",
     "zod": "^3.23.8"
