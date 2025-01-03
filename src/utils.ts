@@ -1,42 +1,7 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
 
-import {
-  Blueprint,
-  DecomposedRegex,
-  DecomposedRegexJson,
-  DecomposedRegexPart,
-  DecomposedRegexPartJson,
-} from "./blueprint";
 import { Auth } from "./types/auth";
 import { getTokenFromAuth } from "./auth";
-import {
-  BlueprintProps,
-  GenerateProofInputsParams,
-  GenerateProofInputsParamsInternal,
-  ParsedEmail,
-  ExternalInputInput,
-} from "./types";
-
-import {
-  init,
-  parseEmail as parseEmailUtils,
-  sha256Pad,
-  extractSubstr,
-  generateCircuitInputsWithDecomposedRegexesAndExternalInputs,
-} from "@zk-email/relayer-utils";
-
-let relayerUtilsResolver: (value: any) => void;
-const relayerUtilsInit: Promise<void> = new Promise((resolve) => {
-  relayerUtilsResolver = resolve;
-});
-
-init()
-  .then(() => {
-    relayerUtilsResolver(null);
-  })
-  .catch((err) => {
-    console.log("Failed to initialize wasm for relayer-utils: ", err);
-  });
 
 export async function post<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
   let authToken: string | null = null;
@@ -216,4 +181,29 @@ export function startJsonFileDownload(json: string, name = "data") {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+export function getDKIMSelector(emlContent: string): string | null {
+  const headerLines: string[] = [];
+  const lines = emlContent.split("\n");
+  for (const line of lines) {
+    if (line.trim() === "") break;
+    // If line starts with whitespace, it's a continuation of previous header
+    if (line.startsWith(" ") || line.startsWith("\t")) {
+      headerLines[headerLines.length - 1] += line.trim();
+    } else {
+      headerLines.push(line);
+    }
+  }
+
+  // Then look for DKIM-Signature in the joined headers
+  for (const line of headerLines) {
+    if (line.includes("DKIM-Signature")) {
+      const match = line.match(/s=([^;]+)/);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+  }
+  return null;
 }

@@ -12,6 +12,7 @@ import { del, get, patch, post } from "./utils";
 import { verifyProofOnChain } from "./chain";
 import { Auth } from "./types/auth";
 import { Proof } from "./proof";
+import { blueprintFormSchema } from "./blueprintValidation";
 
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
@@ -22,6 +23,8 @@ export class Blueprint {
   auth?: Auth;
   baseUrl: string;
   stars = 0;
+
+  public static readonly formSchema: typeof blueprintFormSchema = blueprintFormSchema;
 
   private lastCheckedStatus: Date | null = null;
 

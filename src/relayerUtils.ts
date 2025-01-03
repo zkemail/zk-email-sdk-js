@@ -133,12 +133,16 @@ export async function testDecomposedRegex(
   const maxLength =
     "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
 
+  console.log("maxLength: ", maxLength);
+
   await relayerUtilsInit;
   const privateResult = extractSubstr(inputStr, inputDecomposedRegex, false);
 
+  console.log("privateResult : ", privateResult);
+
   if (privateResult[0].length > maxLength) {
     throw new Error(
-      `Max length of extracted result was exceeded for decomposed regex ${decomposedRegex.name}`
+      `Max length of ${maxLength} of extracted result was exceeded for decomposed regex ${decomposedRegex.name}`
     );
   }
 
@@ -191,4 +195,64 @@ export async function generateProofInputs(
     console.error("Failed to generate inputs for proof");
     throw err;
   }
+}
+
+export async function getMaxEmailBodyLength(emlContent: string, shaPrecomputeSelector: string) {
+  const parsedEmail = await parseEmail(emlContent);
+
+  const body = parsedEmail.cleanedBody;
+  const index = body.indexOf(shaPrecomputeSelector);
+
+  if (index === -1) {
+    return body.length;
+  }
+
+  return body.length - index - shaPrecomputeSelector.length;
+}
+
+export async function extractEMLDetails(emlContent: string) {
+  const headers: Record<string, string> = {};
+  const lines = emlContent.split("\n");
+
+  let headerPart = true;
+  let headerLines = [];
+
+  // Parse headers
+  for (let line of lines) {
+    if (headerPart) {
+      if (line.trim() === "") {
+        headerPart = false; // End of headers
+      } else {
+        headerLines.push(line);
+      }
+    }
+  }
+
+  // Join multi-line headers and split into key-value pairs
+  const joinedHeaders = headerLines
+    .map((line) =>
+      line.startsWith(" ") || line.startsWith("\t") ? line.trim() : `\n${line.trim()}`
+    )
+    .join("")
+    .split("\n");
+
+  joinedHeaders.forEach((line) => {
+    const [key, ...value] = line.split(":");
+    if (key) headers[key.trim()] = value.join(":").trim();
+  });
+
+  // Extract details
+  const senderDomain =
+    headers["Return-Path"]
+      ?.match(/@([^\s>]+)/)?.[1]
+      ?.split(".")
+      .slice(-2)
+      .join(".") || null;
+  const emailQuery = `from:${senderDomain}`;
+  const parsedEmail = await parseEmail(emlContent);
+  console.log(parsedEmail.canonicalizedBody, "parsedEmail");
+  const emailBodyMaxLength = parsedEmail.cleanedBody.length;
+  const headerLength = parsedEmail.canonicalizedHeader.length;
+
+  return { senderDomain, headerLength, emailQuery, emailBodyMaxLength };
 }
