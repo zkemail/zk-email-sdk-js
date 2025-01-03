@@ -12,7 +12,7 @@ export * from "./types/prover";
 export type { Auth } from "./types/auth";
 export type { ParsedEmail } from "./types/utils";
 // Re-Export zod types to avoid version mismatches if package importing this sdk has zod
-export { ValidationErrors } from "./blueprintValidation";
+export type { ValidationErrors } from "./blueprintValidation";
 
 // Exports that don't need initialization or options
 export { startJsonFileDownload, getDKIMSelector } from "./utils";

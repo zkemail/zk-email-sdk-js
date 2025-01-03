@@ -323,3 +323,19 @@ describe("Blueprint prod test suite", () => {
     }
   });
 });
+
+describe("devin", () => {
+  test("should use test auth token", async () => {
+    const blueprints = await zkeSdk({
+      baseUrl: "http://localhost:8080",
+      auth: {
+        getToken: async () =>
+          // Token only usable locally
+          "zkemail",
+        onTokenExpired: async () => {},
+      },
+    }).listBlueprints();
+
+    console.log("blueprints: ", blueprints);
+  });
+});
