@@ -133,12 +133,8 @@ export async function testDecomposedRegex(
   const maxLength =
     "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
 
-  console.log("maxLength: ", maxLength);
-
   await relayerUtilsInit;
   const privateResult = extractSubstr(inputStr, inputDecomposedRegex, false);
-
-  console.log("privateResult : ", privateResult);
 
   if (privateResult[0].length > maxLength) {
     throw new Error(
@@ -255,4 +251,100 @@ export async function extractEMLDetails(emlContent: string) {
   const headerLength = parsedEmail.canonicalizedHeader.length;
 
   return { senderDomain, headerLength, emailQuery, emailBodyMaxLength };
+}
+
+// Parses public signals from a proof to readable outputs
+// Translated from our existing go code internal/temporal/workflows/circom_workflows.go
+export function parsePublicSignals(
+  publicSignals: string[],
+  decomposedRegexes: DecomposedRegex[]
+): string {
+  let publicOutputIterator = 1; // like publicOutputIterator in Go
+  const publicStruct: { [key: string]: string[] } = {};
+
+  decomposedRegexes.forEach((decomposedRegex) => {
+    const signalLength = Math.ceil(decomposedRegex.maxLength / 31);
+
+    const partOutputs: string[] = [];
+
+    decomposedRegex.parts.forEach((part) => {
+      if (part.isPublic) {
+        // Slice out the relevant subset from publicSignals
+        const publicOutputsSlice = publicSignals.slice(
+          publicOutputIterator,
+          publicOutputIterator + signalLength
+        );
+
+        // Decode using the replicated Go logic
+        const output = processIntegers(publicOutputsSlice);
+
+        // Store the decoded result
+        partOutputs.push(output);
+
+        // Advance the iterator
+        publicOutputIterator += signalLength;
+      }
+    });
+
+    // Collect all part outputs for this decomposedRegex
+    publicStruct[decomposedRegex.name] = partOutputs;
+  });
+
+  // Combine part outputs into final object
+  const result = decodePublicOutputs(publicStruct);
+
+  // Return it as JSON
+  return JSON.stringify(result);
+}
+
+function decodePublicOutputs(outputs: { [key: string]: string[] }): { [key: string]: string } {
+  const decodedOutputs: { [key: string]: string } = {};
+  for (const [key, values] of Object.entries(outputs)) {
+    decodedOutputs[key] = values.join(""); // Concatenate everything for that key
+  }
+  return decodedOutputs;
+}
+
+function processIntegers(integers: string[]): string {
+  let result = "";
+
+  for (const numStr of integers) {
+    // 1. Convert string to BigInt
+    let n: bigint;
+    try {
+      n = BigInt(numStr);
+    } catch (err) {
+      console.warn("Failed to parse integer:", numStr, err);
+      continue;
+    }
+
+    if (n === 0n) continue;
+
+    // 2. Convert BigInt to hex, ensure even length
+    let hexStr = n.toString(16);
+    if (hexStr.length % 2 !== 0) {
+      hexStr = "0" + hexStr;
+    }
+
+    // 3. Decode hex -> bytes
+    const bytes: number[] = [];
+    for (let i = 0; i < hexStr.length; i += 2) {
+      bytes.push(parseInt(hexStr.slice(i, i + 2), 16));
+    }
+
+    // 4. *** Reverse the bytes array (NOT the final string) ***
+    for (let i = 0, j = bytes.length - 1; i < j; i++, j--) {
+      const tmp = bytes[i];
+      bytes[i] = bytes[j];
+      bytes[j] = tmp;
+    }
+
+    // 5. Decode reversed bytes to UTF-8
+    const decodedString = new TextDecoder().decode(new Uint8Array(bytes));
+
+    // 6. Concatenate to result
+    result += decodedString;
+  }
+
+  return result;
 }

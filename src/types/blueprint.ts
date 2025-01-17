@@ -165,3 +165,8 @@ export type ListBlueprintsOptions = {
 };
 
 export type DownloadUrls = Record<string, string>;
+
+export type ChunkedZkeyUrl = {
+  url: string;
+  suffix: "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k";
+};

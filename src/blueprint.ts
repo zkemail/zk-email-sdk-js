@@ -3,6 +3,7 @@ import {
   BlueprintProps,
   BlueprintRequest,
   BlueprintResponse,
+  ChunkedZkeyUrl,
   DownloadUrls,
   ListBlueprintsOptions,
   Status,
@@ -13,6 +14,7 @@ import { verifyProofOnChain } from "./chain";
 import { Auth } from "./types/auth";
 import { Proof } from "./proof";
 import { blueprintFormSchema } from "./blueprintValidation";
+import { ProverOptions } from "./types";
 
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
@@ -478,8 +480,8 @@ export class Blueprint {
    * Creates an instance of Prover with which you can create proofs.
    * @returns An instance of Prover.
    */
-  createProver() {
-    return new Prover(this);
+  createProver(options?: ProverOptions) {
+    return new Prover(this, options);
   }
 
   /**
@@ -658,6 +660,66 @@ export class Blueprint {
       console.error("Failed calling DELETE on /blueprint/${id} in cancelCompilation: ", err);
       throw err;
     }
+  }
+
+  async getChunkedZkeyDownloadLinks(): Promise<ChunkedZkeyUrl[]> {
+    if (this.props.status !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    let response: { urls: ChunkedZkeyUrl[] };
+    try {
+      response = await get<{ urls: ChunkedZkeyUrl[] }>(
+        `${this.baseUrl}/blueprint/chunked-zkey/${this.props.id}`
+      );
+    } catch (err) {
+      console.error(
+        "Failed calling GET on /blueprint/chunked-zkey/:id in getChunkedZkeyDownloadLinks: ",
+        err
+      );
+      throw err;
+    }
+
+    return response.urls;
+  }
+
+  async getWasmFileDownloadLink(): Promise<string> {
+    if (this.props.status !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(`${this.baseUrl}/blueprint/wasm/${this.props.id}`);
+    } catch (err) {
+      console.error("Failed calling GET on /blueprint/wasm/:id in getWasmFileDownloadLink: ", err);
+      throw err;
+    }
+
+    return response.url;
+  }
+
+  async getVkeyFileDownloadLink(): Promise<string> {
+    if (this.props.status !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(`${this.baseUrl}/blueprint/vkey/${this.props.id}`);
+    } catch (err) {
+      console.error("Failed calling GET on /blueprint/vkey/:id in getVkeyFileDownloadLink: ", err);
+      throw err;
+    }
+
+    return response.url;
+  }
+
+  async getVkey(): Promise<string> {
+    const downloadUrl = await this.getVkeyFileDownloadLink();
+    const response = await fetch(downloadUrl);
+    const vkey = await response.text();
+    return vkey;
   }
 }
 
