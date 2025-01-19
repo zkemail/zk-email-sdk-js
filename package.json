@@ -1,15 +1,15 @@
 {
   "name": "@zk-email/sdk",
-  "version": "0.0.86",
+  "version": "0.0.86-8",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "module": "./dist/zk-email-sdk.es.js",
+  "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/zk-email-sdk.cjs.js",
+      "import": "./dist/zk-email-sdk.es.js",
+      "types": "./dist/types/index.d.ts"
     }
   },
   "files": [
@@ -17,13 +17,15 @@
     "README.md"
   ],
   "scripts": {
-    "build": "bunx tsup",
+    "build-old": "bunx tsup src/index.ts src/localProverWorker.ts --format esm,cjs --dts",
+    "build": "vite build",
+    "build-prove-worker": "bun x vite build --config vite.config.worker.ts && bun scripts/escape_str_chars.js",
+    "publish": "bun run build && npm publish --access public",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublishOnly": "bun run build",
     "clean": "rm -rf dist",
-    "publish": "npm publish --access public",
-    "publish-nightly": "npm publish --access public --tag nightly"
+    "publish-nightly": "bun run build && npm publish --access public --tag nightly"
   },
   "keywords": [
     "zk",
@@ -34,12 +36,24 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@rollup/plugin-typescript": "^12.1.2",
     "@types/bun": "^1.1.12",
     "@types/pg": "^8.11.10",
     "open": "^10.1.0",
     "pg": "^8.13.0",
     "prettier": "^3.3.3",
-    "tsup": "^8.3.5"
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "vite": "^6.0.7",
+    "vite-plugin-commonjs": "^0.10.4",
+    "crypto-browserify": "^3.12.1",
+    "stream-browserify": "^3.0.0",
+    "buffer": "^6.0.3",
+    "vite-plugin-replace": "^0.1.1",
+    "localforage": "^1.10.0",
+    "localforage-memoryStorageDriver": "^0.9.2",
+    "pako": "^2.1.0",
+    "snarkjs": "https://github.com/sampritipanda/snarkjs.git#fef81fc51d17a734637555c6edbd585ecda02d9e"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

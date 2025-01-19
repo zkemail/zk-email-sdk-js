@@ -322,6 +322,23 @@ describe("Blueprint prod test suite", () => {
       console.error("err: ", err);
     }
   });
+
+  test("Should get chunked zkey download links", async () => {
+    const sdk = zkeSdk({ baseUrl: "http://localhost:8080" });
+    const blueprint = await sdk.getBlueprintById("126380f6-a752-48ae-bae7-03cfc31d2f01");
+
+    const downloadLinks = await blueprint.getChunkedZkeyDownloadLinks();
+    expect(downloadLinks.length).toBe(10);
+  });
+
+  test("Should get vkey as string", async () => {
+    const sdk = zkeSdk({ baseUrl: "http://localhost:8080" });
+    const blueprint = await sdk.getBlueprintById("126380f6-a752-48ae-bae7-03cfc31d2f01");
+
+    const vkey = await blueprint.getVkey();
+    expect(typeof vkey).toBe("string");
+    expect(vkey.length).toBeGreaterThan(10);
+  });
 });
 
 describe("devin", () => {
