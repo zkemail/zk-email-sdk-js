@@ -9,17 +9,26 @@ export enum ProofStatus {
   Failed,
 }
 
+export type PublicProofData = {
+  [key: string]: string[];
+};
+
+export type ExternalInputProof = {
+  [key: string]: string;
+};
+
 export type ProofProps = {
   id: string;
   blueprintId: string;
   input: string;
   proofData?: string;
-  publicData?: string;
+  publicData?: PublicProofData;
   publicOutputs?: string[];
-  externalInputs?: string;
+  externalInputs?: ExternalInputProof;
   status?: ProofStatus;
   startedAt?: Date;
   provedAt?: Date;
+  isLocal: boolean;
 };
 
 export type ProofResponse = {
@@ -27,8 +36,8 @@ export type ProofResponse = {
   blueprint_id: string;
   input: string;
   proof?: string;
-  public?: string;
-  external_inputs?: string;
+  public?: PublicProofData;
+  external_inputs?: ExternalInputProof;
   public_outputs?: string[];
   started_at: ServerDate;
   proved_at?: ServerDate;
