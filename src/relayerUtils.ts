@@ -10,6 +10,7 @@ import {
   GenerateProofInputsParamsInternal,
   ParsedEmail,
   ExternalInputInput,
+  PublicProofData,
 } from "./types";
 import {
   init,
@@ -258,7 +259,7 @@ export async function extractEMLDetails(emlContent: string) {
 export function parsePublicSignals(
   publicSignals: string[],
   decomposedRegexes: DecomposedRegex[]
-): string {
+): PublicProofData {
   let publicOutputIterator = 1; // like publicOutputIterator in Go
   const publicStruct: { [key: string]: string[] } = {};
 
@@ -291,10 +292,7 @@ export function parsePublicSignals(
   });
 
   // Combine part outputs into final object
-  const result = decodePublicOutputs(publicStruct);
-
-  // Return it as JSON
-  return JSON.stringify(result);
+  return publicStruct;
 }
 
 function decodePublicOutputs(outputs: { [key: string]: string[] }): { [key: string]: string } {

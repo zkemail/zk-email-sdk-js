@@ -2,6 +2,7 @@ import { Blueprint } from "./blueprint";
 import { Proof } from "./proof";
 import { generateProofInputs, parsePublicSignals, testBlueprint } from "./relayerUtils";
 import {
+  ExternalInputProof,
   GenerateProofInputsParams,
   ProofProps,
   ProofRequest,
@@ -196,18 +197,26 @@ export class Prover {
       });
     });
 
+    const proofExternalInputs: ExternalInputProof = externalInputs.reduce(
+      (acc: ExternalInputProof, cur) => {
+        acc[cur.name] = cur.value;
+        return acc;
+      },
+      {}
+    );
+
     const proofProps: ProofProps = {
-      // TODO: save serverside and get id there
-      id: "id-" + Math.random().toString(36).substr(2, 9),
+      id: "id-" + Math.random().toString(36).substring(2, 9),
       blueprintId: this.blueprint.props.id!,
       input: inputs,
       proofData: proof,
       publicData: parsePublicSignals(publicSignals, this.blueprint.props.decomposedRegexes),
       publicOutputs: publicSignals,
-      externalInputs: JSON.stringify(externalInputs),
+      externalInputs: proofExternalInputs,
       status: ProofStatus.Done,
       startedAt: startTime,
       provedAt: new Date(),
+      isLocal: false,
     };
 
     return new Proof(this.blueprint, proofProps);

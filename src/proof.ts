@@ -1,6 +1,12 @@
 import { Blueprint, Status } from "./blueprint";
 import { verifyProofOnChain } from "./chain";
-import { ProofProps, ProofResponse, ProofStatus } from "./types/proof";
+import {
+  ExternalInputProof,
+  ProofProps,
+  ProofResponse,
+  ProofStatus,
+  PublicProofData,
+} from "./types/proof";
 import { get } from "./utils";
 
 /**
@@ -198,6 +204,7 @@ export class Proof {
       externalInputs: response.external_inputs,
       startedAt: new Date(response.started_at.seconds * 1000),
       provedAt: response.proved_at ? new Date(response.proved_at.seconds * 1000) : undefined,
+      isLocal: false,
     };
     return props;
   }
@@ -207,9 +214,9 @@ export class Proof {
    */
   getProofData(): {
     proofData: string;
-    publicData: string;
+    publicData: PublicProofData;
     publicOutputs: string[];
-    externalInputs: string;
+    externalInputs: ExternalInputProof;
   } {
     if (this.props.status !== ProofStatus.Done) {
       throw new Error("Cannot get proof data, proof is not Done");
