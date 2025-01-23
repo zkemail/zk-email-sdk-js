@@ -10,7 +10,7 @@ import {
   ProofStatus,
 } from "./types/proof";
 import { ExternalInputInput, ProverOptions } from "./types/prover";
-import { post } from "./utils";
+import { patch, post } from "./utils";
 import { localProverWorkerCode } from "./localProverWorkerString";
 
 /**
@@ -205,6 +205,11 @@ export class Prover {
       {}
     );
 
+    // Do not await, local proof should not fail if this fails
+    this._incNumLocalProofs().catch((err) => {
+      console.error("Failed to increase local proofs after generating proof");
+    });
+
     const proofProps: ProofProps = {
       id: "id-" + Math.random().toString(36).substring(2, 9),
       blueprintId: this.blueprint.props.id!,
@@ -220,5 +225,19 @@ export class Prover {
     };
 
     return new Proof(this.blueprint, proofProps);
+  }
+
+  private async _incNumLocalProofs(): Promise<void> {
+    try {
+      await patch<{ success: boolean }>(
+        `${this.blueprint.baseUrl}/blueprint/inc-local-proofs/${this.blueprint.props.id}`
+      );
+    } catch (err) {
+      console.error(
+        "Failed calling PATCH on /blueprint/inc-local-proofs in _incNumLocalProofs: ",
+        err
+      );
+      throw err;
+    }
   }
 }

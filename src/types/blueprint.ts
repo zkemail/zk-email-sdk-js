@@ -25,6 +25,7 @@ export type BlueprintProps = {
   verifierContract?: VerifierContract;
   version?: number;
   stars?: number;
+  numLocalProofs?: number;
 };
 
 export type DecomposedRegex = {
@@ -130,6 +131,7 @@ export type BlueprintResponse = {
   verifier_contract_chain: number;
   version: number;
   stars: number;
+  num_local_proofs: number;
 };
 
 export type ServerDate = {

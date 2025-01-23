@@ -157,6 +157,7 @@ export class Blueprint {
       },
       version: response.version,
       stars: response.stars,
+      numLocalProofs: response.num_local_proofs,
     };
 
     return props;
@@ -720,6 +721,20 @@ export class Blueprint {
     const response = await fetch(downloadUrl);
     const vkey = await response.text();
     return vkey;
+  }
+
+  async getNumOfRemoteProofs(): Promise<number> {
+    let countResponse: { count: number };
+    try {
+      countResponse = await get<{ count: number }>(
+        `${this.baseUrl}/blueprint/count-remote-proofs/${this.props.id}`
+      );
+    } catch (err) {
+      console.error("Failed calling /blueprint/:id in getBlueprintById: ", err);
+      throw err;
+    }
+
+    return countResponse.count;
   }
 }
 

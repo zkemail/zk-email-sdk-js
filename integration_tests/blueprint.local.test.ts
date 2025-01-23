@@ -339,6 +339,27 @@ describe("Blueprint prod test suite", () => {
     expect(typeof vkey).toBe("string");
     expect(vkey.length).toBeGreaterThan(10);
   });
+
+  test("Should increase local proof count", async () => {
+    const sdk = zkeSdk({ baseUrl: "http://localhost:8080" });
+    const blueprint = await sdk.getBlueprintById("0026f203-2643-430e-b97c-b6c3e5300548");
+
+    const prover = blueprint.createProver({ isLocal: true });
+
+    // bypass private
+    await (prover as any)._incNumLocalProofs();
+
+    const updatedBlueprint = await sdk.getBlueprintById("0026f203-2643-430e-b97c-b6c3e5300548");
+
+    expect(blueprint.props.numLocalProofs).toBe(updatedBlueprint.props.numLocalProofs! - 1);
+  });
+
+  test("Should return remote proof count", async () => {
+    const sdk = zkeSdk({ baseUrl: "http://localhost:8080" });
+    const blueprint = await sdk.getBlueprintById("52f21e2c-6bea-414f-965f-3b09910dc6d7");
+    const numRemoteProofs = await blueprint.getNumOfRemoteProofs();
+    expect(numRemoteProofs).toBeNumber();
+  });
 });
 
 describe("devin", () => {
