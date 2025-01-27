@@ -1,7 +1,7 @@
 # ZKEmail SDK
 
 With the ZKEmail SDK you can create proofs about emails using blueprints. You can create blueprints with this
-SDK (documentation pending), or using our [registry](registry.zk.email).
+SDK (documentation pending), or using our [registry](https://registry.zk.email).
 
 ## Install
 
@@ -16,7 +16,7 @@ npm i @zk-email/sdk
 
 ## Create a blueprint
 
-Go to our [registry](registry.zk.email) and create a blueprint there. You can also create one with the SDK,
+Go to our [registry](https://registry.zk.email) and create a blueprint there. You can also create one with the SDK,
 we will provide the documentation for this shortly.
 
 ## Generate a proof
@@ -28,7 +28,7 @@ import zkeSdk from "@zk-email/sdk";
 const sdk = zkSdk();
 ```
 
-Next, obtain the slug of the blueprint you want to create a proof for from our [registry](registry.zk.email).
+Next, obtain the slug of the blueprint you want to create a proof for from our [registry](https://registry.zk.email).
 
 ![Copy Slug](https://raw.githubusercontent.com/zkemail/zk-email-sdk-js/main/assets/copy_slug.png)
 
