@@ -108,6 +108,7 @@ export class Prover {
     eml: string,
     externalInputs: ExternalInputInput[] = []
   ): Promise<Proof> {
+    console.log("generating remote proof");
     const blueprintId = this.blueprint.getId();
     if (!blueprintId) {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
@@ -146,6 +147,7 @@ export class Prover {
    * Done or Failed.
    */
   async generateLocalProof(eml: string, externalInputs: ExternalInputInput[] = []): Promise<Proof> {
+    console.log("generating local proof");
     const blueprintId = this.blueprint.getId();
     if (!blueprintId) {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
@@ -221,7 +223,7 @@ export class Prover {
       status: ProofStatus.Done,
       startedAt: startTime,
       provedAt: new Date(),
-      isLocal: false,
+      isLocal: true,
     };
 
     return new Proof(this.blueprint, proofProps);
