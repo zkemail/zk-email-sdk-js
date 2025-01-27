@@ -63,8 +63,14 @@ export async function verifyProofOnChain(proof: Proof) {
   const args = [
     [BigInt(proofData.pi_a[0]), BigInt(proofData.pi_a[1])],
     [
-      [BigInt(proofData.pi_b[0][0]), BigInt(proofData.pi_b[0][1])],
-      [BigInt(proofData.pi_b[1][0]), BigInt(proofData.pi_b[1][1])],
+      [
+        BigInt(proofData.pi_b[0][1]), // swap coordinates
+        BigInt(proofData.pi_b[0][0]),
+      ],
+      [
+        BigInt(proofData.pi_b[1][1]), // swap coordinates
+        BigInt(proofData.pi_b[1][0]),
+      ],
     ],
     [BigInt(proofData.pi_c[0]), BigInt(proofData.pi_c[1])],
     proof.props.publicOutputs.map((output) => BigInt(output)),
