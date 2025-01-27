@@ -37,6 +37,7 @@ function getVerifierContractAbi(signalLength: number) {
 }
 
 export async function verifyProofOnChain(proof: Proof) {
+  console.log("verifierContract: ", proof.blueprint.props.verifierContract);
   if (
     !proof.blueprint.props.verifierContract?.chain ||
     !proof.blueprint.props.verifierContract?.address
@@ -62,14 +63,8 @@ export async function verifyProofOnChain(proof: Proof) {
   const args = [
     [BigInt(proofData.pi_a[0]), BigInt(proofData.pi_a[1])],
     [
-      [
-        BigInt(proofData.pi_b[0][1]), // swap coordinates
-        BigInt(proofData.pi_b[0][0]),
-      ],
-      [
-        BigInt(proofData.pi_b[1][1]), // swap coordinates
-        BigInt(proofData.pi_b[1][0]),
-      ],
+      [BigInt(proofData.pi_b[0][0]), BigInt(proofData.pi_b[0][1])],
+      [BigInt(proofData.pi_b[1][0]), BigInt(proofData.pi_b[1][1])],
     ],
     [BigInt(proofData.pi_c[0]), BigInt(proofData.pi_c[1])],
     proof.props.publicOutputs.map((output) => BigInt(output)),

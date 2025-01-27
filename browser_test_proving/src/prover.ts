@@ -1,20 +1,32 @@
-import zkeSdk from "@zk-email/sdk";
-// import zkeSdk from "../../src/index";
+// import zkeSdk from "@zk-email/sdk";
+import zkeSdk from "../../src/index";
 
 export function setupProver(element: HTMLElement) {
-  const sdk = zkeSdk({ baseUrl: "http://localhost:8080" });
+  const sdk = zkeSdk();
 
   const proveButton = element.querySelector("button");
   if (proveButton) {
     proveButton.addEventListener("click", async () => {
-      const blueprint = await sdk.getBlueprintById("126380f6-a752-48ae-bae7-03cfc31d2f01");
-      const prover = blueprint.createProver({ isLocal: true });
+      try {
+        console.log("getting blueprint");
+        const blueprint = await sdk.getBlueprintById("008b5da5-fbda-4445-b7df-6b0c6dde4bb1");
+        console.log("blueprint: ", blueprint);
 
-      const eml = await getEml();
+        const prover = blueprint.createProver({ isLocal: true });
 
-      // console.log("putting in eml: ", eml);
-      const proof = await prover.generateProof(eml!);
-      console.log("proof done in browser: ", proof);
+        const eml = await getEml();
+
+        // console.log("putting in eml: ", eml);
+        const proof = await prover.generateProof(eml!);
+
+        console.log("proof done in browser: ", proof);
+
+        const verified = await blueprint.verifyProofOnChain(proof);
+
+        console.log("Proof verified: ", verified);
+      } catch (err) {
+        console.error("Failed to prove: ", err);
+      }
     });
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@zk-email/sdk",
-  "version": "0.0.88",
+  "version": "0.0.92",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/zk-email-sdk.es.js",
@@ -14,7 +14,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "NPM-README.md",
+    "assets"
   ],
   "scripts": {
     "build-old": "bunx tsup src/index.ts src/localProverWorker.ts --format esm,cjs --dts",

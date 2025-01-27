@@ -59,6 +59,7 @@ export class Blueprint {
     baseUrl: string,
     auth?: Auth
   ): Promise<Blueprint> {
+    console.log("getting blueprint by id");
     let blueprintResponse: BlueprintResponse;
     try {
       blueprintResponse = await get<BlueprintResponse>(`${baseUrl}/blueprint/${id}`);

@@ -1,63 +1,70 @@
-# zk-email-sdk-js
+# ZKEmail SDK
 
-With the ZK Email SDK you can easily compile zk regex circuits and directly create proofs with them.
+With the ZKEmail SDK you can create proofs about emails using blueprints. You can create blueprints with this
+SDK (documentation pending), or using our [registry](registry.zk.email).
 
-For demos on how to use this repo, refer to our demo [https://github.com/zkemail/sdk-ts-demo](demo).
+## Install
 
-## Test a decomposed regex locally
+The SDK works for all JavaScript environments. You can find
+examples for server-side (Node, Deno, Bun) and client-side (Vite, Next.js) usage [here](https://github.com/zkemail/sdk-ts-demo).
 
-Install Bun:
+To install run:
 
-`curl -fsSL https://bun.sh/install | bash`
+```bash
+npm i @zk-email/sdk
+```
 
-Install dependencies:
+## Create a blueprint
 
-`bun i`
+Go to our [registry](registry.zk.email) and create a blueprint there. You can also create one with the SDK,
+we will provide the documentation for this shortly.
 
-## Note
+## Generate a proof
 
-This first version of this SDK does not support compiling the circuits and running the proofs without our infra,
-but it is our priority to make this work with your own ifra easily, too.
+Initialize the SDK:
 
-## Setup
+```ts
+import zkeSdk from "@zk-email/sdk";
+const sdk = zkSdk();
+```
 
-This project uses bun. So to install packages use `bun i`.
+Next, obtain the slug of the blueprint you want to create a proof for from our [registry](registry.zk.email).
 
-## Run integration tests
+![Copy Slug](https://raw.githubusercontent.com/zkemail/zk-email-sdk-js/main/assets/copy_slug.png)
 
-Before you can run the tests, you must have the conductor running.
+Use the slug to get the blueprint:
 
-NOTE: Not all tests are currently working, due to changes to the interfaces and the backend.
+```ts
+const blueprint = await sdk.getBlueprint("Bisht13/SuccinctZKResidencyInvite@v2");
+```
 
-Then you can run `bun test`.
+Create a prover. Here you can define whether the proof should be generated remotely (faster)
+or in the browser (slower but private).
+Set `isLocal` to `true` for proving in the browser.
 
-### Directly start downloads
+```ts
+const prover = blueprint.createProver({ isLocal: true });
+```
 
-To run the `start download` test, you first have to compile the TypeScript files to js with `bun run build`.
+Now pass the email as a `string` to the prover to generate a proof.
 
-If you have python installed run `python -m http.server 8000`. Then you can go to
-`http://localhost:8000/integration_tests/start_downlaod_in_browser.html` and click the download button.
+If your blueprint requires external inputs, pass them as a second argument.
 
-## Updating localProverWorker.js
+You can check out our [Next.js example](https://github.com/zkemail/sdk-ts-demo/tree/main/nextjs) to see how
+a user can locally upload an email file.
 
-For local proving, we use a javascript WebWorker. In order to make this compatible with any bundler, we first build the worker file using vite.
-This will inline all dependencies and remove import statements. The next step is to generate a string from this file. Now we can
-use the worker in a native js way by passing a string to the worker.
+```ts
+// 2. argument, externalInputs is only required if defined in the blueprint
+const proof = await prover.generateProof(emailStr, [
+  { name: "email", value: "a@b.de", maxLength: 50 },
+]);
 
-To generate the `localProverWorkerString.ts` file which is passed into the worker, run:
+console.log("Proof data: ", proof.props.proofData);
+console.log("Public data: ", proof.props.publicData);
+```
 
-`bun run build-prove-worker`.
+You can also verify the proof on chain. We currently use a contract deployed to Base Sepolia for this.
 
-## Publish to npm
-
-### Publish nightly for testing
-
-Bump the version in `package.json`, use a trailing version number, starting with `-1`, e.g. `0.0.86-6`.
-
-Run `bun run publish-nightly`.
-
-### Publish new production version
-
-Bump the version in `package.json`, using this format: `0.0.86`.
-
-Run `bun run publish`.
+```ts
+const isVerified = await blueprint.verifyProofOnChain(proof);
+```
