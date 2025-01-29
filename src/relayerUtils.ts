@@ -247,11 +247,13 @@ export async function extractEMLDetails(emlContent: string) {
       .join(".") || null;
   const emailQuery = `from:${senderDomain}`;
   const parsedEmail = await parseEmail(emlContent);
-  console.log(parsedEmail.canonicalizedBody, "parsedEmail");
   const emailBodyMaxLength = parsedEmail.cleanedBody.length;
   const headerLength = parsedEmail.canonicalizedHeader.length;
 
-  return { senderDomain, headerLength, emailQuery, emailBodyMaxLength };
+  const dkimHeader = parsedEmail.headers.get("DKIM-Signature")?.[0] || "";
+  const selector = dkimHeader.match(/s=([^;]+)/)?.[1] || "";
+
+  return { senderDomain, headerLength, emailQuery, emailBodyMaxLength, selector };
 }
 
 // Parses public signals from a proof to readable outputs
