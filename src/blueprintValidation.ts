@@ -37,7 +37,7 @@ export const blueprintFormSchema = z.object({
       ctx.addIssue({ code: "custom", message: "Must be a multiple of 64" });
     }
     if (n > 10000) {
-      ctx.addIssue({ code: "custom", message: "Must be less than or equal to 10000" });
+      ctx.addIssue({ code: "custom", message: "Must be less than or equal to 9984" });
     }
     return n;
   }),
