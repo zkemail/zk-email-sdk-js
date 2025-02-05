@@ -16,6 +16,8 @@ import { Proof } from "./proof";
 import { blueprintFormSchema } from "./blueprintValidation";
 import { ProverOptions } from "./types";
 import { testBlueprint } from "./relayerUtils";
+import * as snarkjs from "snarkjs";
+import { Verify } from "crypto";
 
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
@@ -490,7 +492,7 @@ export class Blueprint {
   /**
    * Verifies a proof on chain.
    * @param proof - The generated proof you want to verify.
-   * @returns A true if the verification was successfull, false if it failed.
+   * @returns Returns true if the verification was successfull, false if it failed.
    */
   async verifyProofOnChain(proof: Proof): Promise<boolean> {
     try {
@@ -500,6 +502,67 @@ export class Blueprint {
       return false;
     }
     return true;
+  }
+
+  /**
+   * Verifies a proof. This can be used, e.g. to verify a proof server side that was generated locally.
+   * @param publicOutputs - The public outputs of the proof as string
+   * @param proofData - The proof data to verify as string.
+   * @returns Returns true if the verification was successfull, false if it failed.
+   */
+  async verifyProofData(publicOutputs: string, proofData: string): Promise<boolean> {
+    let vkey: string;
+    try {
+      vkey = await this.getVkey();
+    } catch (err) {
+      console.log("Failed to get vkey: ", err);
+      return false;
+    }
+
+    try {
+      const verified = await snarkjs.groth16.verify(
+        JSON.parse(vkey),
+        JSON.parse(publicOutputs),
+        JSON.parse(proofData)
+      );
+      return verified;
+    } catch (err) {
+      console.log("Failed to verify proof: ", err);
+    }
+    return false;
+  }
+
+  /**
+   * Verifies a proof.
+   * @param proof - The generated proof you want to verify.
+   * @returns Returns true if the verification was successfull, false if it failed.
+   */
+  async verifyProof(proof: Proof): Promise<boolean> {
+    if (proof.props.blueprintId !== this.props.id) {
+      throw Error(
+        `The proof was generated using a different blueprint: ${proof.props.blueprintId}`
+      );
+    }
+
+    let vkey: string;
+    try {
+      vkey = await this.getVkey();
+    } catch (err) {
+      console.log("Failed to get vkey: ", err);
+      return false;
+    }
+
+    try {
+      const verified = await snarkjs.groth16.verify(
+        JSON.parse(vkey),
+        proof.props.publicOutputs,
+        proof.props.proofData
+      );
+      return verified;
+    } catch (err) {
+      console.log("Failed to verify proof: ", err);
+    }
+    return false;
   }
 
   /**

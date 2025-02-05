@@ -1,5 +1,5 @@
-import zkeSdk from "@zk-email/sdk";
-// import zkeSdk from "../../src/index";
+// import zkeSdk from "@zk-email/sdk";
+import zkeSdk from "../../src/index";
 
 export function setupProver(element: HTMLElement) {
   const sdk = zkeSdk();
@@ -21,9 +21,16 @@ export function setupProver(element: HTMLElement) {
 
         console.log("proof done in browser: ", proof);
 
-        const verified = await blueprint.verifyProofOnChain(proof);
+        const verified = await blueprint.verifyProofData(
+          JSON.stringify(proof.props.publicOutputs!),
+          JSON.stringify(proof.props.proofData!)
+        );
 
-        console.log("Proof verified: ", verified);
+        console.log("Proof verified using strigified data: ", verified);
+
+        const verifiedDirect = await blueprint.verifyProof(proof);
+
+        console.log("Proof verified using proof directly: ", verifiedDirect);
       } catch (err) {
         console.error("Failed to prove: ", err);
       }
