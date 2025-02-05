@@ -18,6 +18,7 @@ import {
   sha256Pad,
   extractSubstr,
   generateCircuitInputsWithDecomposedRegexesAndExternalInputs,
+  genFromDecomposed,
 } from "@zk-email/relayer-utils";
 
 let relayerUtilsResolver: (value: any) => void;
@@ -50,6 +51,10 @@ export async function testBlueprint(
   blueprint: BlueprintProps,
   revealPrivate = false
 ): Promise<string[][]> {
+  // First test for validity of decomposed regex by generating the Dfa
+  // Will throw an error if the decomposed regex is not valid
+  await Promise.all(blueprint.decomposedRegexes.map(generateDfa));
+
   const parsedEmail = await parseEmail(eml);
 
   if (
@@ -75,9 +80,9 @@ export async function testBlueprint(
   await checkInputLengths(header, body, blueprint);
 
   const output = await Promise.all(
-    blueprint.decomposedRegexes.map((dcr: DecomposedRegex) =>
-      testDecomposedRegex(body, header, dcr, revealPrivate)
-    )
+    blueprint.decomposedRegexes.flatMap((dcr: DecomposedRegex) => [
+      testDecomposedRegex(body, header, dcr, revealPrivate),
+    ])
   );
 
   return output;
@@ -347,4 +352,37 @@ function processIntegers(integers: string[]): string {
   }
 
   return result;
+}
+
+export async function generateDfa(
+  decomposedRegex: DecomposedRegex | DecomposedRegexJson
+): Promise<string> {
+  try {
+    await relayerUtilsInit;
+
+    const inputDecomposedRegex = {
+      parts: decomposedRegex.parts.map((p: DecomposedRegexPart | DecomposedRegexPartJson) => ({
+        is_public: "isPublic" in p ? p.isPublic : p.is_public,
+        regex_def: "regexDef" in p ? p.regexDef : p.regex_def,
+      })),
+    };
+
+    const dfa = genFromDecomposed(JSON.stringify(inputDecomposedRegex), "circuit");
+    return dfa;
+
+    // Error handling is according to zk-regex repo
+  } catch (err) {
+    if (typeof err === "string" && err.includes("failed to convert the decomposed regex to dfa")) {
+      const failedRegex = err.split('"')?.[1];
+      if (failedRegex) {
+        throw new Error(`Regex unsupported: ${failedRegex}`);
+      }
+    } else if (
+      typeof err === "string" &&
+      err.includes("Accept Nodes Error: The size of accept nodes must be one for regex")
+    ) {
+      throw new Error("A single regex definition must not match multiple parts in the email");
+    }
+    throw err;
+  }
 }

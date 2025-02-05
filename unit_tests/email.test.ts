@@ -1,6 +1,7 @@
 import { expect, test, describe, beforeAll, afterAll, it } from "bun:test";
-import helloTestEmail from "./hello_eml";
+// import helloTestEmail from "./hello_eml";
 import {
+  generateDfa,
   generateProofInputs,
   parseEmail,
   testBlueprint,
@@ -10,12 +11,16 @@ import {
   BlueprintProps,
   DecomposedRegex,
   DecomposedRegexJson,
-  DecomposedRegexPart,
   GenerateProofInputsParams,
 } from "../src";
-import { readFile } from "fs/promises";
+import { readFileSync } from "fs";
 
 const timeout = 10_000;
+
+// NOTE: Tests fail due to parseEmail testing public key due to
+
+const helloTestEmail = readFileSync("unit_tests/hello_eml.eml", "utf-8");
+const helloEml = readFileSync("unit_tests/test.eml", "utf-8");
 
 describe("Email utils test suite", async () => {
   // Wait for wasm to initialize
@@ -296,8 +301,14 @@ describe("Email utils test suite", async () => {
         ],
       };
 
+      const parsedEmail = await parseEmail(helloTestEmail);
       try {
-        await testDecomposedRegex(helloTestEmail, decomposedRegex, true);
+        await testDecomposedRegex(
+          parsedEmail.cleanedBody,
+          parsedEmail.canonicalizedHeader,
+          decomposedRegex,
+          true
+        );
       } catch (err) {
         expect(err).not.toBeUndefined();
         return;
@@ -337,8 +348,6 @@ describe("Email utils test suite", async () => {
   test(
     "Can create proof inputs",
     async () => {
-      const helloEml = await readFile("unit_tests/test.eml", "utf-8");
-
       const decomposedRegexes: DecomposedRegex[] = [
         {
           parts: [
@@ -371,7 +380,7 @@ describe("Email utils test suite", async () => {
   );
 });
 
-describe("testBlueprint", () => {
+describe("testBlueprint", async () => {
   test(
     "Should find header and body",
     async () => {
