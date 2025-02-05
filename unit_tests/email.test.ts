@@ -8,6 +8,7 @@ import {
   testDecomposedRegex,
 } from "../src/relayerUtils";
 import {
+  Blueprint,
   BlueprintProps,
   DecomposedRegex,
   DecomposedRegexJson,
@@ -557,6 +558,82 @@ describe("testBlueprint", async () => {
         return;
       }
       throw new Error("Did not failed to find header in cut off header");
+    },
+    timeout
+  );
+
+  test(
+    "blueprint.validateEmail should return false if max length of part is exceeded",
+    async () => {
+      const decomposedRegex: DecomposedRegex = {
+        name: "Hello Pattern",
+        maxLength: 1,
+        location: "body",
+        parts: [
+          {
+            isPublic: false,
+            regexDef: "Hello ",
+          },
+          {
+            isPublic: true,
+            regexDef: "[^,]+",
+          },
+          {
+            isPublic: false,
+            regexDef: "!",
+          },
+        ],
+      };
+
+      // @ts-ignore
+      const blueprintProps: BlueprintProps = {
+        emailBodyMaxLength: 1024,
+        emailHeaderMaxLength: 1024,
+        decomposedRegexes: [decomposedRegex],
+      };
+
+      const blueprint = new Blueprint(blueprintProps, "");
+
+      const isValid = await blueprint.validateEmail(helloTestEmail);
+      expect(isValid).toBeFalse();
+    },
+    timeout
+  );
+
+  test(
+    "blueprint.validateEmail should return true if valid email",
+    async () => {
+      const decomposedRegex: DecomposedRegex = {
+        name: "Hello Pattern",
+        maxLength: 4000,
+        location: "body",
+        parts: [
+          {
+            isPublic: false,
+            regexDef: "Hello ",
+          },
+          {
+            isPublic: true,
+            regexDef: "[^,]+",
+          },
+          {
+            isPublic: false,
+            regexDef: "!",
+          },
+        ],
+      };
+
+      // @ts-ignore
+      const blueprintProps: BlueprintProps = {
+        emailBodyMaxLength: 9984,
+        emailHeaderMaxLength: 1024,
+        decomposedRegexes: [decomposedRegex],
+      };
+
+      const blueprint = new Blueprint(blueprintProps, "");
+
+      const isValid = await blueprint.validateEmail(helloTestEmail);
+      expect(isValid).toBeTrue();
     },
     timeout
   );

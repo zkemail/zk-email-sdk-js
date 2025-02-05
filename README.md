@@ -38,6 +38,15 @@ Use the slug to get the blueprint:
 const blueprint = await sdk.getBlueprint("Bisht13/SuccinctZKResidencyInvite@v2");
 ```
 
+You can optionally test first if the email can be used with the blueprint.
+
+You can check out our [Next.js example](https://github.com/zkemail/sdk-ts-demo/tree/main/nextjs) to see how
+a user can locally upload an email file.
+
+```ts
+const isValid = await blueprint.validateEmail(emailStr);
+```
+
 Create a prover. Here you can define whether the proof should be generated remotely (faster)
 or in the browser (slower but private).
 Set `isLocal` to `true` for proving in the browser.
@@ -49,9 +58,6 @@ const prover = blueprint.createProver({ isLocal: true });
 Now pass the email as a `string` to the prover to generate a proof.
 
 If your blueprint requires external inputs, pass them as a second argument.
-
-You can check out our [Next.js example](https://github.com/zkemail/sdk-ts-demo/tree/main/nextjs) to see how
-a user can locally upload an email file.
 
 ```ts
 // 2. argument, externalInputs is only required if defined in the blueprint

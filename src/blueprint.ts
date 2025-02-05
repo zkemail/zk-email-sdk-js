@@ -15,6 +15,7 @@ import { Auth } from "./types/auth";
 import { Proof } from "./proof";
 import { blueprintFormSchema } from "./blueprintValidation";
 import { ProverOptions } from "./types";
+import { testBlueprint } from "./relayerUtils";
 
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
@@ -736,6 +737,20 @@ export class Blueprint {
     }
 
     return countResponse.count;
+  }
+
+  /**
+   * Validates if a given email matches the blueprint.
+   * @returns true if the given email is is valid for the blueprint and a proof can be generated.
+   */
+  async validateEmail(eml: string): Promise<boolean> {
+    try {
+      await testBlueprint(eml, this.props, false);
+      return true;
+    } catch (err) {
+      console.log("Email is invalid: ", err);
+      return false;
+    }
   }
 }
 
