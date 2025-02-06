@@ -69,7 +69,31 @@ console.log("Proof data: ", proof.props.proofData);
 console.log("Public data: ", proof.props.publicData);
 ```
 
-You can also verify the proof on chain. We currently use a contract deployed to Base Sepolia for this.
+## Verify a proof
+
+### Locally
+
+You can verify a proof direclty using a instance of Proof.
+`verifyProof` will be true if the proof is valid and false if it is invalid.
+
+```ts
+const verified = await blueprint.verifyProof(proof);
+console.log("Proof is valid: ", verified);
+```
+
+If you only have the proof data, you can verify the proof like this:
+
+```ts
+const verified = await blueprint.verifyProofData(
+  JSON.stringify(proof.props.publicOutputs),
+  JSON.stringify(proof.props.proofData)
+);
+console.log("Proof is valid: ", verified);
+```
+
+### On chain
+
+We currently use a contract deployed to Base Sepolia for this.
 
 ```ts
 const isVerified = await blueprint.verifyProofOnChain(proof);
