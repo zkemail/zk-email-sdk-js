@@ -1,6 +1,6 @@
 {
   "name": "@zk-email/sdk",
-  "version": "0.0.100",
+  "version": "0.0.101-1",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/zk-email-sdk.es.js",
@@ -53,8 +53,7 @@
     "vite-plugin-replace": "^0.1.1",
     "localforage": "^1.10.0",
     "localforage-memoryStorageDriver": "^0.9.2",
-    "pako": "^2.1.0",
-    "snarkjs": "https://github.com/sampritipanda/snarkjs.git#fef81fc51d17a734637555c6edbd585ecda02d9e"
+    "pako": "^2.1.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -63,6 +62,7 @@
     "@zk-email/relayer-utils": "0.4.62-9",
     "ethers": "^6.13.4",
     "viem": "^2.21.53",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "snarkjs": "https://github.com/sampritipanda/snarkjs.git#fef81fc51d17a734637555c6edbd585ecda02d9e"
   }
 }
