@@ -98,3 +98,30 @@ We currently use a contract deployed to Base Sepolia for this.
 ```ts
 const isVerified = await blueprint.verifyProofOnChain(proof);
 ```
+
+## Fetch emails with Gmail
+
+You can use the sdks' `Gmail` utility class to fetch users emails according to the blueprints query.
+
+**NOTE:** This will only work if you approved your domain with us.
+
+```ts
+import zkeSdk, { Gmail } from "@zk-email/sdk";
+
+const gmail = new Gmail();
+const sdk = zkeSdk();
+
+// optional - manually start Login with Google flow and authorize before fetching emails
+await gmail.authorize();
+
+// Will start Login with Google flow if not already autorized
+// Fetches emails using the email queries given in the blueprints
+const emails = await gmail.fetchEmails([blueprint]);
+
+// Will return an empty array if there are no more emails matching the blueprints query
+const moreEmails = await gmail.fetchMore();
+
+// You can validate if an email is valid according to a blueprint
+const isValid = await blueprint.validateEmail(emails[0].decodedContents);
+console.log("isValid: ", isValid);
+```
