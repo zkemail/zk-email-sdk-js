@@ -32,6 +32,7 @@ export type DecomposedRegex = {
   parts: DecomposedRegexPart[];
   name: string;
   maxLength: number;
+  isHashed?: boolean;
   location: "body" | "header";
 };
 
@@ -44,6 +45,7 @@ export type DecomposedRegexJson = {
   parts: DecomposedRegexPartJson[];
   name: string;
   max_length: number;
+  is_hashed?: boolean;
   location: "body" | "header";
 };
 
@@ -148,6 +150,7 @@ export type DecomposedRegexResponse = {
   parts: DecomposedRegexPartResponse[];
   name: string;
   max_length: number;
+  is_hashed?: boolean;
   location: "body" | "header";
 };
 

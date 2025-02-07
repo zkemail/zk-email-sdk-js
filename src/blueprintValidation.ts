@@ -67,6 +67,7 @@ export const blueprintFormSchema = z.object({
           return value;
         }),
       maxLength: z.coerce.number().positive().default(64),
+      isHashed: z.boolean().optional(),
       location: z.string().regex(/(body)|(header)/),
       parts: z
         .string()
