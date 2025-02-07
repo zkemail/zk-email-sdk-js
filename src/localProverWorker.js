@@ -1,5 +1,5 @@
 import localforage from "localforage";
-import * as snarkjs from "snarkjs";
+import * as snarkjs from "@zk-email/snarkjs";
 import pako from "pako";
 
 const circuitName = "circuit";

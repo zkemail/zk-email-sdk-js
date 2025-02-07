@@ -1,5 +1,5 @@
-import zkeSdk from "@zk-email/sdk";
-// import zkeSdk from "../../src/index";
+// import zkeSdk from "@zk-email/sdk";
+import zkeSdk from "../../src/index";
 
 export function setupProver(element: HTMLElement) {
   const sdk = zkeSdk();
@@ -12,7 +12,7 @@ export function setupProver(element: HTMLElement) {
         const blueprint = await sdk.getBlueprintById("008b5da5-fbda-4445-b7df-6b0c6dde4bb1");
         console.log("blueprint: ", blueprint);
 
-        const prover = blueprint.createProver();
+        const prover = blueprint.createProver({ isLocal: true });
 
         const eml = await getEml();
 

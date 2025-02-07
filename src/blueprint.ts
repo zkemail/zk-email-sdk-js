@@ -16,7 +16,7 @@ import { Proof } from "./proof";
 import { blueprintFormSchema } from "./blueprintValidation";
 import { ProverOptions } from "./types";
 import { testBlueprint } from "./relayerUtils";
-import * as snarkjs from "snarkjs";
+import * as snarkjs from "@zk-email/snarkjs";
 
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.

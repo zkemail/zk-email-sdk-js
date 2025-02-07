@@ -21,7 +21,6 @@
     "localforage": "^1.10.0",
     "pako": "^2.1.0",
     "rollup-plugin-node-polyfills": "^0.2.1",
-    "snarkjs": "https://github.com/sampritipanda/snarkjs.git#fef81fc51d17a734637555c6edbd585ecda02d9e",
     "stream-browserify": "^3.0.0",
     "vite-plugin-commonjs": "^0.10.4",
     "vite-plugin-replace": "^0.1.1"
