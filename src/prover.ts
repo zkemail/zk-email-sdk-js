@@ -147,6 +147,9 @@ export class Prover {
    * Done or Failed.
    */
   async generateLocalProof(eml: string, externalInputs: ExternalInputInput[] = []): Promise<Proof> {
+    if (!Worker) {
+      throw new Error("Local proving is only supported in the browser");
+    }
     console.log("generating local proof");
     const blueprintId = this.blueprint.getId();
     if (!blueprintId) {
