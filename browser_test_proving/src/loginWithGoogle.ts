@@ -1,5 +1,5 @@
-// import zkeSdk,  {LoginWithGoogle} from "@zk-email/sdk";
-import zkeSdk, { Gmail } from "../../src/index";
+import zkeSdk, { Gmail } from "@zk-email/sdk";
+// import zkeSdk, { Gmail } from "../../src/index";
 
 export function setupLoginWithGoogle(element: HTMLElement) {
   const sdk = zkeSdk();

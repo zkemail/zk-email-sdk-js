@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 import typescript from "@rollup/plugin-typescript";
 import path from "path";
+import inject from "@rollup/plugin-inject";
 
 // This helps ensure .d.ts files get emitted.
 // We point to our existing tsconfig.json for strict and rootDir settings.
@@ -34,6 +35,11 @@ export default defineConfig({
             // Important: do not emit .js here, because Vite does that.
             emitDeclarationOnly: true,
           },
+        }),
+        // This tells Rollup: whenever you see “Worker”, import the default export
+        // from our polyfillWorker.js module.
+        inject({
+          Worker: [resolve(__dirname, "polyfillWorker.js"), "default"],
         }),
       ],
     },
