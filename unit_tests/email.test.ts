@@ -1,7 +1,6 @@
 import { expect, test, describe, beforeAll, afterAll, it } from "bun:test";
 // import helloTestEmail from "./hello_eml";
 import {
-  generateDfa,
   generateProofInputs,
   parseEmail,
   testBlueprint,
