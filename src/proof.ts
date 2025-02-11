@@ -192,6 +192,14 @@ export class Proof {
     return new Proof(blueprint, proofProps);
   }
 
+  public getHeaderHash(): [string, string] {
+    if (!this.props.publicOutputs || !this.props.publicOutputs.length) {
+      throw new Error("Poof is not Done yet.");
+    }
+
+    return [this.props.publicOutputs[0], this.props.publicOutputs[1]];
+  }
+
   public static responseToProofProps(response: ProofResponse): ProofProps {
     const props: ProofProps = {
       id: response.id,
