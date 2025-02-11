@@ -34,10 +34,22 @@ init()
     console.log("Failed to initialize wasm for relayer-utils: ", err);
   });
 
+const emlPubKeyCache = new Map();
+
 export async function parseEmail(eml: string): Promise<ParsedEmail> {
   try {
     await relayerUtilsInit;
-    const parsedEmail = await parseEmailUtils(eml);
+
+    const publicKey = emlPubKeyCache.get(eml);
+
+    let parsedEmail;
+    if (publicKey) {
+      parsedEmail = await parseEmailUtils(eml, publicKey);
+    } else {
+      parsedEmail = await parseEmailUtils(eml);
+      emlPubKeyCache.set(eml, parsedEmail.publicKey);
+    }
+
     return parsedEmail as ParsedEmail;
   } catch (err) {
     console.error("Failed to parse email: ", err);
