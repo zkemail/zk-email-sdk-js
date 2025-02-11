@@ -138,3 +138,15 @@ describe("Proof test suite", async () => {
     });
   });
 });
+
+describe("Proof suite no auth", () => {
+  test("Get proof hashes", async () => {
+    const { getProof } = sdk();
+    const proof = await getProof("da56d824-4920-415e-8b32-e3c5b886c826");
+    const headerHash = proof.getHeaderHash();
+    expect(headerHash[0]).toBe(
+      "12421518966169864696647489187550758355845786139247225534357274307185098105625"
+    );
+    expect(headerHash[1]).toBe("188603216623945328674982261041175035792");
+  });
+});
