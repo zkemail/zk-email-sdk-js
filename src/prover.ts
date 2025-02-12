@@ -49,6 +49,10 @@ export class Prover {
 
       // Wait for proof to finish
       while (![ProofStatus.Done, ProofStatus.Failed].includes(await proof.checkStatus())) {}
+      const status = await proof.checkStatus();
+      if (status === ProofStatus.Failed) {
+        throw new Error("Remote proving failed");
+      }
       return proof;
     }
   }
