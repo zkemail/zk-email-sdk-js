@@ -149,4 +149,14 @@ describe("Proof suite no auth", () => {
     );
     expect(headerHash[1]).toBe("188603216623945328674982261041175035792");
   });
+
+  test("Get proof subject output", async () => {
+    const { getProof } = sdk();
+    const proof = await getProof("305b3981-b8bf-44a3-a48e-03bc36abba3a");
+    expect(proof.props?.publicData?.subject[0]).toBe(
+      "[Bybit]Identity Verification Lv. 1 Has Been Approved"
+    );
+
+    console.log("subject: ", proof.props?.publicData?.subject[0]);
+  });
 });
