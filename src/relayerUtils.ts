@@ -252,16 +252,18 @@ export async function extractEMLDetails(emlContent: string) {
 
   joinedHeaders.forEach((line) => {
     const [key, ...value] = line.split(":");
+    if (headers[key.trim()]) {
+      return;
+    }
     if (key) headers[key.trim()] = value.join(":").trim();
   });
 
-  // Extract details
   const senderDomain =
-    headers["Return-Path"]
-      ?.match(/@([^\s>]+)/)?.[1]
-      ?.split(".")
-      .slice(-2)
-      .join(".") || null;
+    headers["DKIM-Signature"]
+      ?.split(";")
+      .find((part) => part.trim().startsWith("d="))
+      ?.split("=")[1]
+      ?.trim() || null;
   const emailQuery = `from:${senderDomain}`;
   const parsedEmail = await parseEmail(emlContent);
   const emailBodyMaxLength = parsedEmail.cleanedBody.length;
