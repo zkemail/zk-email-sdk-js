@@ -197,7 +197,7 @@ export class Proof {
       throw new Error("Poof is not Done yet.");
     }
 
-    return [this.props.publicOutputs[0], this.props.publicOutputs[1]];
+    return [this.props.publicOutputs[1], this.props.publicOutputs[2]];
   }
 
   public static responseToProofProps(response: ProofResponse): ProofProps {
