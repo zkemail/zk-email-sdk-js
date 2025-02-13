@@ -274,11 +274,14 @@ export function parsePublicSignals(
   publicSignals: string[],
   decomposedRegexes: DecomposedRegex[]
 ): PublicProofData {
-  let publicOutputIterator = 1; // like publicOutputIterator in Go
+  let publicOutputIterator = 3; // like publicOutputIterator in Go
   const publicStruct: { [key: string]: string[] } = {};
 
   decomposedRegexes.forEach((decomposedRegex) => {
-    const signalLength = Math.ceil(decomposedRegex.maxLength / 31);
+    let signalLength = 1;
+    if (!decomposedRegex.isHashed) {
+      signalLength = Math.ceil(decomposedRegex.maxLength / 31);
+    }
 
     const partOutputs: string[] = [];
 
@@ -291,7 +294,12 @@ export function parsePublicSignals(
         );
 
         // Decode using the replicated Go logic
-        const output = processIntegers(publicOutputsSlice);
+        let output = "";
+        if (decomposedRegex.isHashed) {
+          output = publicOutputsSlice + "";
+        } else {
+          output = processIntegers(publicOutputsSlice);
+        }
 
         // Store the decoded result
         partOutputs.push(output);
@@ -307,14 +315,6 @@ export function parsePublicSignals(
 
   // Combine part outputs into final object
   return publicStruct;
-}
-
-function decodePublicOutputs(outputs: { [key: string]: string[] }): { [key: string]: string } {
-  const decodedOutputs: { [key: string]: string } = {};
-  for (const [key, values] of Object.entries(outputs)) {
-    decodedOutputs[key] = values.join(""); // Concatenate everything for that key
-  }
-  return decodedOutputs;
 }
 
 function processIntegers(integers: string[]): string {
