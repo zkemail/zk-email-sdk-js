@@ -255,20 +255,15 @@ export async function extractEMLDetails(emlContent: string) {
     if (key) headers[key.trim()] = value.join(":").trim();
   });
 
-  // Extract details
-  const senderDomain =
-    headers["Return-Path"]
-      ?.match(/@([^\s>]+)/)?.[1]
-      ?.split(".")
-      .slice(-2)
-      .join(".") || null;
-  const emailQuery = `from:${senderDomain}`;
   const parsedEmail = await parseEmail(emlContent);
   const emailBodyMaxLength = parsedEmail.cleanedBody.length;
   const headerLength = parsedEmail.canonicalizedHeader.length;
 
   const dkimHeader = parsedEmail.headers.get("DKIM-Signature")?.[0] || "";
   const selector = dkimHeader.match(/s=([^;]+)/)?.[1] || "";
+
+  const senderDomain = dkimHeader.match(/d=([^;]+)/)?.[1] || "";
+  const emailQuery = `from:${senderDomain}`;
 
   return { senderDomain, headerLength, emailQuery, emailBodyMaxLength, selector };
 }
