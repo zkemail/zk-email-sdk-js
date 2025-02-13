@@ -26,7 +26,7 @@ export class LoginWithGoogle {
     });
   }
 
-  async authorize(): Promise<string> {
+  async authorize(options: any): Promise<string> {
     // Load Google's OAuth2 library dynamically
     await this.loadGoogleScript();
 
@@ -35,6 +35,7 @@ export class LoginWithGoogle {
         client_id: clientId,
         // prompt: "consent",
         // access_type: "offline",
+        ...(!isPlainObject(options) ? {} : options),
         scope: "https://www.googleapis.com/auth/gmail.readonly",
         callback: (response: { access_token: string }) => {
           console.log("response: ", response);
@@ -99,8 +100,8 @@ export class Gmail {
     this.loginWithGoogle = new LoginWithGoogle();
   }
 
-  async authorize() {
-    await this.loginWithGoogle.authorize();
+  async authorize(options: any) {
+    await this.loginWithGoogle.authorize(options);
   }
 
   async fetchEmails(blueprints: Blueprint[]): Promise<RawEmailResponse[]> {
@@ -210,4 +211,8 @@ export class Gmail {
       throw new Error("Error fetching emails");
     }
   }
+}
+
+function isPlainObject(obj: any) {
+  return typeof obj === "object" && obj !== null && !Array.isArray(obj);
 }

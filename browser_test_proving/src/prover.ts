@@ -1,5 +1,5 @@
-import zkeSdk from "@zk-email/sdk";
-// import zkeSdk from "../../src/index";
+// import zkeSdk from "@zk-email/sdk";
+import zkeSdk from "../../src/index";
 
 export function setupProver(element: HTMLElement) {
   const sdk = zkeSdk();

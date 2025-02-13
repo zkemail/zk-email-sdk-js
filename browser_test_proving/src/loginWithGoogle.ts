@@ -1,5 +1,5 @@
-import zkeSdk, { Gmail } from "@zk-email/sdk";
-// import zkeSdk, { Gmail } from "../../src/index";
+// import zkeSdk, { Gmail } from "@zk-email/sdk";
+import zkeSdk, { Gmail } from "../../src/index";
 
 export function setupLoginWithGoogle(element: HTMLElement) {
   const sdk = zkeSdk();
@@ -14,7 +14,10 @@ export function setupLoginWithGoogle(element: HTMLElement) {
 
       // optional - manually start Login with Google flow and authorize before fetching emails
       console.log("Manually authorizing");
-      await gmail.authorize();
+      await gmail.authorize({
+        prompt: "consent",
+        access_type: "online",
+      });
 
       // Will start Login with Google flow if not already autorized
       // Fetches emails using the email queries given in the blueprints
