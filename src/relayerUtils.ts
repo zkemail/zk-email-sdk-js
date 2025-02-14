@@ -48,6 +48,22 @@ export async function parseEmail(eml: string): Promise<ParsedEmail> {
     } else {
       parsedEmail = await parseEmailUtils(eml);
       emlPubKeyCache.set(eml, parsedEmail.publicKey);
+
+      try {
+        const { senderDomain, selector } = await extractEMLDetails(eml);
+
+        const response = await fetch("https://archive.zk.email/api/dsp", {
+          method: "POST",
+          body: JSON.stringify({
+            domain: senderDomain,
+            selector: selector,
+          }),
+        });
+
+        // Do not stop function flow if this fails - warn only
+      } catch (err) {
+        console.warn("Failed to findOrCreateDSP: ", err);
+      }
     }
 
     return parsedEmail as ParsedEmail;
