@@ -52,7 +52,7 @@ export async function parseEmail(eml: string): Promise<ParsedEmail> {
       try {
         const { senderDomain, selector } = await extractEMLDetails(eml);
 
-        const response = await fetch("https://archive.zk.email/api/dsp", {
+        await fetch("https://archive.zk.email/api/dsp", {
           method: "POST",
           body: JSON.stringify({
             domain: senderDomain,
