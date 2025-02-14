@@ -9,6 +9,7 @@ export { Blueprint } from "./blueprint";
 export * from "./types/proof";
 export { Proof } from "./proof";
 export * from "./types/prover";
+export * from "./types/gmail";
 export type { Auth } from "./types/auth";
 export type { ParsedEmail } from "./types/utils";
 // Re-Export zod types to avoid version mismatches if package importing this sdk has zod

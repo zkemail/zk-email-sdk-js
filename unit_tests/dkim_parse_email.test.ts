@@ -1,4 +1,3 @@
-import { generateCircuitInputsWithDecomposedRegexesAndExternalInputs } from "@zk-email/relayer-utils";
 import { expect, test, describe, beforeAll, afterAll, it } from "bun:test";
 import { readFileSync } from "fs";
 import { generateProofInputs } from "../src";
@@ -10,8 +9,6 @@ describe("Email utils test suite", async () => {
   // await new Promise((r) => setTimeout(r, 100));
 
   test("parseEmail test", async () => {
-    const bpId = "e4e81b62-a3cc-4b13-8371-03673e79d94b";
-
     const decomposedRegex = [
       {
         name: "emailRecipient",

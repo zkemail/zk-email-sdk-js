@@ -1,5 +1,5 @@
 import { Blueprint } from "./blueprint";
-import { GmailMessagesListResponse, RawEmailResponse } from "./types/gmail";
+import { FetchEmailOptoins, GmailMessagesListResponse, RawEmailResponse } from "./types/gmail";
 
 const clientId = "773062743658-rauj7nb18ikr1lrfs5bl8lt3b31r2nen.apps.googleusercontent.com";
 /**
@@ -104,22 +104,44 @@ export class Gmail {
     await this.loginWithGoogle.authorize(options);
   }
 
-  async fetchEmails(blueprints: Blueprint[]): Promise<RawEmailResponse[]> {
+  async fetchEmails(
+    blueprints: Blueprint[],
+    options?: FetchEmailOptoins
+  ): Promise<RawEmailResponse[]> {
     const accessToken = await this.loginWithGoogle.getAccessToken();
+    this.query = this.buildQuery(blueprints, options);
+    console.log("Fetching emails with query: ", this.query);
+    const emailList = await this.fetchEmailInfoList(accessToken);
+    this.nextPageToken = emailList.nextPageToken || null;
+    if (!emailList.messages?.length) return [];
+    const emails = await this.fetchEmailsRaw(
+      accessToken,
+      emailList.messages.map((msg) => msg.id)
+    );
+    return emails;
+  }
+
+  private buildQuery(blueprints: Blueprint[], options?: FetchEmailOptoins): string {
+    if (options?.replaceQuery !== undefined) {
+      return options.replaceQuery;
+    }
+
     let query = "";
     for (const blueprint of blueprints) {
       if (blueprint.props.emailQuery) {
         query += ` OR (${blueprint.props.emailQuery})`;
       }
     }
-    this.query = query;
-    const emailList = await this.fetchEmailInfoList(accessToken);
-    this.nextPageToken = emailList.nextPageToken || null;
-    const emails = await this.fetchEmailsRaw(
-      accessToken,
-      emailList.messages.map((msg) => msg.id)
-    );
-    return emails;
+
+    if (options?.OR) {
+      query += ` OR (${options.OR})`;
+    }
+
+    if (options?.AND) {
+      query = `(${query}) AND (${options.AND})`;
+    }
+
+    return query;
   }
 
   async fetchMore(): Promise<RawEmailResponse[]> {

@@ -1,5 +1,5 @@
-// import zkeSdk, { Gmail } from "@zk-email/sdk";
-import zkeSdk, { Gmail } from "../../src/index";
+import zkeSdk, { Gmail, FetchEmailOptoins } from "@zk-email/sdk";
+// import zkeSdk, { FetchEmailOptoins, Gmail } from "../../src/index";
 
 export function setupLoginWithGoogle(element: HTMLElement) {
   const sdk = zkeSdk();
@@ -22,7 +22,13 @@ export function setupLoginWithGoogle(element: HTMLElement) {
       // Will start Login with Google flow if not already autorized
       // Fetches emails using the email queries given in the blueprints
       console.log("fetching emails");
-      let emails = await gmail.fetchEmails([blueprint]);
+
+      const queryOptions: FetchEmailOptoins = {
+        replaceQuery: "from:uber.com",
+      };
+
+      let emails = await gmail.fetchEmails([blueprint], queryOptions);
+      console.log("emails: ", emails);
 
       // Will return an empty array if there are no more emails matching the blueprints query
       let moreEmails = await gmail.fetchMore();
