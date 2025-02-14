@@ -108,6 +108,7 @@ export class Gmail {
     blueprints: Blueprint[],
     options?: FetchEmailOptoins
   ): Promise<RawEmailResponse[]> {
+    this.nextPageToken = null;
     const accessToken = await this.loginWithGoogle.getAccessToken();
     this.query = this.buildQuery(blueprints, options);
     console.log("Fetching emails with query: ", this.query);

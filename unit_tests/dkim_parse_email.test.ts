@@ -1,6 +1,7 @@
 import { expect, test, describe, beforeAll, afterAll, it } from "bun:test";
 import { readFileSync } from "fs";
 import { generateProofInputs } from "../src";
+import zkeSdk from "../src";
 
 const amazonEml = readFileSync("unit_tests/amazon3.eml", "utf-8");
 
@@ -85,5 +86,21 @@ describe("Email utils test suite", async () => {
       const parsed = JSON.parse(inputs);
       console.log("inputs: ", parsed.pubkey[0]);
     }
+  }, 180_000);
+
+  test("proof in a loop", async () => {
+    const sdk = zkeSdk();
+    const blueprint = await sdk.getBlueprintById("230f5428-e1cd-480e-a553-df0c7124bc08");
+    const prover = blueprint.createProver();
+
+    const externalInputs = {
+      name: "address",
+      value: "0x0000",
+      maxLength: 44,
+    };
+
+    console.log("externalInput: ", externalInputs);
+    const proof = await prover.generateProof(amazonEml, [externalInputs]);
+    console.log("got proof: ", proof);
   }, 180_000);
 });
