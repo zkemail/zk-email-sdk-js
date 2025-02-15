@@ -1,0 +1,160 @@
+Delivered-To: aayushgupta5000@gmail.com
+Received: by 2002:a5d:452a:0:b0:371:95f6:e86c with SMTP id j10csp734wra;
+        Mon, 30 Sep 2024 14:16:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGAbi8mjmEHzJ/d7HlabgPZ4wJQHv9+qx1mhVZ5cfmaXLuleiXxqleTfaHOdNBGPcMi94EZ
+X-Received: by 2002:a05:6a00:8b04:b0:717:92d8:ca5c with SMTP id d2e1a72fcca58-71db79bb1dfmr1216783b3a.3.1727731008308;
+        Mon, 30 Sep 2024 14:16:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1727731008; cv=none;
+        d=google.com; s=arc-20240605;
+        b=dEfJnxyfcEQZnp84LLRr4/uiMFkMAcs3EAaPjq3H8BDmg06Ksc6om6Sg/dbVcpGndI
+         50NNybrYRqRY2XyEui8VRXC5wLSD4WNmDZFJz2XRYz5L0YVjB+RBb7BvEdAiGOhvvKle
+         x5/fb0vPU5QlqlWI6LvTDViHfPY20VshexRhbalJ+0uxk5HV3a8arXpyEbSXLFUV2Ozf
+         L2/X9e/C8m858xdX3o7HQUz7tiEPs98JB0sl6N+dLnjEpK7nA1F9zRCM1B+xqTOQKkVp
+         UZy8aF0hB9EscoqP6OtLqmxiYELaY3LiT2hxBdKXA9FNWHSH6YSdR291oWqLfnob9Arn
+         mXAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=feedback-id:message-id:date:reply-to:cc:to:from:subject
+         :mime-version:dkim-signature:dkim-signature;
+        bh=sU/Y38pLrG/L4M6oRfjJ2Qw1o1xki7K5nLRIigMbEUU=;
+        fh=cZruFNUUoc+TDoZgVAgBbiQugqmdD9u1qTaSubeaF3w=;
+        b=iSk+7Iyt3xTNN+0EtRxu3rzEX/pZyqBHCa5J/ECwYSvDX6HP4Fh07cIWMCNTJgt9is
+         +nXbBE1jlzSi8H2C5FHSanSGzyNAPSa07VdFc7aLiAn2bO593W9tcjzg8JKf8i6tBOUB
+         nOcuTdXyyEH4NjMF9/tUr7w7clS5ZbZmsHENIjCMkYSy+xfNQjdUzJtqCVgoGRBwQByx
+         AUzGPurvyOXVYgf4rfsmNeUGJ/FgEM1xoVrSXhxv4APBGRITDMgCMk1Fejzr0GdqM8w/
+         f+w6LJ3EgsFd02rsmYAd2oaGTZXcQpyyRvuQn5+AiTFUEGAS29mSkb8y+U2QijG56HEl
+         qCPQ==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@devcon.org header.s=kh3h37a2jhlhfkth4f6smd3zlfz4sffz header.b=AcATdYy0;
+       dkim=pass header.i=@amazonses.com header.s=7v7vs6w47njt4pimodk5mmttbegzsi6n header.b=fYI4a6cI;
+       spf=pass (google.com: domain of 0101019244cb00ad-eaacd10f-fd6e-40e8-9f12-dd982e6fbd20-000000@email.devcon.org designates 54.240.27.205 as permitted sender) smtp.mailfrom=0101019244cb00ad-eaacd10f-fd6e-40e8-9f12-dd982e6fbd20-000000@email.devcon.org;
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=devcon.org
+Return-Path: <0101019244cb00ad-eaacd10f-fd6e-40e8-9f12-dd982e6fbd20-000000@email.devcon.org>
+Received: from a27-205.smtp-out.us-west-2.amazonses.com (a27-205.smtp-out.us-west-2.amazonses.com. [54.240.27.205])
+        by mx.google.com with ESMTPS id d2e1a72fcca58-71b26486a6dsi9235116b3a.53.2024.09.30.14.16.47
+        for <aayushgupta5000@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Sep 2024 14:16:48 -0700 (PDT)
+Received-SPF: pass (google.com: domain of 0101019244cb00ad-eaacd10f-fd6e-40e8-9f12-dd982e6fbd20-000000@email.devcon.org designates 54.240.27.205 as permitted sender) client-ip=54.240.27.205;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@devcon.org header.s=kh3h37a2jhlhfkth4f6smd3zlfz4sffz header.b=AcATdYy0;
+       dkim=pass header.i=@amazonses.com header.s=7v7vs6w47njt4pimodk5mmttbegzsi6n header.b=fYI4a6cI;
+       spf=pass (google.com: domain of 0101019244cb00ad-eaacd10f-fd6e-40e8-9f12-dd982e6fbd20-000000@email.devcon.org designates 54.240.27.205 as permitted sender) smtp.mailfrom=0101019244cb00ad-eaacd10f-fd6e-40e8-9f12-dd982e6fbd20-000000@email.devcon.org;
+       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=devcon.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=kh3h37a2jhlhfkth4f6smd3zlfz4sffz; d=devcon.org; t=1727731007;
+	h=Content-Type:MIME-Version:Subject:From:To:Cc:Reply-To:Date:Message-ID;
+	bh=N3c7S9IYQYAAgligxMvU/aKBUUK+Pxg6Dfkvf5z50rQ=;
+	b=AcATdYy05NqEHZlBhFEjFJQO5O3K+wvoMMGDZ1qbyuPgiCwAKr67eZ+KSTtopFs3
+	5NcUg2NxjTmuJboz4iu24DoifpKjJJoKW7UEYbO+XBB4uYaKsKCB/vrnbiielkkaBYQ
+	sL3LevdLdJVWoVWqPW3pslEI+MnGiYfFkNDLu0Zo=
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=7v7vs6w47njt4pimodk5mmttbegzsi6n; d=amazonses.com; t=1727731007;
+	h=Content-Type:MIME-Version:Subject:From:To:Cc:Reply-To:Date:Message-ID:Feedback-ID;
+	bh=N3c7S9IYQYAAgligxMvU/aKBUUK+Pxg6Dfkvf5z50rQ=;
+	b=fYI4a6cIIXkRpxS7koJ/Co/eYPWpQvRhf/lOEqCckD+3MDVuq4aGPZrVVPxm2njg
+	UM1DsxIni4b+73U81gtnJK646MzWCDhihSZy9oX2PB41uY8axnLhZQGKYum0EU40243
+	+p+PrHZ00T8aGKKC+F2mO1pMfMdUUQSHCb4sNArw=
+Content-Type: multipart/alternative;
+ boundary="===============5190789429191303035=="
+MIME-Version: 1.0
+Subject: 
+ =?utf-8?q?Congratulations_Aayush_Gupta=2C_Sora_Suegami!_Review_and_confirm_y?=
+ =?utf-8?q?our_participation_in_Devcon_SEA_=F0=9F=A6=84?=
+From: Devcon 7 SEA <speak@devcon.org>
+To: aayushgupta5000@gmail.com
+Cc: 
+Reply-To: speak@devcon.org
+Date: Mon, 30 Sep 2024 21:16:47 +0000
+Message-ID: <0101019244cb00ad-eaacd10f-fd6e-40e8-9f12-dd982e6fbd20-000000@us-west-2.amazonses.com>
+Feedback-ID: ::1.us-west-2.ahHCdjCvZMZIHkDavYoF1OYpoqRAjSPDXzbmgiyNRn4=:AmazonSES
+X-SES-Outgoing: 2024.09.30-54.240.27.205
+
+--===============5190789429191303035==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+Hi Aayush Gupta, Sora Suegami,
+
+We are happy to accept your proposal "Client-side ZK Proving and its Applications: Experiments from ZK Email" as a **Talk (20"+5"Q&A)** in the *Applied Cryptography* track at Devcon SEA.
+*Please note that the format of your submission might be slightly different from what you initially submitted.* 
+
+**To confirm the session, you must click the following link (while signed-in with aayushgupta5000@gmail.com):** <br>
+    https://speak.devcon.org/devcon7-sea/me/submissions/WNQBQH/confirm <br>
+*(If you do not confirm within the next 7 days, we will need to offer your talk slot to another applicant.)*
+
+A few remarks: <br>
+• We may request changes to the duration, format, and/or focus of the talk as we continue formulating a holistic and complete schedule. <br>
+• Gentle reminder that Devcon talks should be educational, inspirational and not promotional. <br>
+• The specific date of your talk is to be confirmed. Please ensure you are available during all Devcon dates. We also encourage you to arrive a few days earlier for the invite-only speakers' evening on November 10th. There will also be events before and after, so you may want to consider extending your trip. <br>
+• As the event date approaches, we will be in touch to gather additional information, share presentation logistics, and ensure you have everything you need for a great experience at Devcon 7 SEA. <br>
+• Lastly, we would like to invite you to share your personalized Speaker Card on X/Farcaster/Lens to celebrate the news and inspire other great minds to join us at Devcon:
+https://devcon.org/en/sea/schedule/WNQBQH/
+
+If you have any questions feel free to reach out.
+
+Talk soon, <br>
+The Devcon 7 SEA Team
+--===============5190789429191303035==
+Content-Type: text/html; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+
+<!DOCTYPE html><html><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=false">
+    </head>
+    
+    <body style="background-color: #eee;background-position: top;background-repeat: repeat-x;font-family: 'Open Sans', 'OpenSans', 'Helvetica Neue', Helvetica, Arial, sans-serif;font-size: 16px;line-height: 22px;color: #333;margin: 0;padding-top: 20px;">
+        <table class="layout" width="600" cellspacing="0" border="0" style="background: white;max-width: 600px;width: 100%;border-spacing: 0px;border-collapse: separate;margin: auto;overflow-wrap: break-word;word-wrap: break-word;word-break: break-word;-ms-word-break: break-all;-ms-hyphens: auto;-moz-hyphens: auto;-webkit-hyphens: auto;hyphens: auto;">
+            <tbody><tr>
+                <td class="header" align="center" background="" style="text-align: center;">
+                    
+                        <h2 style="margin-top: 20px;margin-bottom: 10px;font-size: 22px;line-height: 26px;"><a href="https://speak.devcon.org/devcon7-sea/" target="_blank" rel="noopener" style="color: #8A4FF6;font-weight: bold;text-decoration: none;">Devcon 7 SEA</a></h2>
+                    
+                    
+                        <h1 style="margin-top: 0px;font-size: 26px;line-height: 30px;">Congratulations Aayush Gupta, Sora Suegami! Review and confirm your participation in Devcon SEA 🦄</h1>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="containertd">
+                    <div class="content" style="padding: 20px 28px 0 28px;">
+                        <p style="margin: 0 0 10px;">Hi Aayush Gupta, Sora Suegami,</p>
+<p style="margin: 0 0 10px;">We are happy to accept your proposal "Client-side ZK Proving and its Applications: Experiments from ZK Email" as a <strong>Talk (20"+5"Q&amp;A)</strong> in the <em>Applied Cryptography</em> track at Devcon SEA.
+<em>Please note that the format of your submission might be slightly different from what you initially submitted.</em> </p>
+<p style="margin: 0 0 10px;"><strong>To confirm the session, you must click the following link (while signed-in with <a href="mailto:aayushgupta5000@gmail.com" style="color: #8A4FF6;font-weight: bold;">aayushgupta5000@gmail.com</a>):</strong> <br>
+    <a href="https://speak.devcon.org/devcon7-sea/me/submissions/WNQBQH/confirm" rel="nofollow" style="color: #8A4FF6;font-weight: bold;">https://speak.devcon.org/devcon7-sea/me/submissions/WNQBQH/confirm</a> <br>
+<em>(If you do not confirm within the next 7 days, we will need to offer your talk slot to another applicant.)</em></p>
+<p style="margin: 0 0 10px;">A few remarks: <br>
+• We may request changes to the duration, format, and/or focus of the talk as we continue formulating a holistic and complete schedule. <br>
+• Gentle reminder that Devcon talks should be educational, inspirational and not promotional. <br>
+• The specific date of your talk is to be confirmed. Please ensure you are available during all Devcon dates. We also encourage you to arrive a few days earlier for the invite-only speakers' evening on November 10th. There will also be events before and after, so you may want to consider extending your trip. <br>
+• As the event date approaches, we will be in touch to gather additional information, share presentation logistics, and ensure you have everything you need for a great experience at Devcon 7 SEA. <br>
+• Lastly, we would like to invite you to share your personalized Speaker Card on X/Farcaster/Lens to celebrate the news and inspire other great minds to join us at Devcon:
+<a href="https://devcon.org/en/sea/schedule/WNQBQH/" rel="nofollow" style="color: #8A4FF6;font-weight: bold;">https://devcon.org/en/sea/schedule/WNQBQH/</a></p>
+<p style="margin: 0 0 10px;">If you have any questions feel free to reach out.</p>
+<p style="margin: 0 0 10px;">Talk soon, <br>
+The Devcon 7 SEA Team</p>
+                    </div>
+                </td>
+            </tr>
+            
+                <tr class="last" style="height: 40px;"></tr>
+            
+        </tbody></table>
+        <div class="footer" style="padding: 10px;text-align: center;font-size: 12px;">
+            
+
+
+    powered by <a href="https://pretalx.com" target="_blank" rel="noopener" style="color: #8A4FF6;font-weight: bold;">pretalx</a>
+
+
+        </div>
+        <br>
+        <br>
+    
+
+</body></html>
+--===============5190789429191303035==--

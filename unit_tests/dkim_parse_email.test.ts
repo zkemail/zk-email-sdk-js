@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 import { generateProofInputs } from "../src";
 import zkeSdk from "../src";
 
-const amazonEml = readFileSync("unit_tests/amazon3.eml", "utf-8");
+const eml = readFileSync("unit_tests/devcon.eml", "utf-8");
 
 describe("Email utils test suite", async () => {
   // Wait for wasm to initialize
@@ -77,7 +77,7 @@ describe("Email utils test suite", async () => {
     // @ts-ignore
     for (let i = 0; i < 40; i++) {
       const inputs = await generateProofInputs(
-        amazonEml,
+        eml,
         // @ts-ignore
         decomposedRegex,
         [externalInputs],
@@ -100,7 +100,7 @@ describe("Email utils test suite", async () => {
     };
 
     console.log("externalInput: ", externalInputs);
-    const proof = await prover.generateProof(amazonEml, [externalInputs]);
+    const proof = await prover.generateProof(eml, [externalInputs]);
     console.log("got proof: ", proof);
   }, 180_000);
 });
