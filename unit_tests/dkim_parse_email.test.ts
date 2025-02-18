@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeAll, afterAll, it } from "bun:test";
 import { readFileSync } from "fs";
-import { generateProofInputs } from "../src";
+import { Blueprint, generateProofInputs } from "../src";
 import zkeSdk from "../src";
 
 const eml = readFileSync("emls/amazon.eml", "utf-8");
@@ -106,4 +106,15 @@ describe("Email utils test suite", async () => {
     const verified = await blueprint.verifyProof(proof);
     console.log("verified: ", verified);
   }, 180_000);
+
+  test("validate domain of email on blueprint", async () => {
+    const sdk = zkeSdk();
+    // const sdk = zkeSdk();
+    const blueprint = await sdk.getBlueprintById("230f5428-e1cd-480e-a553-df0c7124bc08");
+    blueprint.props.senderDomain = "bla.blub";
+
+    const verified = await blueprint.validateEmail(eml);
+    console.log("verified: ", verified);
+    expect(verified).toBeFalse();
+  });
 });

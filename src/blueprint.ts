@@ -9,7 +9,7 @@ import {
   Status,
   ZkFramework,
 } from "./types/blueprint";
-import { del, get, patch, post } from "./utils";
+import { del, get, patch, post, verifyPubKey } from "./utils";
 import { verifyProofOnChain } from "./chain";
 import { Auth } from "./types/auth";
 import { Proof } from "./proof";
@@ -512,6 +512,22 @@ export class Blueprint {
    * @returns Returns true if the verification was successfull, false if it failed.
    */
   async verifyProofData(publicOutputs: string, proofData: string): Promise<boolean> {
+    const parsedPublicOutputs = JSON.parse(publicOutputs);
+    try {
+      const pubKeyHash = parsedPublicOutputs[0];
+      const validPubKey = await verifyPubKey(this.props.senderDomain!, pubKeyHash);
+
+      if (!validPubKey) {
+        console.warn(
+          "Public key of proof is invalid. The domains of blueprint and proof don't match"
+        );
+        return false;
+      }
+    } catch (err) {
+      console.warn("Failed to verify proofs public key");
+      return false;
+    }
+
     let vkey: string;
     try {
       vkey = await this.getVkey();
@@ -523,7 +539,7 @@ export class Blueprint {
     try {
       const verified = await snarkjs.groth16.verify(
         JSON.parse(vkey),
-        JSON.parse(publicOutputs),
+        parsedPublicOutputs,
         JSON.parse(proofData)
       );
       return verified;
@@ -545,11 +561,26 @@ export class Blueprint {
       );
     }
 
+    try {
+      const pubKeyHash = proof.props.publicOutputs![0];
+
+      const validPubKey = await verifyPubKey(this.props.senderDomain!, pubKeyHash);
+      if (!validPubKey) {
+        console.warn(
+          "Public key of proof is invalid. The domains of blueprint and proof don't match"
+        );
+        return false;
+      }
+    } catch (err) {
+      console.warn("Failed to verify proofs public key");
+      return false;
+    }
+
     let vkey: string;
     try {
       vkey = await this.getVkey();
     } catch (err) {
-      console.log("Failed to get vkey: ", err);
+      console.warn("Failed to get vkey: ", err);
       return false;
     }
 
@@ -561,7 +592,7 @@ export class Blueprint {
       );
       return verified;
     } catch (err) {
-      console.log("Failed to verify proof: ", err);
+      console.warn("Failed to verify proof: ", err);
     }
     return false;
   }

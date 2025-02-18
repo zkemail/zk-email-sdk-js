@@ -1,7 +1,10 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
+import { poseidonLarge } from "./hash";
+import { pki } from "node-forge";
 
 import { Auth } from "./types/auth";
 import { getTokenFromAuth } from "./auth";
+import { DkimRecord } from "./types";
 
 export async function post<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
   let authToken: string | null = null;
@@ -206,4 +209,59 @@ export function getDKIMSelector(emlContent: string): string | null {
     }
   }
   return null;
+}
+
+/**
+ * Verifies if a hashed pubkey matches the given sender domain.
+ * @param senderDomain - The sender domain, e.g. spotify.com
+ * @param hashedPublicKey - The hashed public key, a BigIng as string
+ * @returns Returns true if the verification was successfull, false if it failed.
+ */
+export async function verifyPubKey(senderDomain: string, hashedPublicKey: string) {
+  // Get all keys for a domain
+  let response: Response;
+  try {
+    response = await fetch(`https://archive.zk.email/api/key?domain=${senderDomain}`, {
+      method: "GET",
+    });
+  } catch (err) {
+    console.error("Failed to get pubkey records from archive", err);
+    return false;
+  }
+
+  const records = (await response.json()) as DkimRecord[];
+
+  for (const record of records) {
+    // Archive does a fuzzy search, check for exact match
+    if (record.domain !== senderDomain) {
+      continue;
+    }
+
+    const pKeys = extractPValues(record.value);
+    for (const pKey of pKeys) {
+      const pubKeyStr = pki.publicKeyFromPem(
+        `-----BEGIN PUBLIC KEY-----${pKey}-----END PUBLIC KEY-----`
+      );
+      const poseidonHash = await poseidonLarge(BigInt(pubKeyStr.n.toString()), 9, 242);
+
+      if (poseidonHash.toString() === hashedPublicKey) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+function extractPValues(input: string): string[] {
+  // Match p= followed by any characters until a semicolon or end of string
+  // Using positive lookbehind (?<=p=) to exclude the p= from the match
+  // Using negative lookahead (?!.*p=) to ensure we don't match partial values
+  const regex = /(?<=p=)([^;]+)(?=;|$)/g;
+
+  // Find all matches
+  const matches = input.match(regex);
+
+  // Return matches or empty array if no matches found
+  return matches || [];
 }

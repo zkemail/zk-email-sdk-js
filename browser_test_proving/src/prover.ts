@@ -18,6 +18,10 @@ export function setupProver(element: HTMLElement) {
 
         const eml = await getEml();
 
+        const isValidEml = await blueprint.validateEmail(eml!);
+
+        console.log("isValidEml: ", isValidEml);
+
         // console.log("putting in eml: ", eml);
         const externalInputs = {
           name: "address",
@@ -25,6 +29,8 @@ export function setupProver(element: HTMLElement) {
           maxLength: 44,
         };
         const proof = await prover.generateProof(eml!, [externalInputs]);
+
+        // const proof = await sdk.getProof("b80bc8ff-fb3e-4dbc-9ccb-b47a58b6faf6");
 
         console.log("proof done in browser: ", proof);
 

@@ -9,3 +9,14 @@ export type ParsedEmail = {
   cleanedBody: string;
   headers: Map<string, string[]>;
 };
+
+export type DkimRecord = {
+  domain: string;
+  selector: string;
+  // UTC Date String
+  firstSeenAt: string;
+  // UTC Date String
+  lastSeenAt: string;
+  // string with selectors, e.g. "v=DIM1;t=s"
+  value: string;
+};

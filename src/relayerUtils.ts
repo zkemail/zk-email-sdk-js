@@ -84,6 +84,11 @@ export async function testBlueprint(
   await Promise.all(blueprint.decomposedRegexes.map(generateDfa));
 
   const parsedEmail = await parseEmail(eml);
+  const domain = getSenderDomain(parsedEmail);
+
+  if (blueprint.senderDomain !== domain) {
+    throw new Error("The senderDomain of Blueprint and email are different");
+  }
 
   if (
     (blueprint.emailBodyMaxLength === undefined && !blueprint.ignoreBodyHashCheck) ||
@@ -278,10 +283,15 @@ export async function extractEMLDetails(emlContent: string) {
   const dkimHeader = parsedEmail.headers.get("DKIM-Signature")?.[0] || "";
   const selector = dkimHeader.match(/s=([^;]+)/)?.[1] || "";
 
-  const senderDomain = dkimHeader.match(/d=([^;]+)/)?.[1] || "";
+  const senderDomain = getSenderDomain(parsedEmail);
   const emailQuery = `from:${senderDomain}`;
 
   return { senderDomain, headerLength, emailQuery, emailBodyMaxLength, selector };
+}
+
+export function getSenderDomain(parsedEmail: ParsedEmail): string {
+  const dkimHeader = parsedEmail.headers.get("DKIM-Signature")?.[0] || "";
+  return dkimHeader.match(/d=([^;]+)/)?.[1] || "";
 }
 
 // Parses public signals from a proof to readable outputs
