@@ -9,15 +9,22 @@ export function setupProver(element: HTMLElement) {
     proveButton.addEventListener("click", async () => {
       try {
         console.log("getting blueprint");
-        const blueprint = await sdk.getBlueprintById("008b5da5-fbda-4445-b7df-6b0c6dde4bb1");
+        // const blueprint = await sdk.getBlueprintById("008b5da5-fbda-4445-b7df-6b0c6dde4bb1");
+        const blueprint = await sdk.getBlueprintById("230f5428-e1cd-480e-a553-df0c7124bc08");
+
         console.log("blueprint: ", blueprint);
 
-        const prover = blueprint.createProver({ isLocal: true });
+        const prover = blueprint.createProver();
 
         const eml = await getEml();
 
         // console.log("putting in eml: ", eml);
-        const proof = await prover.generateProof(eml!);
+        const externalInputs = {
+          name: "address",
+          value: "0x0000",
+          maxLength: 44,
+        };
+        const proof = await prover.generateProof(eml!, [externalInputs]);
 
         console.log("proof done in browser: ", proof);
 
@@ -40,7 +47,7 @@ export function setupProver(element: HTMLElement) {
 
 async function getEml() {
   try {
-    const response = await fetch("/residency.eml"); // URL is relative to the root of the project
+    const response = await fetch("/amazon.eml"); // URL is relative to the root of the project
     if (!response.ok) {
       throw new Error("Network response was not ok " + response.statusText);
     }

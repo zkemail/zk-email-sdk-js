@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 import { generateProofInputs } from "../src";
 import zkeSdk from "../src";
 
-const eml = readFileSync("unit_tests/devcon.eml", "utf-8");
+const eml = readFileSync("emls/amazon.eml", "utf-8");
 
 describe("Email utils test suite", async () => {
   // Wait for wasm to initialize
@@ -90,6 +90,7 @@ describe("Email utils test suite", async () => {
 
   test("proof in a loop", async () => {
     const sdk = zkeSdk();
+    // const sdk = zkeSdk();
     const blueprint = await sdk.getBlueprintById("230f5428-e1cd-480e-a553-df0c7124bc08");
     const prover = blueprint.createProver();
 
@@ -101,6 +102,8 @@ describe("Email utils test suite", async () => {
 
     console.log("externalInput: ", externalInputs);
     const proof = await prover.generateProof(eml, [externalInputs]);
-    console.log("got proof: ", proof);
+    console.log("got proof: ");
+    const verified = await blueprint.verifyProof(proof);
+    console.log("verified: ", verified);
   }, 180_000);
 });
