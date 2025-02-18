@@ -96,7 +96,7 @@ export class Proof {
     if (!this.lastCheckedStatus) {
       this.lastCheckedStatus = new Date();
     } else {
-      const waitTime = 2_000;
+      const waitTime = 2_500;
       const sinceLastChecked = new Date().getTime() - this.lastCheckedStatus.getTime();
       if (sinceLastChecked < waitTime) {
         await new Promise((r) => setTimeout(r, waitTime - sinceLastChecked));

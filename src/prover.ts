@@ -47,6 +47,8 @@ export class Prover {
     } else {
       const proof = await this.generateProofRequest(eml, externalInputs);
 
+      await new Promise((r) => setTimeout(r, 6_000));
+
       // Wait for proof to finish
       while (![ProofStatus.Done, ProofStatus.Failed].includes(await proof.checkStatus())) {}
       const status = await proof.checkStatus();
