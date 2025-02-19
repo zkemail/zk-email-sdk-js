@@ -88,4 +88,7 @@ export default defineConfig({
       domain: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/domain"),
     },
   },
+  define: {
+    global: {},
+  },
 });

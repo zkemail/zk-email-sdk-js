@@ -1,10 +1,12 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
 import { poseidonLarge } from "./hash";
-import { pki } from "node-forge";
 
 import { Auth } from "./types/auth";
 import { getTokenFromAuth } from "./auth";
 import { DkimRecord } from "./types";
+import { Crypto } from "@peculiar/webcrypto";
+
+const crypto = new Crypto();
 
 export async function post<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
   let authToken: string | null = null;
@@ -218,7 +220,6 @@ export function getDKIMSelector(emlContent: string): string | null {
  * @returns Returns true if the verification was successfull, false if it failed.
  */
 export async function verifyPubKey(senderDomain: string, hashedPublicKey: string) {
-  // Get all keys for a domain
   let response: Response;
   try {
     response = await fetch(`https://archive.zk.email/api/key?domain=${senderDomain}`, {
@@ -232,25 +233,25 @@ export async function verifyPubKey(senderDomain: string, hashedPublicKey: string
   const records = (await response.json()) as DkimRecord[];
 
   for (const record of records) {
-    // Archive does a fuzzy search, check for exact match
-    if (record.domain !== senderDomain) {
-      continue;
-    }
+    if (record.domain !== senderDomain) continue;
 
     const pKeys = extractPValues(record.value);
     for (const pKey of pKeys) {
-      const pubKeyStr = pki.publicKeyFromPem(
-        `-----BEGIN PUBLIC KEY-----${pKey}-----END PUBLIC KEY-----`
-      );
-      const poseidonHash = await poseidonLarge(BigInt(pubKeyStr.n.toString()), 9, 242);
+      const jwk = await importPEMPublicKey(`${pKey}`);
+      // Make sure the key has an 'n' property
+      if (!jwk.n) continue;
+
+      // Convert the base64url string 'n' to a BigInt
+      const modulusBigInt = base64UrlToBigInt(jwk.n);
+
+      // Compute the Poseidon hash
+      const poseidonHash = await poseidonLarge(modulusBigInt, 9, 242);
 
       if (poseidonHash.toString() === hashedPublicKey) {
         return true;
       }
     }
   }
-
-  return false;
 }
 
 function extractPValues(input: string): string[] {
@@ -264,4 +265,45 @@ function extractPValues(input: string): string[] {
 
   // Return matches or empty array if no matches found
   return matches || [];
+}
+
+async function importPEMPublicKey(pemKey: string): Promise<JsonWebKey> {
+  // Remove header/footer and whitespace to extract the pure base64 key content
+  // (Assuming your input is already formatted as needed.)
+  const binaryDer = Uint8Array.from(atob(pemKey), (c) => c.charCodeAt(0)).buffer as ArrayBuffer;
+
+  // Import the public key using the Web Crypto API
+  const cryptoKey = await crypto.subtle.importKey(
+    "spki",
+    binaryDer,
+    {
+      name: "RSA-OAEP",
+      hash: { name: "SHA-256" },
+    },
+    true,
+    ["encrypt"]
+  );
+
+  // Export the key as a JWK, which gives you an object with properties like `n` and `e`
+  return await crypto.subtle.exportKey("jwk", cryptoKey);
+}
+
+function base64UrlToBigInt(base64Url: string): bigint {
+  // Convert base64url to standard base64
+  let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  // Add padding if necessary
+  const pad = base64.length % 4;
+  if (pad) {
+    base64 += "=".repeat(4 - pad);
+  }
+  // Decode base64 string to binary string
+  const binaryStr = atob(base64);
+  // Convert binary string to a hex string
+  let hex = "";
+  for (let i = 0; i < binaryStr.length; i++) {
+    let h = binaryStr.charCodeAt(i).toString(16);
+    if (h.length === 1) h = "0" + h;
+    hex += h;
+  }
+  return BigInt("0x" + hex);
 }

@@ -1,6 +1,7 @@
 import { expect, test, describe, beforeAll, afterAll, it } from "bun:test";
 // import helloTestEmail from "./hello_eml";
 import {
+  extractEMLDetails,
   generateProofInputs,
   parseEmail,
   testBlueprint,
@@ -21,6 +22,7 @@ const timeout = 10_000;
 
 const helloTestEmail = readFileSync("unit_tests/hello_eml.eml", "utf-8");
 const helloEml = readFileSync("unit_tests/test.eml", "utf-8");
+const amazonUk = readFileSync("emls/amazon_uk.eml", "utf-8");
 
 describe("Email utils test suite", async () => {
   // Wait for wasm to initialize
@@ -636,4 +638,10 @@ describe("testBlueprint", async () => {
     },
     timeout
   );
+});
+
+describe("extractEMLDetails", () => {
+  test("should extract normal sender domain", async () => {
+    const { senderDomain } = await extractEMLDetails(amazonUk);
+  });
 });

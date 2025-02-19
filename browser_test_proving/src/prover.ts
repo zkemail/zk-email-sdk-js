@@ -32,7 +32,7 @@ export function setupProver(element: HTMLElement) {
 
         // const proof = await sdk.getProof("b80bc8ff-fb3e-4dbc-9ccb-b47a58b6faf6");
 
-        console.log("proof done in browser: ", proof);
+        // console.log("proof done in browser: ", proof);
 
         const verified = await blueprint.verifyProofData(
           JSON.stringify(proof.props.publicOutputs!),

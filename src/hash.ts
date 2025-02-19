@@ -1,13 +1,13 @@
 // Copy of @zk-email/helper
 // @zk-email/helpers has packages using git, not supported by some js frameworks
-import { buildPoseidon } from "circomlibjs";
+import * as poseidon from "poseidon-lite";
 
 export async function poseidonLarge(input: bigint, numChunks: number, bitsPerChunk: number) {
-  const poseidon = await buildPoseidon();
   const pubkeyChunked = bigIntToChunkedBytes(input, bitsPerChunk, numChunks);
-  const hash = poseidon(pubkeyChunked);
 
-  return poseidon.F.toObject(hash) as Promise<bigint>;
+  // @ts-ignore
+  const poseidonFunc = poseidon[`poseidon${pubkeyChunked.length}`];
+  return poseidonFunc(pubkeyChunked);
 }
 
 function bigIntToChunkedBytes(num: BigInt | bigint, bytesPerChunk: number, numChunks: number) {
