@@ -145,7 +145,7 @@ export class Blueprint {
         maxLength: input.max_length,
       })),
       decomposedRegexes: response.decomposed_regexes?.map((regex) => ({
-        parts: regex.parts.map((part) => ({
+        parts: (regex?.parts || []).map((part) => ({
           isPublic: part.is_public,
           regexDef: part.regex_def,
         })),
@@ -193,7 +193,7 @@ export class Blueprint {
         max_length: input.maxLength,
       })),
       decomposed_regexes: props.decomposedRegexes?.map((regex) => ({
-        parts: regex.parts.map((part) => ({
+        parts: (regex?.parts || []).map((part) => ({
           // @ts-ignore
           is_public: part.isPublic || part.is_public,
           // @ts-ignore
@@ -325,7 +325,7 @@ export class Blueprint {
       return [];
     }
 
-    const blueprints = response.blueprints.map((blueprintResponse) => {
+    const blueprints = response.blueprints?.map((blueprintResponse) => {
       const blueprintProps = Blueprint.responseToBlueprintProps(blueprintResponse);
       return new Blueprint(blueprintProps, baseUrl, auth);
     });
