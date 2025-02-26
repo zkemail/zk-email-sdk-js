@@ -838,13 +838,12 @@ export class Blueprint {
    * Validates if a given email matches the blueprint.
    * @returns true if the given email is is valid for the blueprint and a proof can be generated.
    */
-  async validateEmail(eml: string): Promise<boolean> {
+  async validateEmail(eml: string): Promise<void> {
     try {
       await testBlueprint(eml, this.props, false);
-      return true;
     } catch (err) {
-      console.log("Email is invalid: ", err);
-      return false;
+      console.warn("Email is invalid: ", err);
+      throw err;
     }
   }
 }
