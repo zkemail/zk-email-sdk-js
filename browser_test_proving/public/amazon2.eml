@@ -1,0 +1,1236 @@
+Received: from DS7PR11MB7860.namprd11.prod.outlook.com (2603:10b6:8:e9::7) by
+ PH0PR11MB7470.namprd11.prod.outlook.com with HTTPS; Thu, 9 May 2024 00:41:58
+ +0000
+Received: from BN8PR15CA0027.namprd15.prod.outlook.com (2603:10b6:408:c0::40)
+ by DS7PR11MB7860.namprd11.prod.outlook.com (2603:10b6:8:e9::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7544.46; Thu, 9 May 2024 00:41:55 +0000
+Received: from BN1PEPF00004688.namprd05.prod.outlook.com
+ (2603:10b6:408:c0:cafe::ca) by BN8PR15CA0027.outlook.office365.com
+ (2603:10b6:408:c0::40) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.46 via Frontend
+ Transport; Thu, 9 May 2024 00:41:53 +0000
+Authentication-Results: spf=pass (sender IP is 54.240.13.31)
+ smtp.mailfrom=bounces.amazon.com; dkim=pass (signature was verified)
+ header.d=amazon.com;dkim=pass (signature was verified)
+ header.d=amazonses.com;dmarc=pass action=none
+ header.from=amazon.com;compauth=pass reason=100
+Received-SPF: Pass (protection.outlook.com: domain of bounces.amazon.com
+ designates 54.240.13.31 as permitted sender) receiver=protection.outlook.com;
+ client-ip=54.240.13.31; helo=a13-31.smtp-out.amazonses.com; pr=C
+Received: from a13-31.smtp-out.amazonses.com (54.240.13.31) by
+ BN1PEPF00004688.mail.protection.outlook.com (10.167.243.133) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7544.18 via Frontend Transport; Thu, 9 May 2024 00:41:52 +0000
+X-IncomingTopHeaderMarker: OriginalChecksum:1AEA8B405440C23155F2351743A023F287B34CBC256E62407F81636C1D23DF96;UpperCasedChecksum:A53987FF9C8FDF7E346426741706F81E38E1FBE5B112400424BC24860A4E4FF0;SizeAsReceived:1718;Count:15
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=yg4mwqurec7fkhzutopddd3ytuaqrvuz; d=amazon.com; t=1715215312;
+	h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type;
+	bh=TpnIHeEb/egfGjo8W5BSl3mvrTrWZst85mMxf0v/9hU=;
+	b=e2EpgGiiUzyP3Wz1j4wa/MyxghgGxtZBUhWbyOb0sX9xMwQVU3mfAZWkPVwmOgbj
+	+jHd5otAnCWgMIuyFF7+lPzJh+STKBxDaXGnV9MqMk34jR6Vu8hBpZ1vieACs1KNfl/
+	Wc+hVjRX+Tt3fNCpZM97zoeEHadjDXLeA3DH8BPw=
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=ug7nbtf4gccmlpwj322ax3p6ow6yfsug; d=amazonses.com; t=1715215312;
+	h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type:Feedback-ID;
+	bh=TpnIHeEb/egfGjo8W5BSl3mvrTrWZst85mMxf0v/9hU=;
+	b=o6mHdLXCC5/llnagXBkxQeOsIkJPbdYtaeKe8soiET1ZhdUmxX6yaETu6oF8roQ9
+	Erw6tkG1qLHePhttQxk8+784uQuaXf7FpM9ufoCLMJCutlq5aVsuZPcVp65LPe47k6e
+	tnX8HkVNv/3TCdFIaHM8j7zKXGh9OMgZ+dtSFinc=
+Date: Thu, 9 May 2024 00:41:52 +0000
+From: Amazon Prime <prime@amazon.com>
+To: jbl3000_lopez@hotmail.com
+Message-ID: <0100018f5acca71c-b026a9f4-9bb5-4d48-87e8-8f8382ac49e9-000000@email.amazonses.com>
+Subject: =?UTF-8?B?wqFUZSBkYW1vcyBsYSBiaWVudmVuaWRhIGEgQW1h?=
+ =?UTF-8?B?em9uIFByaW1lLCBKZXN1cyBMb3BleiBGYXJpYXMh?=
+Content-Type: multipart/alternative; 
+	boundary="----=_Part_1064999_1039573903.1715215312661"
+X-AMAZON-MAIL-RELAY-TYPE: notification
+Bounces-to: 20240509004152bfb49012ae5c4076975804ac9380p0na-CHVW7D01TGCUH@bounces.amazon.com
+X-AMAZON-METADATA: CA=CHVW7D01TGCUH-CU=A231B9RGU0ZUM
+X-Original-MessageID: <urn.rtn.msg.20240509004152bfb49012ae5c4076975804ac9380p0na@1715215312662.>
+Feedback-ID: 1.us-east-1.ZHcGJK6s+x+i9lRHKog4RW3tECwWIf1xzTYCZyUaiec=:AmazonSES
+X-SES-Outgoing: 2024.05.09-54.240.13.31
+X-IncomingHeaderCount: 15
+Return-Path: 20240509004152bfb49012ae5c4076975804ac9380p0na-CHVW7D01TGCUH@bounces.amazon.com
+X-MS-Exchange-Organization-ExpirationStartTime: 09 May 2024 00:41:53.0198
+ (UTC)
+X-MS-Exchange-Organization-ExpirationStartTimeReason: OriginalSubmit
+X-MS-Exchange-Organization-ExpirationInterval: 1:00:00:00.0000000
+X-MS-Exchange-Organization-ExpirationIntervalReason: OriginalSubmit
+X-MS-Exchange-Organization-Network-Message-Id: 2ee3bde2-d08f-4ab2-e7a4-08dc6fc0d22a
+X-EOPAttributedMessage: 0
+X-EOPTenantAttributedMessage: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa:0
+X-MS-Exchange-Organization-MessageDirectionality: Incoming
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004688:EE_|DS7PR11MB7860:EE_|PH0PR11MB7470:EE_
+X-MS-Exchange-Organization-AuthSource: BN1PEPF00004688.namprd05.prod.outlook.com
+X-MS-Exchange-Organization-AuthAs: Anonymous
+X-MS-UserLastLogonTime: 5/9/2024 12:36:59 AM
+X-MS-Office365-Filtering-Correlation-Id: 2ee3bde2-d08f-4ab2-e7a4-08dc6fc0d22a
+X-MS-Exchange-EOPDirect: true
+X-Sender-IP: 54.240.13.31
+X-SID-PRA: PRIME@AMAZON.COM
+X-SID-Result: PASS
+X-MS-Exchange-Organization-PCL: 2
+X-MS-Exchange-Organization-SCL: 1
+X-Microsoft-Antispam: BCL:4;ARA:1444111002|10300799020|58200799006|9000799038|461199019|47200799009|9400799015|68400799004|69100799006|1680799042|440099019|3412199016|1602099003|1122599004|1290799018|1370799021|1380799021|1360799021|56899024;
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2024 00:41:52.9573
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ee3bde2-d08f-4ab2-e7a4-08dc6fc0d22a
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-AuthSource: BN1PEPF00004688.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: Internet
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7860
+X-MS-Exchange-Transport-EndToEndLatency: 00:00:05.9839644
+X-MS-Exchange-Processed-By-BccFoldering: 15.20.7544.013
+X-Microsoft-Antispam-Mailbox-Delivery: ucf:0;jmr:0;ex:0;auth:1;dest:I;ENG:(5062000308)(920221119095)(90000117)(920221120095)(90012020)(91020020)(91040095)(9050020)(9100341)(944500132)(4810010)(4910033)(9575002)(10195002)(9320005)(120001);
+X-Message-Delivery: Vj0xLjE7dXM9MDtsPTE7YT0xO0Q9MTtHRD0xO1NDTD0z
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?MEROVUpVdjhKakhpaFlxVjFsenVvRWdGbzZQbVlqZVJKV1hQcjZUaGdUNVBh?=
+ =?utf-8?B?OG1BUDdWYyt2ejNLV0RzWkt2cEdPL0hLcGN4bGV1V3JIcHdMTi93WEp3K05G?=
+ =?utf-8?B?RzBLaXFqdENHWGFybEJWYUVrczZMV1FjYktVYitVUGN3MFBHUFU2TVhnZXor?=
+ =?utf-8?B?cDJ6QlVJS2JaN1JRT0d5V2h0L2hjbHF5cnhXcHpCekhCS2kvOVRuUEZtTGRm?=
+ =?utf-8?B?VW9ORnVWejdJNkcwelNmZUlnNThzRHgrWWY0NnJCUEVzdGFVVW40Q085K0Rn?=
+ =?utf-8?B?SVdLZDFaTEVMQzd3TTlwajBDcTlvNGpGS09ScXllZzRZL0VrbUwyT0NORGVj?=
+ =?utf-8?B?OFlCYXNOaThKZm1KbGZPUDVUMzBDdERNd2EvZ0ZKdFl6V2VEcVVmQUwzd00y?=
+ =?utf-8?B?SnJET2NjQnR2RVIyWEhnVkczQWdnQXBEQlY5dDVpbWZNSHVLRjQzU1RoQmNt?=
+ =?utf-8?B?UkR5eVM4aHpSSjFZQyt4ZmdhOG83eDdLdHJSQUMzanFnanY5ZmpjSndCM0lE?=
+ =?utf-8?B?UW9GdXRHdzNLWHhldCtTVmhxcFNiSUhMNjRyVTBhckgxemJ2TEVibnJuTHVz?=
+ =?utf-8?B?L3RqSm1TN2Z2am16Sm93dXdrZW5raG03RExZT2MySUFiZUF4eVp2Mzd5cW1h?=
+ =?utf-8?B?bklRZWNVRVRsZGtwV1VyU1ZvQVlqMUhlb1h2TkFpaG1zZTMvcnZrczdONFIx?=
+ =?utf-8?B?bVNEZGZWMnY5K2hXUUUzZ29qVEFrekdJaGVab2lwWUhXaTZ1RFNrNXluOHda?=
+ =?utf-8?B?OUVRcjl6cTgwcEg2UjB3Z21OU1NrZTM1bHJZaCtYMmdQUy90L2RneHVTOExH?=
+ =?utf-8?B?L3NtT3BkNkhROHhrNW5UVklqNVdFU0ZwMFJaNXY1RDRoak01TmFiWG1leFZE?=
+ =?utf-8?B?QWtWSkxKZUwxTlNTamd1MTBEcDVCQXV5U1ExempKcDFXaFpqeDkvZzVGNnBQ?=
+ =?utf-8?B?OFVyNzcyWUtLQWNZUGhWaGozb0tETWR4d2tHQmhqM3NlSG5Mb1J2OEpOTGlN?=
+ =?utf-8?B?SjNXazNsSFcvNVE4MHh5dURnbEw3WTdmbjAxalBjanFqeG90aEFBaS9BbGh6?=
+ =?utf-8?B?NFJLNjlXZlk0ZEJHN0dNQnhBWWZPM1pVS1o1dy9tRk41OWZGSUtiOHhuQ01t?=
+ =?utf-8?B?TDhpUUF1USs5b2R6RmRHczFsSUhBc1h1Wmd3ZmIxUnI5WWdOT2VCTDJia3JP?=
+ =?utf-8?B?RGtvSDNsRFFKTVRhZEVvM25EMjZlRWlaRENNRXRWMVdzRDRCbUtYQ0JxMVVM?=
+ =?utf-8?B?ZzRDVWl5dXcveEp4cjF0RkdPNGRyQkJLdlNTNTNKNTRQZEpXZzQzeUZWQXl3?=
+ =?utf-8?B?VmlSRVQydkM5NVlFaHF6MlNRbHNMYkNSR3hKT0FRaVh5SzE4bzJCUUp6V2Jy?=
+ =?utf-8?B?QTNlRWVVM2pFTkxoVmlHYmlLRko5bi9lTTcrd2Jwb09YdnA1Yy82TThJRG5S?=
+ =?utf-8?B?dnplc3VLaGF6SHBWby8rcm1nU0xnSjF0OEhOZFdVeXBtZWo2Z2NxaE9OYm50?=
+ =?utf-8?B?MEdQUmgxQ0tkQ3dHSnBINUhZWHJ2aTA5N2hUTENxaTk2UFV2dXNiZ3dScFJh?=
+ =?utf-8?B?aW1SL292aFQzT2kvUkd4b3o3YTR5V0x3dUliM0tZZFhRZy9wdk5VYUNRY3FX?=
+ =?utf-8?B?WE1VUTM2QXpSdkdIWUJpUitYRlluYWI0QkpWYUxwUCtSa0ZQRE9PbDRkcGhP?=
+ =?utf-8?B?bXZNMWovSk51RzVMVjZKQ2Q4WXowNmkzaEY5OTEvb3AvdjJMelpUWkxWbG53?=
+ =?utf-8?B?NmFKK0RxSlBqTmVJRis1Q0lRbDFPY3FXUmV6bU9IKzFPMDYxUStpVFl6cVZD?=
+ =?utf-8?B?enJqWjBQeHpyZWxvUS9YVFRoOXZpbUxDZEw3OWxadytRNnJvaERxNVlucmcv?=
+ =?utf-8?B?eHFsMGgzV21SQjBFdGd1SUMzd3doNUZyOG1VS3hwcWhrQlZzNXI0anRFTlpz?=
+ =?utf-8?B?YjE4WHZzaGhONWJOeGFzYVZHUHlCbDZMMzdMT1JzOUNRcFhTL2FjaU5oaUVI?=
+ =?utf-8?B?TFFRQWxvNE8rc2FBbjZYZnNFNmRxS1hzdzA4L0pOU3g1S01BSTYxajFSWVh5?=
+ =?utf-8?B?ZllVTmtGV2dXZHNpSFNhMnVpTkVMZ1YxK2NuVFA3d1llTm56aitiOUVUSW5z?=
+ =?utf-8?B?K2V6eG1sMXZHd3pOUHd1Z3FUTldYb090anYwUSt3eUNYczhjcjh1aVNwY0dQ?=
+ =?utf-8?B?eWhlS044NEFNTm1RYS9ldXNuZkVWa2R5MnoxczYzYXRtbXRZbkQzZjZ6VHg2?=
+ =?utf-8?B?M0hqcU5RSWJZSjY5SWZzL3FkM2l1WFVPb2ZlUnlsRHZhMGoxSlZ4dnN1dTE1?=
+ =?utf-8?B?VHdqS05adG5oVXJocGVYbXg4NE9vSmtWc3ErZU50WmI4VERVZ2pEUHh5T1NC?=
+ =?utf-8?B?M3pmeDRKeE5jNmJmaityRTNPOTd4Q2ZtNjRGQkdzbEJDcG1XZ0NDQmQvS0VD?=
+ =?utf-8?B?VEZjTVRvajVCZEYveFB1M0VUYnhuS2w1NHBjY0JCV3N3eWpsaXdqZnpCMUhn?=
+ =?utf-8?B?ZE12UDFiZzhuMndPb2tuMzZra0pibXRZRkJZWDQ4cmVMMTg2YnlFWUpjcWlP?=
+ =?utf-8?B?NmxwaW1sNWlTa0hkdHZybHcvY3B6QWlCTW1IMFlzQlpXT1R0RGRveWtKUnBN?=
+ =?utf-8?B?MlQyOURGUT09?=
+MIME-Version: 1.0
+
+------=_Part_1064999_1039573903.1715215312661
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+AMAZON.COM=20
+
+Tu Amazonhttps://www.amazon.com/gp/yourstore/home/ref=3Dpe_yourstore
+
+Ofertas del D=C3=ADahttps://www.amazon.com/gp/goldbox/ref=3Dpe_todaysdeal/
+
+Prime Insiderhttps://www.amazon.com/primeinsider?ref=3Dprime_welcomeemail_h=
+eader_primeinsider
+
+Estimado Jesus Lopez Farias,
+=C2=A1Felicitaciones! A partir de ahora, tu  desbloquea los mejores benefic=
+ios de compras y entretenimiento. Como miembro Prime, aqu=C3=AD hay algunos=
+ de los m=C3=BAltiples beneficios incluidos con tu membres=C3=ADa:=20
+
+Compras
+Los miembros Prime tienen acceso a Ofertas Rel=C3=A1mpago exclusivas y cupo=
+nes. Adem=C3=A1s, con un dispositivo Alexa, puedes disfrutar de Compras por=
+ Voz manos libres y Ofertas de Alexa exclusivas de Prime.
+
+Entrega
+Los art=C3=ADculos se entregan r=C3=A1pidamente con opciones de Entrega Pri=
+me como Entrega de dos d=C3=ADas GRATIS, Entrega el mismo d=C3=ADa GRATIS y=
+ Entrega de 2 horas en =C3=A1reas seleccionadas.
+
+Entretenimiento
+Mira y disfruta de miles de pel=C3=ADculas y programas de TV populares con =
+Prime Video.
+Escoge entre miles de libros digitales, revistas, c=C3=B3mics y m=C3=A1s co=
+n Prime Reading.
+Escucha m=C3=BAsica sin anuncios disponible en cualquier dispositivo con Pr=
+ime Music.Comenzar Ahora
+https://www.amazon.com/
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Pel=C3=ADculas populares incluidas en tu membres=C3=ADa Primehttps://www.am=
+azon.com/b/ref=3Dhowelcome_pivshov?ie=3DUTF8&node=3D2676882011
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Programas de TV populares incluidos en tu membres=C3=ADa Primehttps://www.a=
+mazon.com/b/ref=3Dhowelcome_pivshov?ie=3DUTF8&node=3D2676882011
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+ Si no deseas continuar tu membres=C3=ADa por  m=C3=A1s los impuestos aplic=
+ables, puedes cancelar en cualquier momento. Si cancelas en los siguientes =
+3 d=C3=ADas h=C3=A1biles de haber convertido tu membres=C3=ADa a una pagada=
+, te daremos el reembolso completo por la tarifa de la membres=C3=ADa, meno=
+s el valor de los beneficios de Prime que hayas utilizado durante este peri=
+odo. Si cancelas en cualquier otro momento, te daremos el reembolso complet=
+o por la tarifa de la membres=C3=ADa si t=C3=BA y tu cuenta no utilizaron n=
+inguno de los beneficios de Prime desde el =C3=BAltimo cobro por tu membres=
+=C3=ADa Prime.
+
+Para m=C3=A1s detalles, lee nuestros T=C3=A9rminos y Condiciones de Amazon =
+Prime - https://www.amazon.com/gp/help/customer/display.html?nodeId=3D13819=
+201.
+
+=C2=A9 2020, Amazon.com, Inc. o sus filiales. Todos los derechos reservados=
+. Amazon, Amazon.com, Prime, 1-Clic, el logo de la sonrisa y todos los dem=
+=C3=A1s logos relacionados son marcas registradas de Amazon.com, Inc. o sus=
+ filiales. Amazon.com, 410 Terry Avenue North, Seattle, WA 98109-5210.
+
+
+
+Este mensaje fue enviado a: jbl3000_lopez@hotmail.com
+------=_Part_1064999_1039573903.1715215312661
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www=
+.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html><head>
+<t=
+itle>Amazon.com: : Jesus Lopez Farias, Welcome to Amazon Prime</title>
+
+  <style type=3D"text/css">
+  html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; }
+  body { margin:0; padding:0; }
+  .ReadMsgBody { width: 100%; }
+  .ExternalClass { width: 100%; }
+  .ExternalClass *{line-height:100%; }
+  .amz_link {color:#333333;}
+  .iosLinkPurple a { color:#97005e; text-decoration:none; }
+  .iosLinkMaroon a { color:#98005d; text-decoration:none; }=20
+  .iosLinkGrey a { color:#666666; text-decoration:none; }  =20
+
+  @media screen and (max-width: 620px) {
+  *[class].block {display:block !important;}
+  *[class].hide {display:none !important;}
+  *[class].rel { position:relative !important; }
+  *[class].abs { position:absolute !important; }
+  *[class].show {display: block !important; width: auto !important; overflo=
+w: visible !important; float: none !important; max-height: inherit !importa=
+nt; line-height: inherit !important;}
+
+  /* ALIGNMENT */
+  *[class].aligncenter {text-align:center !important;}
+  *[class].alignleft {text-align:left !important;}
+  *[class].alignright {text-align:right !important;}
+  *[class].valigntop { vertical-align:top !important; }
+  *[class].valigncenter { vertical-align:middle !important; }
+  *[class].centertable {margin:0 auto !important;}
+  *[class].floatleft{ float: left !important; }
+  *[class].floatright{ float: right !important; }=09
+
+  /*** heights & widths ****/
+  *[class].width1 {width:1px !important;}
+  *[class].width2 {width:2px !important;}
+  *[class].width3 {width:3px !important;}
+  *[class].width4 {width:4px !important;}
+  *[class].width5 {width:5px !important;}
+  *[class].width6 {width:6px !important;}
+  *[class].width7 {width:7px !important;}
+  *[class].width8 {width:8px !important;}
+  *[class].width9 {width:9px !important;}
+  *[class].width10 {width:10px !important;}
+  *[class].width11 {width:11px !important;}
+  *[class].width12 {width:12px !important;}
+  *[class].width13 {width:13px !important;}
+  *[class].width14 {width:14px !important;}
+  *[class].width15 {width:15px !important;}
+  *[class].width18 {width:18px !important;}
+  *[class].width19 {width:19px !important;}
+  *[class].width20 {width:20px !important;}
+  *[class].width22 {width:22px !important;}
+  *[class].width25 {width:25px !important;}
+  *[class].width27 {width:27px !important;}
+  *[class].width30 {width:30px !important;}
+  *[class].width35 {width:35px !important;}
+  *[class].width40 {width:40px !important;}
+  *[class].width45 {width:45px !important;}
+  *[class].width50 {width:50px !important;}
+  *[class].width65 {width:65px !important;}
+  *[class].width77 {width:77px !important;}
+  *[class].width85 {width:85px !important;}
+  *[class].width87 {width:87px !important;}
+  *[class].width90 {width:90px !important;}
+  *[class].width94 {width:94px !important;}
+  *[class].width95 {width:95px !important;}
+  *[class].width96 {width:96px !important;}
+  *[class].width100 {width:100px !important;}
+  *[class].width104 {width:104px !important;}
+  *[class].width105 {width:105px !important;}
+  *[class].width110 {width:110px !important;}
+  *[class].width111 {width:111px !important;}
+  *[class].width118 {width:118px !important;}
+  *[class].width125 {width:125px !important;}
+  *[class].width128 {width:128px !important;}
+  *[class].width130 {width:130px !important;}
+  *[class].width131 {width:131px !important;}
+  *[class].width133 {width:133px !important;}
+  *[class].width136 {width:136px !important;}
+  *[class].width138 {width:138px !important;}
+  *[class].width139 {width:139px !important;}
+  *[class].width140 {width:140px !important;}
+  *[class].width142 {width:142px !important;}
+  *[class].width143 {width:143px !important;}
+  *[class].width148 {width:148px !important;}
+  *[class].width150 {width:150px !important;}
+  *[class].width152 {width:152px !important;}
+  *[class].width153 {width:153px !important;}
+  *[class].width155 {width:155px !important;}
+  *[class].width156 {width:156px !important;}
+  *[class].width160 {width:160px !important;}
+  *[class].width165 {width:165px !important;}
+  *[class].width170 {width:170px !important;}
+  *[class].width171 {width:171px !important;}
+  *[class].width180 {width:180px !important;}
+  *[class].width189 {width:189px !important;}
+  *[class].width194 {width:194px !important;}
+  *[class].width208 {width:208px !important;}
+  *[class].width210 {width:210px !important;}
+  *[class].width212 {width:212px !important;}
+  *[class].width214 {width:214px !important;}
+  *[class].width240 {width:240px !important;}
+  *[class].width242 {width:242px !important;}
+  *[class].width246 {width:246px !important;}
+  *[class].width245 {width:245px !important;}
+  *[class].width250 {width:250px !important;}
+  *[class].width256 {width:256px !important;}
+  *[class].width258 {width:258px !important;}
+  *[class].width260 {width:260px !important;}
+  *[class].width264 {width:264px !important;}
+  *[class].width266 {width:266px !important;}
+  *[class].width268 {width:268px !important;}
+  *[class].width276 {width:276px !important;}
+  *[class].width278 {width:278px !important;}
+  *[class].width286 {width:286px !important;}
+  *[class].width296 {width:296px !important;}
+  *[class].width298 {width:298px !important;}
+  *[class].width300 {width:300px !important;}
+  *[class].width305 {width:305px !important;}
+  *[class].width310 {width:310px !important;}
+  *[class].width318 {width:318px !important;}
+  *[class].width320 {width:320px !important;}
+  *[class].width323 {width:323px !important;}
+  *[class].width324 {width:324px !important;}
+  *[class].width330 {width:330px !important;}
+  *[class].width340 {width:340px !important;}
+  *[class].width350 {width:350px !important;}
+
+  *[class].hauto   {height:auto !important;}
+
+  *[class].height1 {height:1px !important;}
+  *[class].height2 {height:2px !important;}
+  *[class].height3 {height:3px !important;}
+  *[class].height4 {height:4px !important;}
+  *[class].height5 {height:5px !important;}
+  *[class].height6 {height:6px !important;}
+  *[class].height7 {height:7px !important;}
+  *[class].height8 {height:8px !important;}
+  *[class].height9 {height:9px !important;}
+  *[class].height10 {height:10px !important;}
+  *[class].height11 {height:11px !important;}
+  *[class].height12 {height:12px !important;}
+  *[class].height13 {height:13px !important;}
+  *[class].height14 {height:14px !important;}
+  *[class].height15 {height:15px !important;}
+  *[class].height18 {height:18px !important;}
+  *[class].height20 {height:20px !important;}
+  *[class].height21 {height:21px !important;}
+  *[class].height24 {height:24px !important;}
+  *[class].height25 {height:25px !important;}
+  *[class].height27 {height:27px !important;}
+  *[class].height30 {height:30px !important;}
+  *[class].height32 {height:32px !important;}
+  *[class].height35 {height:35px !important;}
+  *[class].height40 {height:40px !important;}
+  *[class].height41 {height:41px !important;}
+  *[class].height42 {height:42px !important;}
+  *[class].height45 {height:45px !important;}
+  *[class].height46 {height:46px !important;}
+  *[class].height47 {height:47px !important;}
+  *[class].height50 {height:50px !important;}
+  *[class].height53 {height:53px !important;}
+  *[class].height67 {height:67px !important;}
+  *[class].height76 {height:76px !important;}
+  *[class].height80 {height:80px !important;}
+  *[class].height86 {height:86px !important;}
+  *[class].height130 {height:130px !important;}
+  *[class].height140 {height:140px !important;}
+  *[class].height189 {height:189px !important;}
+  *[class].height203 {height:203px !important;}
+  *[class].height319 {height:319px !important;}
+  *[class].height322 {height:322px !important;}
+  *[class].height330 {height:330px !important;}
+  *[class].height350 {height:350px !important;}
+
+  /*** padding/margin ****/
+  *[class].paddingl0 {padding-left:0px !important;}
+  *[class].paddingl15 {padding-left:15px !important;}
+  *[class].paddingl55 {padding-left:55px !important;}
+
+  *[class].paddingr0 {padding-right:0px !important;}
+  *[class].paddingr15 {padding-right:15px !important;}
+  *[class].paddingr55 {padding-right:55px !important;}
+
+  *[class].paddingb15 {padding-bottom:15px !important;}
+  *[class].paddingl16 {padding-left:16px !important;}
+
+  *[class].margina {margin:auto !important; }
+  *[class].margint6 {margin-top:6px !important;}=09
+  *[class].margint15 {margin-top:15px !important;}
+  *[class].margint30 {margin-top:30px !important;}
+  *[class].marginb9 {margin-bottom:9px !important;}
+  *[class].marginb15 {margin-bottom:15px !important;}
+  *[class].marginb30 {margin-bottom:30px !important;}
+
+  /*** fonts ****/
+  *[class].font11 {font-size:11px !important;}
+  *[class].font12 {font-size:12px !important;}
+  *[class].font13 {font-size:13px !important;}
+  *[class].font14 {font-size:14px !important;}
+  *[class].font15 {font-size:15px !important;}
+  *[class].font16 {font-size:16px !important;}
+  *[class].font18 {font-size:18px !important;}
+  *[class].font19 {font-size:19px !important;}
+  *[class].font25 {font-size:25px !important;}
+  *[class].font32 {font-size:32px !important;}
+
+  *[class].line13 {line-height:13px !important;}
+  *[class].line14 {line-height:14px !important;}
+  *[class].line16 {line-height:16px !important;}
+  *[class].line17 {line-height:17px !important;}
+  *[class].line20 {line-height:20px !important;}
+  *[class].line21 {line-height:21px !important;}
+  *[class].line22 {line-height:22px !important;}
+  *[class].line23 {line-height:23px !important;}
+  *[class].line24 {line-height:24px !important;}
+  *[class].line29 {line-height:29px !important;}
+  *[class].line34 {line-height:34px !important;}
+
+  /*** positioning ***/
+  *[class].tor3_p21 {top:21px !important;}
+  *[class].top0 {top:0px !important;}
+  *[class].tor3_p12 {top:12px !important;}
+  *[class].tor3_p30 {top:30px !important;}
+  *[class].tor3_p32 {top:32px !important;}
+  *[class].tor3_p189 {top:189px !important;}
+
+  *[class].left0 {left:0 !important;}
+  *[class].left15 {left:15 !important;}
+  *[class].left77 {left:77px !important;}
+  *[class].left78 {left:78px !important;}
+  *[class].left138 {left:138px !important;}
+  *[class].left143 {left:143px !important;}
+  *[class].left153 {left:138px !important;}
+  *[class].left156 {left:156px !important;}
+  *[class].left178 {left:178px !important;}
+
+  *[class].cap{ display:  table-caption !important; }
+  *[class].head{ display:table-header-group !important; }
+  *[class].foot{ display:table-footer-group !important; }
+
+  *[class].bggrey {background-color:#cacaca !important;}
+  *[class].bgwhite {background-color:#ffffff !important;}=09
+
+  /*** DIV alignment ***/
+  *[class].columnl {display: table-cell; width: 77px !important;}
+  *[class].columnr {display: table-cell; width: 189px !important;} =20
+  </style>
+
+  </head>
+  <body width=3D"100%" style=3D"padding:0; margin:0;" bgcolor=3D"#ffffff"><=
+img width=3D"1" height=3D"1" src=3D"https://www.amazon.com/gp/r.html?C=3D5Q=
+ELWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012=
+ae5c4076975804ac9380p0na&amp;R=3D3JYAGPRL8K0PR&amp;T=3DO&amp;U=3Dhttps%3A%2=
+F%2Fimages-na.ssl-images-amazon.com%2Fimages%2FG%2F01%2Fnav%2Ftransp.gif&am=
+p;H=3DR6DQBKJ5YTSFWAIODWDJHMQJHNEA&amp;ref_=3Dpe_70187950_729958940_opens">
+     <!--[if gte mso 9]>
+     <style>
+        .mr15{ margin-right:15px !important;}
+        .ml15{ margin-left:15px !important;}
+        .mlr10{ margin-left:10px; margin-right:10px !important;}
+        .mr5lr5 { margin-left:5px !important; margin-right:5px !important;}
+        .mr20lr20 { margin-left:20px !important; margin-right:20px !importa=
+nt;}
+        .cta{ margin-left:60px !important; margin-right:60px !important; ma=
+rgin-top:10px !important; margin-bottom:10px !important;}
+     </style>
+     <![endif]-->
+     <center>
+        <table cellspacing=3D"0" cellpadding=3D"0" width=3D"100%">
+           <tr>
+              <td align=3D"center" valign=3D"top" bgcolor=3D"#ffffff">
+             =20
+                 <table border=3D"0" cellspacing=3D"0" cellpadding=3D"0" wi=
+dth=3D"540" class=3D"width350">
+                    <tr>
+                       <td width=3D"20" align=3D"center" class=3D"width10">=
+</td>
+                      =20
+                       <!-- EMAIL HTML BODY -->
+                       <td width=3D"500" align=3D"left" valign=3D"top" clas=
+s=3D"width330">
+                      =20
+                          <!-- preheader -->
+                          <div style=3D"font-family:Arial, Helvetica, sans-=
+serif; font-size:10px; line-height:16px; color:#666666;" class=3D"hide"> <a=
+ href=3D"https://www.amazon.com/gp/f.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7L=
+UK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c4076975804ac9380p0na&am=
+p;R=3D2DRHA5P65QRT3&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazon.com%2Famazon=
+prime%3Fref_%3Dpe_70187950_729958940_PSCE_627978_T2&amp;H=3DZ57EJOYAWPS36AQ=
+ZBDOIAYAN9OQA&amp;ref_=3Dpe_70187950_729958940_PSCE_627978_T2" style=3D"col=
+or:#666666; text-decoration:underline;">Tu Amazon Prime Membership comienza=
+ hoy.</a></div>
+                          <!-- preheader -->
+                         =20
+                          <!-- TOP STRIPE WIDGET -->
+
+<div id=3D"scoped-content">
+    <style type=3D"text/css" scoped=3D"">
+        .fullstripe img {width: 100% !important; height: auto !important;}
+    </style>
+
+    <table cellpadding=3D"0" cellspacing=3D"0" width=3D"500" class=3D"width=
+330">
+           <tr>
+               <td width=3D"500" align=3D"center" class=3D"block width330 f=
+ullstripe">
+                  =20
+               </td>
+           </tr>
+    </table>
+</div>
+                          <!-- TOP STRIPE WIDGET -->
+                         =20
+                          <!-- HEADER -->
+                          <table cellspacing=3D"0" cellpadding=3D"0">
+                             <tr>
+                                <td height=3D"10" style=3D"line-height:10px=
+;" class=3D"hide"><img src=3D"https://images-na.ssl-images-amazon.com/image=
+s/G/01/e-mail/img14/shards/img/bfd/sp.gif" height=3D"1" width=3D"1" style=
+=3D"visibility: hidden !important; overflow:hidden; border:0;"></td>
+                             </tr>
+                          </table>
+                         =20
+                          <table cellspacing=3D"0" cellpadding=3D"0">
+                             <tr>
+                                <td height=3D"5" style=3D"line-height:5px;"=
+ bgcolor=3D"#1a98ff" width=3D"500" class=3D"width330 height4"><img src=3D"h=
+ttps://images-na.ssl-images-amazon.com/images/G/01/e-mail/img14/shards/img/=
+bfd/sp.gif" height=3D"1" width=3D"1" style=3D"visibility: hidden !important=
+; overflow:hidden; border:0;"></td>
+                             </tr>
+                          </table>
+                         =20
+                              <!-- logo and nav -->
+
+
+
+
+
+
+
+
+
+
+<table cellspacing=3D"0" cellpadding=3D"0">
+   <tr>
+      <td height=3D"10" style=3D"line-height:10px;" class=3D"height10"><img=
+ src=3D"images/sp.gif" height=3D"1" width=3D"1" style=3D"visibility: hidden=
+ !important; overflow:hidden; border:0;"></td>
+   </tr>
+</table>
+
+<table cellpadding=3D"0" cellspacing=3D"0" width=3D"500" class=3D"width330"=
+>
+   <tr>
+      <th width=3D"119" align=3D"center" class=3D"block width330">
+         <a href=3D"https://www.amazon.com/gp/f.html?C=3D5QELWTPVINHS&amp;K=
+=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c4076975804ac=
+9380p0na&amp;R=3D29J2DL9PIGDRL&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazon.c=
+om%2Fgp%2Fprime%2Fref%3Dpe_70187950_729958940_pe_re_note_logo&amp;H=3DAAC7R=
+KYIHCIRKTSQUMHJFASVESUA&amp;ref_=3Dpe_70187950_729958940_pe_re_note_logo" t=
+arget=3D"_blank"><img src=3D"https://m.media-amazon.com/images/G/01/e-mail/=
+logos/2022PrimeLogoEmailHeader._CB633103422_.png" border=3D"0" vspace=3D"0"=
+ alt=3D"Amazon.com" class=3D"PE-header-logo-image" hspace=3D"0">
+      </th>
+     =20
+      <th width=3D"371" align=3D"right" class=3D"block width330 aligncenter=
+">
+      	 <table cellspacing=3D"0" cellpadding=3D"0">
+            <tr>
+               <td height=3D"1" style=3D"line-height:1px;" class=3D"height8=
+"><img src=3D"images/sp.gif" height=3D"1" width=3D"1" style=3D"visibility: =
+hidden !important; overflow:hidden; border:0;"></td>
+            </tr>
+         </table>
+        =20
+         <div style=3D"font-family:Arial, Helvetica, sans-serif; font-size:=
+13px; line-height:18px; color:#333333; font-weight:normal;">
+            <a href=3D"https://www.amazon.com/gp/r.html?C=3D5QELWTPVINHS&am=
+p;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c407697580=
+4ac9380p0na&amp;R=3D1P2TN0ARVICB6&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazo=
+n.com%2Fgp%2Fprimecentral%3Fie%3DUTF8%26ref_%3Dpe_70187950_729958940_prime_=
+welcomeemail_header_primecentral&amp;H=3DTLWIFGB8IGE60RL1KDRXN6IDJKQA&amp;r=
+ef_=3Dpe_70187950_729958940_prime_welcomeemail_header_primecentral" target=
+=3D"_blank" style=3D"color:#333333; text-decoration:none;">Tu Prime</a>&nbs=
+p;&nbsp;&nbsp;|&nbsp;
+            <a href=3D"https://www.amazon.com/gp/r.html?C=3D5QELWTPVINHS&am=
+p;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c407697580=
+4ac9380p0na&amp;R=3D28FK7600NHYXN&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazo=
+n.com%2Fgp%2Fr.html%3FR%3D3Q89S9WPYQKE1%26C%3D34CK02N83LOW3%26H%3DV2OSSYP38=
+N9EZJ2BJWPJTU6EQ8AA%26T%3DTC%26U%3Dhttp%253A%252F%252Fwww.amazon.com%252Fgp=
+%252Fgoldbox%252Fref%253Dpe_0_3436_pe_todaysdeal%252F%26ref_%3Dpe_70187950_=
+729958940&amp;H=3DNA7J9AW2HDU0JNULYQ4AJNV2PG0A&amp;ref_=3Dpe_70187950_72995=
+8940" target=3D"_blank" style=3D"color:#333333; text-decoration:none;">Ofer=
+tas de hoy</a>&nbsp;&nbsp;&nbsp;|&nbsp;
+            <a href=3D"https://www.amazon.com/gp/f.html?C=3D5QELWTPVINHS&am=
+p;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c407697580=
+4ac9380p0na&amp;R=3D18L7HKSE5SAB8&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazo=
+n.com%2Fb%2F%3Fnode%3D23945845011%26ref_%3Dpe_70187950_729958940&amp;H=3DD2=
+PSH3NH1CPTTMSQH2EJ8RY0H18A&amp;ref_=3Dpe_70187950_729958940" target=3D"_bla=
+nk" style=3D"color:#333333; text-decoration:none;">Ventajas de Prime</a>
+         </div>
+        =20
+         <table cellspacing=3D"0" cellpadding=3D"0">
+            <tr>
+               <td height=3D"1" style=3D"line-height:1px;"><img src=3D"imag=
+es/sp.gif" height=3D"1" width=3D"1" style=3D"visibility: hidden !important;=
+ overflow:hidden; border:0;"></td>
+            </tr>
+         </table>
+      </th>
+   =20
+      <td width=3D"10" class=3D"hide"></td>
+   </tr>
+</table>
+
+<table cellspacing=3D"0" cellpadding=3D"0">
+   <tr>
+      <td height=3D"10" style=3D"line-height:10px;" class=3D"height10"><img=
+ src=3D"images/sp.gif" height=3D"1" width=3D"1" style=3D"visibility: hidden=
+ !important; overflow:hidden;border:0;"></td>
+   </tr>
+</table>
+
+<table cellspacing=3D"0" cellpadding=3D"0">
+   <tr>
+      <td height=3D"1" style=3D"line-height:1px;" bgcolor=3D"#959595" width=
+=3D"500" class=3D"width330"><img src=3D"images/sp.gif" height=3D"1" width=
+=3D"1" style=3D"visibility: hidden !important;overflow:hidden; border:0;"><=
+/td>
+   </tr>
+</table>
+
+<table cellspacing=3D"0" cellpadding=3D"0">
+   <tr>
+      <td height=3D"15" style=3D"line-height:15px;"><img src=3D"images/sp.g=
+if" height=3D"1" width=3D"1" style=3D"visibility: hidden !important; overfl=
+ow:hidden; border:0;"></td>
+   </tr>
+</table>
+
+
+
+                              <!-- logo and nav -->
+                          <!-- HEADER -->
+                         =20
+                          <!-- HERO IMAGE -->
+                          <table cellpadding=3D"0" cellspacing=3D"0" width=
+=3D"500" class=3D"width330">
+     							<tr>
+     								<td width=3D"500" align=3D"center" class=3D"block width330">
+     									<a href=3D"https://www.amazon.com/gp/f.html?C=3D5QELWTPVINHS&=
+amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c4076975=
+804ac9380p0na&amp;R=3D1N6KYIVKJLM47&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.ama=
+zon.com%2Famazonprime%3Fref_%3Dpe_70187950_729958940_PSCE_627978_T2&amp;H=
+=3D6ROMB9RTNU7637JNRAYOQ3PCYXUA&amp;ref_=3Dpe_70187950_729958940_PSCE_62797=
+8_T2" style=3D"text-decoration: none;color: #FF9900"><img src=3D"https://m.=
+media-amazon.com/images/G/01/es_US/marketing/prime/nb/Thank_you_for_joining=
+_Prime_w_box_and_fireworks._CB614218737_.png" border=3D"0" vspace=3D"0" alt=
+=3D"=C2=A1Gracias por unirte a Prime!" width=3D"100%" class=3D"hauto" hspac=
+e=3D"0"></a>
+     								</td>
+     							</tr>
+  						</table>
+  						<!-- HERO IMAGE -->
+  					=09
+                          <!-- ACTION BUTTON -->
+
+<table cellpadding=3D"0" cellspacing=3D"0" align=3D"center">
+  <tr>
+    <td width=3D"20" class=3D"width10"></td>
+    <td width=3D"450" align=3D"center" valign=3D"top" class=3D"width310">
+      <table cellspacing=3D"0" cellpadding=3D"0">
+        <tr>
+          <td height=3D"12" style=3D"line-height:12px;" align=3D"center"><i=
+mg src=3D"https://images-na.ssl-images-amazon.com/images/G/01/e-mail/img14/=
+shards/img/bfd/sp.gif" height=3D"1" width=3D"1" align=3D"center" style=3D"v=
+isibility: hidden !important; overflow:hidden; border:0;"></td>
+        </tr>
+      </table>
+
+     <!-- button -->
+     <table width=3D"280" cellpadding=3D"10" cellspacing=3D"0" bgcolor=3D"#=
+FFFFFF">
+        <tr>
+          <td align=3D"center" bgcolor=3D"#FFC435" style=3D"-webkit-border-=
+radius: 5px; -moz-border-radius: 5px; border-radius: 5px; color: #303942; d=
+isplay: block;">
+            <a href=3D"https://www.amazon.com/gp/f.html?C=3D5QELWTPVINHS&am=
+p;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c407697580=
+4ac9380p0na&amp;R=3D38H2KQW9ZMTXG&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazo=
+n.com%2Famazonprime%3Fref_%3Dpe_70187950_729958940_PSCE_627978_T2&amp;H=3DS=
+KFZYGMLUUVPTDVIXVYMM7AGFYGA&amp;ref_=3Dpe_70187950_729958940_PSCE_627978_T2=
+" style=3D"color: #303942; font-size:16px; font-weight: bold; font-family: =
+Arial, sans-serif; text-decoration: none; line-height:20px; width:100%; dis=
+play:inline-block">
+              &nbsp;&nbsp;Descubre los beneficios de Prime&nbsp;&nbsp;
+            </a>
+          </td>
+        </tr>
+     </table>
+     <!-- button -->
+
+    </td>
+    <td width=3D"25" class=3D"width10"></td>
+  </tr>
+</table>
+
+                          <!-- ACTION BUTTON -->
+                         =20
+                          <table cellspacing=3D"0" cellpadding=3D"0">
+                             <tr>
+                                <td height=3D"19" style=3D"line-height:19px=
+;" align=3D"center"><img src=3D"https://images-na.ssl-images-amazon.com/ima=
+ges/G/01/e-mail/img14/shards/img/bfd/sp.gif" height=3D"1" width=3D"1" style=
+=3D"visibility: hidden !important; overflow:hidden; border:0;"></td>
+                             </tr>
+                          </table>
+
+                          <!-- SUB HEADER WIDGET -->
+
+<div id=3D"scoped-content">
+    <style type=3D"text/css" scoped=3D"">
+        .fullstripe img {width: 100% !important; height: auto !important;}
+    </style>
+
+    <table cellpadding=3D"0" cellspacing=3D"0" width=3D"500" class=3D"width=
+330">
+           <tr>
+               <td width=3D"500" align=3D"center" class=3D"block width330 f=
+ullstripe">
+                  =20
+               </td>
+           </tr>
+    </table>
+</div>
+                          <!-- SUB HEADER WIDGET -->
+  					=09
+                          <!-- MAIN CONTENT -->
+                         =20
+                          <table cellpadding=3D"0" cellspacing=3D"0">
+                             <tr>
+                                <td width=3D"7"></td>
+                                <td width=3D"493" align=3D"left" valign=3D"=
+top" class=3D"width323">
+                                   <table cellspacing=3D"0" cellpadding=3D"=
+0">
+                                      <tr>
+                                         <td height=3D"24" style=3D"line-he=
+ight:24px;" class=3D"height15"><img src=3D"https://images-na.ssl-images-ama=
+zon.com/images/G/01/e-mail/img14/shards/img/bfd/sp.gif" height=3D"1" width=
+=3D"1" style=3D"display:block; border:0;"></td>
+                                      </tr>
+                                   </table>
+
+                                   <div style=3D"font-family:Arial, Helveti=
+ca, sans-serif; font-size:16px; line-height:24px; color:#333333;" class=3D"=
+font16 line24">=20
+                                      <!--MsgId:PE_W_Checkout_I-->
+<div style=3D"font-family:Arial, Helvetica, sans-serif; font-size:18px; lin=
+e-height:24px; color:#333333;" class=3D"font18 line24">=20
+<center><b>=C2=A1Desbloqueaste la entrega gratuita en millones de productos=
+, ofertas exclusivas, entretenimiento sin fin y m=C3=A1s!</b></center>
+</div>
+<br>
+<p>Estimado Jesus Lopez Farias:</p><p>=C2=A1Felicidades! A partir de ahora,=
+ tu Amazon Prime Membership desbloquea los mejores beneficios de compras y =
+entretenimiento. Como miembro Prime, estos son tan solo algunos de los incr=
+e=C3=ADbles beneficios que recibes con tu membres=C3=ADa de Prime:</p><h3>E=
+ntrega</h3><p><a href=3D"https://www.amazon.com/gp/r.html?C=3D5QELWTPVINHS&=
+amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c4076975=
+804ac9380p0na&amp;R=3D2MQ7A4HU07A2O&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.ama=
+zon.com%2Fb%2Fref%3Dpe_70187950_729958940_s9_acss_ot_cg_pmpyntp_2a1_w%3Fnod=
+e%3D15247183011%26pf_rd_m%3DATVPDKIKX0DER%26pf_rd_s%3Dcenter-1%26pf_rd_r%3D=
+5CXZ5MPPAJCXFYNNXWGZ%26pf_rd_t%3D8101%26pf_rd_p%3D648da878-fe47-458d-ab7e-5=
+553c93facab%26pf_rd_i%3Ddesktop_landing_prime_member&amp;H=3DDI2UCVVRHDH2PH=
+84ZBV8NU3SQNIA&amp;ref_=3Dpe_70187950_729958940_s9_acss_ot_cg_pmpyntp_2a1_w=
+"><b>Entrega Prime</b></a> ofrece formas r=C3=A1pidas, gratuitas y pr=C3=A1=
+cticas de obtener lo que necesitas, cuando lo necesitas. Compra con <a href=
+=3D"https://www.amazon.com/gp/r.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3EJ=
+&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c4076975804ac9380p0na&amp;R=
+=3D106PE0WI8O471&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fs%3Frh%3D=
+p_85%253A2470955011%26dc%26hidden-keywords%3D%2522%2522%2B-gift%26fst%3Das%=
+253Aoff%26pf_rd_i%3D15247183011%26pf_rd_m%3DATVPDKIKX0DER%26pf_rd_p%3Ddc736=
+a6c-6b5b-4cf4-9ef3-f37c2d8c1684%26pf_rd_r%3DBZPJ7RWM1MVQGQFEJE4G%26pf_rd_s%=
+3Dmerchandised-search-4%26pf_rd_t%3D101%26qid%3D1508540473%26rnid%3D2470954=
+011%26ref%3D%2524%257BrefTag%257D%26ref_%3Dpe_70187950_729958940&amp;H=3DF8=
+RZRW7YJ3DHDULQQ3VPHXXDJAAA&amp;ref_=3Dpe_70187950_729958940"><b>entrega GRA=
+TIS en dos d=C3=ADas</b></a>, <a href=3D"https://www.amazon.com/gp/r.html?C=
+=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb=
+49012ae5c4076975804ac9380p0na&amp;R=3D1V6W8MGDA4UL6&amp;T=3DC&amp;U=3Dhttps=
+%3A%2F%2Fwww.amazon.com%2Fb%3Fnode%3D15247183011%26ref_%3Dpe_70187950_72995=
+8940_prime_we_p_t3_1d&amp;H=3DCFCOTAXQQR8QARA76KI8QYPNLWQA&amp;ref_=3Dpe_70=
+187950_729958940_prime_we_p_t3_1d"><b>entrega GRATIS en un d=C3=ADa</b></a>=
+ y <a href=3D"https://www.amazon.com/gp/r.html?C=3D5QELWTPVINHS&amp;K=3D342=
+VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c4076975804ac9380p0=
+na&amp;R=3D1YYV5B5MS4BT&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fb%=
+3Fnode%3D21382124011%26ref_%3Dpe_70187950_729958940_prime_we_p_t3_sd&amp;H=
+=3D6FD1XBW3R8TCPRNZJERXU0VTHOYA&amp;ref_=3Dpe_70187950_729958940_prime_we_p=
+_t3_sd"><b>entrega GRATIS el mismo d=C3=ADa</b></a>. Adem=C3=A1s, compra du=
+rante toda la semana con <a href=3D"https://www.amazon.com/gp/r.html?C=3D5Q=
+ELWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012=
+ae5c4076975804ac9380p0na&amp;R=3D2PYB34Z1G5I61&amp;T=3DC&amp;U=3Dhttps%3A%2=
+F%2Fwww.amazon.com%2Fb%2Fref%3Dpe_70187950_729958940_s9_acss_ot_cg_dexpmpva=
+_1a1_w%3Fnode%3D17928921011%26pf_rd_m%3DATVPDKIKX0DER%26pf_rd_s%3Dcenter-9%=
+26pf_rd_r%3D5CXZ5MPPAJCXFYNNXWGZ%26pf_rd_t%3D8101%26pf_rd_p%3Db3f9e753-36a7=
+-4ee3-addc-2dd5764e1599%26pf_rd_i%3Ddesktop_landing_prime_member&amp;H=3DN0=
+NSTNHZN1UHJVCS2J7KA3G18LYA&amp;ref_=3Dpe_70187950_729958940_s9_acss_ot_cg_d=
+expmpva_1a1_w"><b>Entrega Amazon Day</b></a> para recibir los pedidos el d=
+=C3=ADa que elijas.</p><p>Tambi=C3=A9n obtienes <a href=3D"https://www.amaz=
+on.com/gp/r.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg=
+:20240509004152bfb49012ae5c4076975804ac9380p0na&amp;R=3DGCPOW1ZTOZ8D&amp;T=
+=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fprime%2Foffer%2Fgrubhub%2Fprime=
+-deal%3Fref%3Dprime_we_p_t3_grub%26ref_%3Dpe_70187950_729958940&amp;H=3DKLA=
+GSX3P9TCBYMBYD2TGHL5AW6AA&amp;ref_=3Dpe_70187950_729958940"><b>un a=C3=B1o =
+de Grubhub+ gratis</b></a> para que puedas disfrutar de tarifas de env=C3=
+=ADo de $0 y ofertas solo para miembros en comida, refrigerios, bebidas y m=
+=C3=A1s.</p><h3>Compras</h3><p>Los miembros Prime tienen acceso a <a href=
+=3D"https://www.amazon.com/gp/f.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3EJ=
+&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c4076975804ac9380p0na&amp;R=
+=3D2K7X9JTMDM6G9&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fgp%2Fgold=
+box%2Fref_%3Dprime_we_p_t3_lighteningdeals%3Fgb_f_GB-SUPPLE%3DsortOrder%3AB=
+Y_SCORE%2CprimeAccessType%3APRIME_EARLY_ACCESS%26pf_rd_p%3D2644760082%26pf_=
+rd_s%3Dslot-3%26pf_rd_t%3D701%26pf_rd_i%3Dgb_main%26pf_rd_m%3DATVPDKIKX0DER=
+%26pf_rd_r%3D2M5N7D9RFP5QC805A4FS%26ref_%3Dpe_70187950_729958940_pe_22531_1=
+5098220&amp;H=3D325QPR7VPAQ464XKLV5QDD4AZ5AA&amp;ref_=3Dpe_70187950_7299589=
+40_pe_22531_15098220"><b>Ofertas rel=C3=A1mpago</b></a> y cupones exclusivo=
+s. Adem=C3=A1s, con un dispositivo Alexa, puedes disfrutar de <a href=3D"ht=
+tps://www.amazon.com/gp/r.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=
+=3Durn:rtn:msg:20240509004152bfb49012ae5c4076975804ac9380p0na&amp;R=3D35PID=
+305JEXP9&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fb%3Fnode%3D145521=
+77011%26prime_we_p_t3_voiceshopping%26ref_%3Dpe_70187950_729958940&amp;H=3D=
+FCG5FMDDNSN8TJEQJ9UDLQKPHPGA&amp;ref_=3Dpe_70187950_729958940"><b>compras p=
+or voz</b></a> y ofertas de Alexa exclusivas de Prime.</p><h3>Entretenimien=
+to</h3><p>Disfruta de miles de pel=C3=ADculas y programas de televisi=C3=B3=
+n populares con anuncios limitados en <a href=3D"https://www.amazon.com/gp/=
+r.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:202405090=
+04152bfb49012ae5c4076975804ac9380p0na&amp;R=3D8JXOM6Y96UIF&amp;T=3DC&amp;U=
+=3Dhttps%3A%2F%2Fwww.amazon.com%2FAmazon-Video%2Fb%3Fnode%3D2858778011%26re=
+f_%3Dpe_70187950_729958940_prime_we_p_t3_video&amp;H=3DJD1A6VZUIF1ZLR9QNL52=
+XAXCOVWA&amp;ref_=3Dpe_70187950_729958940_prime_we_p_t3_video"><b>Prime Vid=
+eo</b></a>.</p><p>Escucha toda la m=C3=BAsica m=C3=A1s el cat=C3=A1logo m=
+=C3=A1s grande de los mejores podcasts sin anuncios en <a href=3D"https://w=
+ww.amazon.com/gp/f.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:=
+rtn:msg:20240509004152bfb49012ae5c4076975804ac9380p0na&amp;R=3D3UVEFJNMZAK8=
+J&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fmusic%2Fplayer%2Fref%3Dp=
+e_70187950_729958940_prime_we_p_t3_music&amp;H=3DUIADQFAUJC3MYQLBWU1VW3EIFJ=
+WA&amp;ref_=3Dpe_70187950_729958940_prime_we_p_t3_music"><b> Amazon Music p=
+ara miembros Prime</b></a>.</p><p>Elige entre libros electr=C3=B3nicos, rev=
+istas, libros con narraci=C3=B3n Audible, c=C3=B3mics y m=C3=A1s con <a hre=
+f=3D"https://www.amazon.com/gp/f.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3E=
+J&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c4076975804ac9380p0na&amp;R=
+=3D3BEPFH2KU5GZB&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fkindle-db=
+s%2Ffd%2Fprime-pr%3Fref_%3Dpe_70187950_729958940_prime_we_p_t3_reading&amp;=
+H=3DUQTKCRM4AEB3RE9DFFB0DVFIUJ0A&amp;ref_=3Dpe_70187950_729958940_prime_we_=
+p_t3_reading"><b>Prime Reading</b></a>.</p><br>
+<br>
+        <style type=3D"text/css">
+            .action-btn {
+                max-width: 280px;
+            }
+            @media (max-width: 620px) {
+                .action-btn {
+                    width: 100%;
+                    max-width: none;
+                }
+            }
+        </style>
+
+        <table width=3D"100%" height=3D"100%" cellpadding=3D"0" cellspacing=
+=3D"0" bgcolor=3D"#EFEFEF" style=3D"padding: 5px 15px 20px 15px; webkit-bor=
+der-radius: 5px; -moz-border-radius: 5px; border-radius: 5px;">
+            <tr>
+                <td width=3D"100%" height=3D"100%" bgcolor=3D"#EFEFEF">
+
+                    <table width=3D"100%" cellpadding=3D"2" cellspacing=3D"=
+2" bgcolor=3D"#EFEFEF" style=3D"font-family:Arial, Helvetica, sans-serif; f=
+ont-size:12px; line-height:16px; color:#333333;" class=3D"font12 line16">
+                        <colgroup>
+                            <col span=3D"1" style=3D"width: 30%;">
+                            <col span=3D"1" style=3D"width: 70%;">
+                        </colgroup>
+
+                        <tbody>
+                            <tr>
+                                <td colspan=3D"2">
+                                    <h3>
+TU MEMBRES=C3=8DA
+                                    </h3>
+                                </td>
+                            </tr>
+
+    <tr>
+        <td valign=3D"top" style=3D"font-weight: bold; text-align: left;">
+            Nombre del plan:
+        </td>
+
+        <td valign=3D"top" style=3D"font-weight: normal; text-align: left;"=
+>
+            Prime
+        </td>
+    </tr>
+
+    <tr>
+        <td valign=3D"top" style=3D"font-weight: bold; text-align: left;">
+            Tipo de Plan:
+
+        </td>
+
+        <td valign=3D"top" style=3D"font-weight: normal; text-align: left;"=
+>
+            Mensual $14.99
+        </td>
+    </tr>
+
+
+   =20
+   =20
+    <tr>
+        <td valign=3D"top" style=3D"font-weight: bold; text-align: left;">
+            Fecha de Renovaci=C3=B3n:
+        </td>
+
+        <td valign=3D"top" style=3D"font-weight: normal; text-align: left;"=
+>
+            8 de junio de 2024
+        </td>
+    </tr>
+
+                           =20
+
+                                <tr>
+                                    <td colspan=3D"2" style=3D"padding-top:=
+5px;">
+                                        <hr style=3D"margin-bottom: 1em;">
+                                        Tu membres=C3=ADa Prime puede estar=
+ sujeta a impuestos aplicables.
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan=3D"2" style=3D"padding-top:=
+5px;">
+                                        Para obtener m=C3=A1s informaci=C3=
+=B3n o realizar cambios,
+<a class=3D"a-link-normal" href=3D"https://www.amazon.com/gp/r.html?C=3D5QE=
+LWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012a=
+e5c4076975804ac9380p0na&amp;R=3D1OC1YMOQ8MOD1&amp;T=3DC&amp;U=3Dhttps%3A%2F=
+%2Fwww.amazon.com%2Fmc%2Fhome%3Fref%3Dmcx_mm%26ms3_c%3Df716536c08d71b4fb42d=
+a99612910077%26ref_%3Dpe_70187950_729958940&amp;H=3DUW7HNQPUFATGH0KKONAN2UY=
+LRDMA&amp;ref_=3Dpe_70187950_729958940">                                   =
+         administrar tu membres=C3=ADa Prime.
+</a>                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td colspan=3D"2" style=3D"padding-top:=
+5px;">
+=C2=BFQuieres un recordatorio antes de renovar?<a class=3D"a-link-normal" h=
+ref=3D"https://www.amazon.com/gp/r.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7LUK=
+3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb49012ae5c4076975804ac9380p0na&amp;=
+R=3DG7QNFZZYG1XH&amp;T=3DC&amp;U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fgp%2Fprim=
+ecentral%2Foneclick%3FoneClickToken%3DWyJjb20uYW1hem9uLnJldGVudGlvbi5jb21tb=
+24uZGF0YS5vbmVjbGljay5PbmVDbGlja1Rva2VuIix7ZW5jcnlwdGVkQ3VzdG9tZXJJRDoiQTIz=
+MUI5UkdVMFpVTSIsZW5jcnlwdGVkTWFya2V0cGxhY2VJRDoiQVRWUERLSUtYMERFUiIsZXhwaXJ=
+hdGlvbkRhdGU6IjIwMjQtMDYtMDhUMDA6NDE6NTEuNTg0Njc1WiIsb25lQ2xpY2tUeXBlOiJSTU=
+wifV0%253D%26oneClickType%3DremindMeLater%26ms3_c%3Df716536c08d71b4fb42da99=
+612910077%26ref_%3Dpe_70187950_729958940&amp;H=3DL1PTXP2XGSQ59TFE3WOYYCVVUV=
+OA&amp;ref_=3Dpe_70187950_729958940">                                      =
+      Recibir un recordatorio por email.
+</a>                                    </td>
+                                </tr>
+
+                        </tbody>
+                    </table>
+
+                </td>
+            </tr>
+        </table>
+
+        <br>
+
+     =20
+                                   </div>
+                                  =20
+                                   <table cellspacing=3D"0" cellpadding=3D"=
+0">
+                                      <tr>
+                                         <td height=3D"11" style=3D"line-he=
+ight:11px;" class=3D"height7"><img src=3D"https://images-na.ssl-images-amaz=
+on.com/images/G/01/e-mail/img14/shards/img/bfd/sp.gif" height=3D"1" width=
+=3D"1" style=3D"display:block; border:0;"></td>
+                                      </tr>
+                                   </table>
+                                </td>
+                             </tr>
+                          </table>
+                          <!-- MAIN CONTENT -->
+
+                          <!-- x.x SPACER -->
+                          <table cellspacing=3D"0" cellpadding=3D"0">
+                             <tr>
+                                <td height=3D"13" style=3D"line-height:13px=
+;"><img src=3D"https://images-na.ssl-images-amazon.com/images/G/01/e-mail/i=
+mg14/shards/img/bfd/sp.gif" height=3D"1" width=3D"1" style=3D"visibility: h=
+idden !important; overflow:hidden; border:0;"></td>
+                             </tr>
+                          </table>
+
+                          <!-- SUB BODY WIDGET -->
+
+<div id=3D"scoped-content">
+    <style type=3D"text/css" scoped=3D"">
+        .fullstripe img {width: 100% !important; height: auto !important;}
+    </style>
+
+    <table cellpadding=3D"0" cellspacing=3D"0" width=3D"500" class=3D"width=
+330">
+           <tr>
+               <td width=3D"500" align=3D"center" class=3D"block width330 f=
+ullstripe">
+                  =20
+<pe-empty-widget></pe-empty-widget>
+
+               </td>
+           </tr>
+    </table>
+</div>
+                          <!-- SUB BODY WIDGET -->
+
+                               <!-- x.x SPACER -->
+                          <table cellspacing=3D"0" cellpadding=3D"0">
+                             <tr>
+                                <td height=3D"30" style=3D"line-height:30px=
+;" class=3D"height20"><img src=3D"https://images-na.ssl-images-amazon.com/i=
+mages/G/01/e-mail/img14/shards/img/bfd/sp.gif" height=3D"1" width=3D"1" sty=
+le=3D"visibility: hidden !important; overflow:hidden; border:0;"></td>
+                             </tr>
+                          </table>
+                         =20
+                          <!-- RECOMMENDATIONS BEGIN -->
+<!-- Check for any source given by the Recommendation Producer -->
+
+<!-- Verify the precedence of the engagement content to show -->
+
+
+<!-- PIV Movies priority -->
+
+<!-- PIV TV priority -->
+
+<!-- Select the master music list to operate with -->
+
+<!-- Evaluate after final assignments if we need to show engagement content=
+ -->
+<!-- Prime Video only plan doesn't include music -->
+
+
+<!-- Evaluate after final assignments if we need to show engagement content=
+ -->
+    <table cellpadding=3D"0" cellspacing=3D"0" width=3D"500" class=3D"width=
+330">
+      <!-- Engagement Content for PIV -->
+      <!-- Recommended Titles Block End -->
+      <!-- Music shows content -->
+	<!-- Music shows block -->
+      <!-- End Music -->
+
+
+</table>
+
+
+
+                         =20
+                          <!-- EXTRA MESSAGE -->
+                              <table cellpadding=3D"0" cellspacing=3D"0" wi=
+dth=3D"500" class=3D"width330">
+         							<tr>
+         								<td width=3D"493" align=3D"left" valign=3D"top" class=3D"w=
+idth323">
+                                          <div style=3D"font-family:Arial, =
+Helvetica, sans-serif; font-size:12px; line-height:16px; color:#333333;" cl=
+ass=3D"font12 line16">=20
+                                              <center>
+<b>Amazon recomienda agregar la autenticaci=C3=B3n multifactor a tu cuenta =
+para aumentar la seguridad de la cuenta.</b> <a href=3D"https://www.amazon.=
+com/gp/f.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20=
+240509004152bfb49012ae5c4076975804ac9380p0na&amp;R=3D1Q2QOEG5O0DCK&amp;T=3D=
+C&amp;U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fap%2Fprofile%2Fmobilephone%3Fopeni=
+d.assoc_handle%3Dusflex%26openid.mode%3Dcheckid_setup%26openid.ns%3Dhttp%25=
+3A%252F%252Fspecs.openid.net%252Fauth%252F2.0%26openid.return_to%3Dhttps%25=
+3A%252F%252Fwww.amazon.com%252Fsomething%26openid.ns.pape%3Dhttp%253A%252F%=
+252Fspecs.openid.net%252Fextensions%252Fpape%252F1.0%26action%3DeditPhoneCl=
+aim%3Fref%3Dp_we_mfa_link%26ref_%3Dpe_70187950_729958940&amp;H=3DBXFQ3RUTBW=
+JIM8V2SGSENBC1QFWA&amp;ref_=3Dpe_70187950_729958940">Agrega un n=C3=BAmero =
+de celular</a> a tu cuenta.</center>
+     =20
+                                          </div>
+         								</td>
+         							</tr>
+      						</table>
+      					<!-- EXTRA MESSAGE -->
+                         =20
+                          <!-- x.x SPACER -->
+                          <table cellspacing=3D"0" cellpadding=3D"0">
+                             <tr>
+                                <td height=3D"30" style=3D"line-height:30px=
+;" class=3D"height20"><img src=3D"https://images-na.ssl-images-amazon.com/i=
+mages/G/01/e-mail/img14/shards/img/bfd/sp.gif" height=3D"1" width=3D"1" sty=
+le=3D"visibility: hidden !important; overflow:hidden; border:0;"></td>
+                             </tr>
+                          </table>
+                          <table cellspacing=3D"0" cellpadding=3D"0">
+                             <tr>
+                                <td height=3D"3" style=3D"line-height:3px;"=
+ bgcolor=3D"#f5f6f7" width=3D"500" class=3D"width330"><img src=3D"https://i=
+mages-na.ssl-images-amazon.com/images/G/01/e-mail/img14/shards/img/bfd/sp.g=
+if" height=3D"1" width=3D"1" style=3D"visibility: hidden !important; overfl=
+ow:hidden; border:0;"></td>
+                             </tr>
+                          </table>
+                          <table cellspacing=3D"0" cellpadding=3D"0">
+                             <tr>
+                                <td height=3D"19" style=3D"line-height:19px=
+;"><img src=3D"https://images-na.ssl-images-amazon.com/images/G/01/e-mail/i=
+mg14/shards/img/bfd/sp.gif" height=3D"1" width=3D"1" style=3D"visibility: h=
+idden !important; overflow:hidden; border:0;"></td>
+                             </tr>
+                          </table>
+                         =20
+                        =20
+                          =20
+                         =20
+                          <!-- FOOTER -->
+                          <table cellpadding=3D"0" cellspacing=3D"0">
+                             <tr>
+                                <td width=3D"10" class=3D"width6"></td>
+                                <td width=3D"480" align=3D"left" valign=3D"=
+top" class=3D"width318">
+                                   <div style=3D"font-family:Arial, Helveti=
+ca, sans-serif; font-size:10px; line-height:12px; color:#666666; font-weigh=
+t:normal;">
+                                      Your Amazon Prime membership will con=
+tinue until canceled. Si no deseas continuar con tu membres=C3=ADa por $14.=
+99 m=C3=A1s cualquier impuesto aplicable, puedes cancelar en cualquier mome=
+nto. Si cancelas en los 3 d=C3=ADas h=C3=A1biles posteriores a haber cambia=
+do tu membres=C3=ADa a una suscripci=C3=B3n pagada, te reembolsaremos la ta=
+rifa de membres=C3=ADa completa, menos el valor de los beneficios de Prime =
+que hayas utilizado durante este periodo. Si cancelas en cualquier otro mom=
+ento, te reembolsaremos la tarifa de membres=C3=ADa completa si t=C3=BA y t=
+u cuenta no usaron ninguno de los beneficios de Prime desde el =C3=BAltimo =
+cargo por tu membres=C3=ADa Prime.<br>
+Para m=C3=A1s detalles, lee nuestros <a href=3D"https://www.amazon.com/gp/r=
+.html?C=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:2024050900=
+4152bfb49012ae5c4076975804ac9380p0na&amp;R=3D18DTKH2FRMFS&amp;T=3DC&amp;U=
+=3Dhttps%3A%2F%2Fwww.amazon.com%2Fgp%2Fhelp%2Fcustomer%2Fdisplay.html%3Fnod=
+eId%3D13819201%26ref_%3Dpe_70187950_729958940&amp;H=3DQXWHY9VKT1PA9V0VIOY41=
+JL0CBAA&amp;ref_=3Dpe_70187950_729958940" style=3D"font-family: verdana,ari=
+al,sans-serif; font-size: 10px; color: #666666; text-decoration: underline;=
+">T=C3=A9rminos y condiciones de Amazon Prime</a>.<br><br>=C2=A9 2023 Amazo=
+n.com, Inc. o sus filiales. Todos los derechos reservados. Amazon, Amazon.c=
+om, Prime, 1-Clic, el logo de la sonrisa y todos los dem=C3=A1s logos relac=
+ionados son marcas registradas de Amazon.com, Inc. o sus filiales. Amazon.c=
+om, 410 Terry Avenue North, Seattle, WA 98109-5210.<br><br>
+
+
+Este mensaje fue enviado a: jbl3000_lopez@hotmail.com
+
+                                      <br>
+                                   </div>
+                                   <table cellspacing=3D"0" cellpadding=3D"=
+0">
+                                      <tr>
+                                         <td height=3D"1" style=3D"line-hei=
+ght:1px;" class=3D"height27"><img src=3D"https://images-na.ssl-images-amazo=
+n.com/images/G/01/e-mail/img14/shards/img/bfd/sp.gif" height=3D"1" width=3D=
+"1" style=3D"visibility: hidden !important; overflow:hidden; border:0;"></t=
+d>
+                                      </tr>
+                                   </table>
+                                </td>
+                                <td width=3D"10" class=3D"width6"></td>
+                             </tr>
+                          </table>
+                          <table cellspacing=3D"0" cellpadding=3D"0">
+                             <tr>
+                                <td height=3D"20" style=3D"line-height:20px=
+;"><img src=3D"https://images-na.ssl-images-amazon.com/images/G/01/e-mail/i=
+mg14/shards/img/bfd/sp.gif" height=3D"1" width=3D"1" style=3D"visibility: h=
+idden !important; overflow:hidden; border:0;"></td>
+                             </tr>
+                          </table>
+                          <!-- FOOTER -->
+                       </td>
+                       <!-- EMAIL HTML BODY -->
+                      =20
+                       <td width=3D"20" align=3D"center" class=3D"width10">=
+</td>
+                      =20
+                    </tr>
+                 </table>
+              </td>
+           </tr>
+        </table>
+     </center>
+  <img width=3D"1" height=3D"1" src=3D"https://www.amazon.com/gp/r.html?C=
+=3D5QELWTPVINHS&amp;K=3D342VYA7LUK3EJ&amp;M=3Durn:rtn:msg:20240509004152bfb=
+49012ae5c4076975804ac9380p0na&amp;R=3D1NJGQQ5NSOTQI&amp;T=3DE&amp;U=3Dhttps=
+%3A%2F%2Fimages-na.ssl-images-amazon.com%2Fimages%2FG%2F01%2Fnav%2Ftransp.g=
+if&amp;H=3DYMELLLXCALRCTNJQ6YB1JPUAG4OA&amp;ref_=3Dpe_70187950_729958940_op=
+en"></body>
+  </html><!--MsgId:welcome_prime_paid_monthly_email_through_turing--><!--TU=
+RING:true-->=
+
+------=_Part_1064999_1039573903.1715215312661--
+

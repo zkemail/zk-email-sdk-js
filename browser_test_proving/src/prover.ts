@@ -53,7 +53,7 @@ export function setupProver(element: HTMLElement) {
 
 async function getEml() {
   try {
-    const response = await fetch("/amazon.eml"); // URL is relative to the root of the project
+    const response = await fetch("/amazon2.eml"); // URL is relative to the root of the project
     if (!response.ok) {
       throw new Error("Network response was not ok " + response.statusText);
     }

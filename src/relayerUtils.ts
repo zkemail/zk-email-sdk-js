@@ -46,7 +46,9 @@ export async function parseEmail(eml: string): Promise<ParsedEmail> {
     if (publicKey) {
       parsedEmail = await parseEmailUtils(eml, publicKey);
     } else {
+      console.log("parsing email no pub key");
       parsedEmail = await parseEmailUtils(eml);
+      console.log("parsed email");
       emlPubKeyCache.set(eml, parsedEmail.publicKey);
 
       try {
