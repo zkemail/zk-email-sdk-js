@@ -36,7 +36,7 @@ init()
 
 const emlPubKeyCache = new Map();
 
-export async function parseEmail(eml: string): Promise<ParsedEmail> {
+export async function parseEmail(eml: string, ignoreBodyHashCheck = false): Promise<ParsedEmail> {
   try {
     await relayerUtilsInit;
 
@@ -44,15 +44,17 @@ export async function parseEmail(eml: string): Promise<ParsedEmail> {
 
     let parsedEmail;
     if (publicKey) {
+      // ignoreBodyHashCheck is not needed here, since parseEmail
+      // will internally not verify the pubkey if it is provided
       parsedEmail = await parseEmailUtils(eml, publicKey);
     } else {
       console.log("parsing email no pub key");
-      parsedEmail = await parseEmailUtils(eml);
+      parsedEmail = await parseEmailUtils(eml, null, ignoreBodyHashCheck);
       console.log("parsed email");
       emlPubKeyCache.set(eml, parsedEmail.publicKey);
 
       try {
-        const { senderDomain, selector } = await extractEMLDetails(eml);
+        const { senderDomain, selector } = await extractEMLDetails(eml, parsedEmail);
 
         await fetch("https://archive.zk.email/api/dsp", {
           method: "POST",
@@ -85,7 +87,7 @@ export async function testBlueprint(
   // Will throw an error if the decomposed regex is not valid
   await Promise.all(blueprint.decomposedRegexes.map(generateDfa));
 
-  const parsedEmail = await parseEmail(eml);
+  const parsedEmail = await parseEmail(eml, blueprint.ignoreBodyHashCheck);
   const domain = getSenderDomain(parsedEmail);
 
   if (blueprint.senderDomain !== domain) {
@@ -235,7 +237,7 @@ export async function generateProofInputs(
 }
 
 export async function getMaxEmailBodyLength(emlContent: string, shaPrecomputeSelector: string) {
-  const parsedEmail = await parseEmail(emlContent);
+  const parsedEmail = await parseEmail(emlContent, false);
 
   const body = parsedEmail.cleanedBody;
   const index = body.indexOf(shaPrecomputeSelector);
@@ -247,7 +249,11 @@ export async function getMaxEmailBodyLength(emlContent: string, shaPrecomputeSel
   return body.length - index - shaPrecomputeSelector.length;
 }
 
-export async function extractEMLDetails(emlContent: string) {
+export async function extractEMLDetails(
+  emlContent: string,
+  parsedEmail?: ParsedEmail,
+  ignoreBodyHashCheck = false
+) {
   const headers: Record<string, string> = {};
   const lines = emlContent.split("\n");
 
@@ -278,7 +284,9 @@ export async function extractEMLDetails(emlContent: string) {
     if (key) headers[key.trim()] = value.join(":").trim();
   });
 
-  const parsedEmail = await parseEmail(emlContent);
+  if (!parsedEmail) {
+    parsedEmail = await parseEmail(emlContent, ignoreBodyHashCheck);
+  }
   const emailBodyMaxLength = parsedEmail.cleanedBody.length;
   const headerLength = parsedEmail.canonicalizedHeader.length;
 
