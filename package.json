@@ -1,6 +1,6 @@
 {
   "name": "@zk-email/sdk",
-  "version": "0.0.132",
+  "version": "0.0.133",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/zk-email-sdk.es.js",
@@ -63,7 +63,7 @@
   },
   "dependencies": {
     "@peculiar/webcrypto": "^1.5.0",
-    "@zk-email/relayer-utils": "0.4.62",
+    "@zk-email/relayer-utils": "0.4.63",
     "@zk-email/snarkjs": "^0.0.1",
     "ethers": "^6.13.4",
     "poseidon-lite": "^0.3.0",
