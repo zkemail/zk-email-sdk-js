@@ -1,12 +1,13 @@
-import { Blueprint } from "./blueprint";
-import { FetchEmailOptoins, GmailMessagesListResponse, RawEmailResponse } from "./types/gmail";
+import { EmailLoginProvider, EmailProvider } from ".";
+import { Blueprint } from "../blueprint";
+import { FetchEmailOptions, GmailMessagesListResponse, RawEmailResponse } from "../types/gmail";
 
 const clientId = "773062743658-rauj7nb18ikr1lrfs5bl8lt3b31r2nen.apps.googleusercontent.com";
 /**
  * A class for handling Google OAuth login flow.
  * Note: This will only work if you first register your callback URL with the zkemail team.
  */
-export class LoginWithGoogle {
+export class LoginWithGoogle implements EmailLoginProvider {
   accessToken: string | null = null;
 
   private loadGoogleScript(): Promise<void> {
@@ -91,7 +92,7 @@ export class LoginWithGoogle {
   }
 }
 
-export class Gmail {
+export class Gmail implements EmailProvider {
   loginWithGoogle: LoginWithGoogle;
   nextPageToken: string | null = null;
   query: string = "";
@@ -110,7 +111,7 @@ export class Gmail {
 
   async fetchEmails(
     blueprints: Blueprint[],
-    options?: FetchEmailOptoins
+    options?: FetchEmailOptions
   ): Promise<RawEmailResponse[]> {
     this.nextPageToken = null;
     const accessToken = await this.loginWithGoogle.getAccessToken();
@@ -126,7 +127,7 @@ export class Gmail {
     return emails;
   }
 
-  private buildQuery(blueprints: Blueprint[], options?: FetchEmailOptoins): string {
+  private buildQuery(blueprints: Blueprint[], options?: FetchEmailOptions): string {
     if (options?.replaceQuery !== undefined) {
       return options.replaceQuery;
     }

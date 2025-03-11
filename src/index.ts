@@ -29,7 +29,8 @@ export {
 export { getLoginWithGithubUrl } from "./auth";
 // Re-Export zod class to avoid version mismatches if package importing this sdk has zod
 export { ZodError } from "./blueprintValidation";
-export { LoginWithGoogle, Gmail } from "./gmail";
+export { LoginWithGoogle, Gmail } from "./login_for_email/gmail";
+export { Outlook, LoginWithMicrosoft } from "./login_for_email/microsoft";
 
 // Exported sdk, functions that need initialization
 export default (sdkOptions?: SdkOptions) => {
