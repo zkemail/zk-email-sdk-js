@@ -29,6 +29,7 @@ export type ProofProps = {
   startedAt?: Date;
   provedAt?: Date;
   isLocal: boolean;
+  sp1VkeyHash?: string;
 };
 
 export type ProofResponse = {
@@ -42,11 +43,13 @@ export type ProofResponse = {
   started_at: ServerDate;
   proved_at?: ServerDate;
   status: number;
+  sp1_vkey_hash?: string;
 };
 
 export type ProofRequest = {
   blueprint_id: string;
-  input: any;
+  input?: any;
+  eml?: string;
   external_inputs: any;
 };
 

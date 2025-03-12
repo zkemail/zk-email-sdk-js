@@ -1,5 +1,5 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
-import { poseidonLarge } from "./hash";
+import { poseidonLarge, sha256Hash } from "./hash";
 
 import { Auth } from "./types/auth";
 import { getTokenFromAuth } from "./auth";
@@ -237,7 +237,7 @@ export async function verifyPubKey(senderDomain: string, hashedPublicKey: string
 
     const pKeys = extractPValues(record.value);
     for (const pKey of pKeys) {
-      const jwk = await importPEMPublicKey(`${pKey}`);
+      const jwk = await importPEMPublicKey(pKey);
       // Make sure the key has an 'n' property
       if (!jwk.n) continue;
 
@@ -246,6 +246,9 @@ export async function verifyPubKey(senderDomain: string, hashedPublicKey: string
 
       // Compute the Poseidon hash
       const poseidonHash = await poseidonLarge(modulusBigInt, 9, 242);
+
+      const shaHash = await sha256Hash(jwk.n);
+      console.log("shaHash: ", shaHash);
 
       if (poseidonHash.toString() === hashedPublicKey) {
         return true;

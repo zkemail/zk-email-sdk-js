@@ -1,4 +1,4 @@
-import { Blueprint, Status } from "./blueprint";
+import { Blueprint, Status, ZkFramework } from "./blueprint";
 import { verifyProofOnChain } from "./chain";
 import {
   ExternalInputProof,
@@ -8,6 +8,7 @@ import {
   PublicProofData,
 } from "./types/proof";
 import { get } from "./utils";
+import { verifyProof } from "./verify";
 
 /**
  * A generated proof. You get get proof data and verify proofs on chain.
@@ -35,6 +36,21 @@ export class Proof {
 
   getId(): string {
     return this.props.id;
+  }
+
+  getPubKeyHash(): string {
+    let pubKeyHash: string;
+    if (this.blueprint.props.zkFramework === ZkFramework.Circom) {
+      pubKeyHash = this.props.publicOutputs![0];
+    } else if (this.blueprint.props.zkFramework === ZkFramework.Sp1) {
+      // @ts-ignore
+      // pubKeyHash = this.props.publicOutputs.outputs.public_key_hash.join().replaceAll(",", "");
+      // pubKeyHash = this.props.publicOutputs.pub_key_hash;
+      pubKeyHash = this.props.publicOutputs.from_domain_hash;
+    } else {
+      throw new Error(`No pubkey hash for zk framework ${this.blueprint.props.zkFramework}`);
+    }
+    return pubKeyHash;
   }
 
   /**
@@ -213,6 +229,7 @@ export class Proof {
       startedAt: new Date(response.started_at.seconds * 1000),
       provedAt: response.proved_at ? new Date(response.proved_at.seconds * 1000) : undefined,
       isLocal: false,
+      sp1VkeyHash: response.sp1_vkey_hash,
     };
     return props;
   }
@@ -235,5 +252,9 @@ export class Proof {
       publicOutputs: this.props.publicOutputs!,
       externalInputs: this.props.externalInputs!,
     };
+  }
+
+  async verify(): Promise<boolean> {
+    return verifyProof(this);
   }
 }
