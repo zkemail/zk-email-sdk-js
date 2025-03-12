@@ -275,10 +275,6 @@ async function getPKeys(senderDomain: string): Promise<string[]> {
 
   const records = (await response.json()) as DkimRecord[];
 
-  for (const record of records) {
-    if (record.domain !== senderDomain) continue;
-  }
-
   return records
     .filter((record) => record.domain === senderDomain)
     .flatMap((record) => extractPValues(record.value));
