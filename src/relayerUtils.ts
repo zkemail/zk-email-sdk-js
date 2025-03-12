@@ -19,6 +19,7 @@ import {
   extractSubstr,
   generateCircuitInputsWithDecomposedRegexesAndExternalInputs,
   genFromDecomposed,
+  verifySp1Proof as verifySp1ProofUtils,
 } from "@zk-email/relayer-utils";
 
 let relayerUtilsResolver: (value: any) => void;
@@ -222,24 +223,32 @@ export async function generateProofInputs(
       };
     });
 
+    console.log("calling generateCircuitInputsWithDecomposedRegexesAndExternalInputs");
     const inputs = await generateCircuitInputsWithDecomposedRegexesAndExternalInputs(
       eml,
       decomposedRegexesCleaned,
       externalInputs,
       internalParams
     );
+    console.log("generateCircuitInputsWithDecomposedRegexesAndExternalInputs DONE: ", inputs);
 
-    return JSON.stringify(Object.fromEntries(inputs));
+    const json = JSON.stringify(Object.fromEntries(inputs));
+    return json;
   } catch (err) {
     console.error("Failed to generate inputs for proof");
     throw err;
   }
 }
 
-export async function getMaxEmailBodyLength(emlContent: string, shaPrecomputeSelector: string) {
+export async function getMaxEmailBodyLength(emlContent: string, shaPrecomputeSelector?: string) {
   const parsedEmail = await parseEmail(emlContent, false);
 
   const body = parsedEmail.cleanedBody;
+
+  if (!shaPrecomputeSelector) {
+    return body.length;
+  }
+
   const index = body.indexOf(shaPrecomputeSelector);
 
   if (index === -1) {
@@ -428,4 +437,18 @@ export async function generateDfa(
     }
     throw err;
   }
+}
+
+export async function verifySp1Proof(hexProof: string, hexOutputs: string, vkeyHash: string) {
+  await relayerUtilsInit;
+
+  const proof = fromHexString(hexProof);
+  const outputs = fromHexString(hexOutputs);
+
+  const result = verifySp1ProofUtils(proof, outputs, vkeyHash);
+  console.log("result: ", result);
+}
+
+function fromHexString(hexString: string) {
+  return Uint8Array.from(hexString.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)));
 }

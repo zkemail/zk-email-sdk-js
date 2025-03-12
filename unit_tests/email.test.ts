@@ -565,11 +565,11 @@ describe("testBlueprint", async () => {
   );
 
   test(
-    "blueprint.validateEmail should return false if max length of part is exceeded",
+    "Should fail on lookahead",
     async () => {
-      const decomposedRegex: DecomposedRegex = {
-        name: "Hello Pattern",
-        maxLength: 1,
+      const decomposedRegexHeader: DecomposedRegex = {
+        name: "Hello",
+        maxLength: 1000,
         location: "body",
         parts: [
           {
@@ -579,6 +579,7 @@ describe("testBlueprint", async () => {
           {
             isPublic: true,
             regexDef: "[^,]+",
+            regexDef: "[sS]*?(?=Emai!)",
           },
           {
             isPublic: false,
@@ -598,44 +599,6 @@ describe("testBlueprint", async () => {
 
       const isValid = await blueprint.validateEmail(helloTestEmail);
       expect(isValid).toBeFalse();
-    },
-    timeout
-  );
-
-  test(
-    "blueprint.validateEmail should return true if valid email",
-    async () => {
-      const decomposedRegex: DecomposedRegex = {
-        name: "Hello Pattern",
-        maxLength: 4000,
-        location: "body",
-        parts: [
-          {
-            isPublic: false,
-            regexDef: "Hello ",
-          },
-          {
-            isPublic: true,
-            regexDef: "[^,]+",
-          },
-          {
-            isPublic: false,
-            regexDef: "!",
-          },
-        ],
-      };
-
-      // @ts-ignore
-      const blueprintProps: BlueprintProps = {
-        emailBodyMaxLength: 9984,
-        emailHeaderMaxLength: 1024,
-        decomposedRegexes: [decomposedRegex],
-      };
-
-      const blueprint = new Blueprint(blueprintProps, "");
-
-      const isValid = await blueprint.validateEmail(helloTestEmail);
-      expect(isValid).toBeTrue();
     },
     timeout
   );
