@@ -253,10 +253,7 @@ describe("Sp1 test suite", async () => {
 
   test("Should verify a proof", async () => {
     const proof = await sdk.getProof("ef69c485-fbcc-41ff-8509-28ade98bac9b");
-    console.log("proof: ", proof);
-
-    console.log("typeof proof.props.publicData: ", typeof proof.props.publicData);
-
+    console.log("verifying proof: ", proof);
     const verified = await proof.verify();
 
     console.log("proof verified: ", verified);
