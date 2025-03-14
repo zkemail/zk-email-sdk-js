@@ -151,7 +151,6 @@ export class Prover {
       console.log("calling proof endpoint");
 
       response = await post<ProofResponse>(`${this.blueprint.baseUrl}/proof`, requestData);
-      console.log("got a response: ", response);
     } catch (err) {
       console.error("Failed calling POST on /proof/ in generateProofRequest: ", err);
       throw err;
