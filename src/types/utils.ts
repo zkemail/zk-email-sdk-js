@@ -20,3 +20,9 @@ export type DkimRecord = {
   // string with selectors, e.g. "v=DIM1;t=s"
   value: string;
 };
+
+export enum HashingAlgorithm {
+  None,
+  Poseidon,
+  Sha256,
+}

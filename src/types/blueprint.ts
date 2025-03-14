@@ -59,8 +59,11 @@ export type ExternalInput = {
   maxLength: number;
 };
 
+// According to protobufs
 export enum ZkFramework {
-  Circom = "circom",
+  None,
+  Circom,
+  Sp1,
 }
 
 // According to protobufs
@@ -95,7 +98,7 @@ export type BlueprintRequest = {
   sender_domain?: string;
   enable_header_masking?: boolean;
   enable_body_masking?: boolean;
-  zk_framework?: string;
+  zk_framework?: number;
   is_public?: boolean;
   external_inputs?: ExternalInputResponse[];
   decomposed_regexes: DecomposedRegexResponse[];
@@ -122,7 +125,7 @@ export type BlueprintResponse = {
   sender_domain: string;
   enable_header_masking?: boolean;
   enable_body_masking?: boolean;
-  zk_framework: string;
+  zk_framework: number;
   is_public: boolean;
   created_at: ServerDate;
   updated_at: ServerDate;
