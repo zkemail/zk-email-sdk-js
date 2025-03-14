@@ -157,9 +157,7 @@ export class Prover {
       throw err;
     }
 
-    console.log("transforming proof props for sdk");
     const proofProps = Proof.responseToProofProps(response);
-    console.log("proofProps: ", proofProps);
 
     return new Proof(this.blueprint, proofProps);
   }

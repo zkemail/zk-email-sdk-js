@@ -1,8 +1,16 @@
 import { Proof } from "./proof";
-import { Blueprint, ZkFramework } from "./blueprint";
+import { ZkFramework } from "./blueprint";
 import { verifyPubKey } from "./utils";
+// @ts-ignore Ignore missing types
 import * as snarkjs from "@zk-email/snarkjs";
 import { verifySp1Proof } from "./relayerUtils";
+import { HashingAlgorithm } from "./types";
+
+const zkFrameworkHashingAlgo = {
+  [ZkFramework.Circom]: HashingAlgorithm.Poseidon,
+  [ZkFramework.Sp1]: HashingAlgorithm.Sha256,
+  [ZkFramework.None]: HashingAlgorithm.None,
+};
 
 type VerifyProofDataProps = {
   publicOutputs: string;
@@ -20,7 +28,7 @@ export async function verifyProofData({
   const parsedPublicOutputs = JSON.parse(publicOutputs);
   try {
     const pubKeyHash = parsedPublicOutputs[0];
-    const validPubKey = await verifyPubKey(senderDomain, pubKeyHash);
+    const validPubKey = await verifyPubKey(senderDomain, pubKeyHash, HashingAlgorithm.Poseidon);
 
     if (!validPubKey) {
       console.warn(
@@ -53,8 +61,12 @@ export async function verifyProof(proof: Proof) {
 
   try {
     const pubKeyHash = proof.getPubKeyHash();
-    console.log("pubKeyHash: ", pubKeyHash);
-    const validPubKey = await verifyPubKey(proof.blueprint.props.senderDomain!, pubKeyHash);
+
+    const validPubKey = await verifyPubKey(
+      proof.blueprint.props.senderDomain!,
+      pubKeyHash,
+      zkFrameworkHashingAlgo[proof.blueprint.props.zkFramework!]
+    );
     if (!validPubKey) {
       console.warn(
         "Public key of proof is invalid. The domains of blueprint and proof don't match"
@@ -76,8 +88,6 @@ export async function verifyProof(proof: Proof) {
       );
       return verified;
     } else if (proof.blueprint.props.zkFramework === ZkFramework.Sp1) {
-      console.log("verifying sp1 proof: ", proof.props);
-      console.log("type of proofData: ", typeof proof.props.proofData);
       // @ts-ignore
       const verified = await verifySp1Proof(
         // @ts-ignore

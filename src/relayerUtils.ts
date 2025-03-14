@@ -439,14 +439,18 @@ export async function generateDfa(
   }
 }
 
-export async function verifySp1Proof(hexProof: string, hexOutputs: string, vkeyHash: string) {
+export async function verifySp1Proof(
+  hexProof: string,
+  hexOutputs: string,
+  vkeyHash: string
+): Promise<boolean> {
   await relayerUtilsInit;
 
   const proof = fromHexString(hexProof);
   const outputs = fromHexString(hexOutputs);
 
   const result = verifySp1ProofUtils(proof, outputs, vkeyHash);
-  console.log("result: ", result);
+  return result;
 }
 
 function fromHexString(hexString: string) {
