@@ -1,9 +1,11 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
 import { poseidonLarge, sha256Hash } from "./hash";
+// @ts-ignore no types available
+import RSAKey from "rsa-key";
 
 import { Auth } from "./types/auth";
 import { getTokenFromAuth } from "./auth";
-import { DkimRecord } from "./types";
+import { DkimRecord, HashingAlgorithm } from "./types";
 import { Crypto } from "@peculiar/webcrypto";
 
 const crypto = new Crypto();
@@ -219,7 +221,48 @@ export function getDKIMSelector(emlContent: string): string | null {
  * @param hashedPublicKey - The hashed public key, a BigIng as string
  * @returns Returns true if the verification was successfull, false if it failed.
  */
-export async function verifyPubKey(senderDomain: string, hashedPublicKey: string) {
+export async function verifyPubKey(
+  senderDomain: string,
+  hashedPublicKey: string,
+  algo: HashingAlgorithm
+): Promise<boolean> {
+  const pKeys = await getPKeys(senderDomain);
+
+  if (algo === HashingAlgorithm.Sha256) {
+    for (const pKey of pKeys) {
+      const key = new RSAKey(pKey);
+      let pkcs1Key = key.exportKey("pkcs1", "der");
+      const pkcs1Buffer = Buffer.from(pkcs1Key);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", pkcs1Buffer);
+      const hash = new Uint8Array(hashBuffer);
+      if (hash.toString() === hashedPublicKey) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  if (algo === HashingAlgorithm.Poseidon) {
+    for (const pKey of pKeys) {
+      const jwt = await importPEMPublicKey(pKey);
+
+      // Make sure the key has an 'n' property
+      if (!jwt.n) continue;
+
+      const modulusBigInt = base64UrlToBigInt(jwt.n);
+      const poseidonHash = await poseidonLarge(modulusBigInt, 9, 242);
+
+      if (poseidonHash.toString() === hashedPublicKey) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  throw new Error("Unknown Hashing Algorithm");
+}
+
+async function getPKeys(senderDomain: string): Promise<string[]> {
   let response: Response;
   try {
     response = await fetch(`https://archive.zk.email/api/key?domain=${senderDomain}`, {
@@ -227,34 +270,18 @@ export async function verifyPubKey(senderDomain: string, hashedPublicKey: string
     });
   } catch (err) {
     console.error("Failed to get pubkey records from archive", err);
-    return false;
+    return [];
   }
 
   const records = (await response.json()) as DkimRecord[];
 
   for (const record of records) {
     if (record.domain !== senderDomain) continue;
-
-    const pKeys = extractPValues(record.value);
-    for (const pKey of pKeys) {
-      const jwk = await importPEMPublicKey(pKey);
-      // Make sure the key has an 'n' property
-      if (!jwk.n) continue;
-
-      // Convert the base64url string 'n' to a BigInt
-      const modulusBigInt = base64UrlToBigInt(jwk.n);
-
-      // Compute the Poseidon hash
-      const poseidonHash = await poseidonLarge(modulusBigInt, 9, 242);
-
-      const shaHash = await sha256Hash(jwk.n);
-      console.log("shaHash: ", shaHash);
-
-      if (poseidonHash.toString() === hashedPublicKey) {
-        return true;
-      }
-    }
   }
+
+  return records
+    .filter((record) => record.domain === senderDomain)
+    .flatMap((record) => extractPValues(record.value));
 }
 
 function extractPValues(input: string): string[] {

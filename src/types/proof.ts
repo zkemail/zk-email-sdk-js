@@ -17,13 +17,22 @@ export type ExternalInputProof = {
   [key: string]: string;
 };
 
+export type PublicOutputsSp1Response = {
+  outputs: {
+    external_inputs: ExternalInputProof;
+    public_key_hash: number[];
+    from_domain_hash: number[];
+  };
+  outputs_hex: string;
+};
+
 export type ProofProps = {
   id: string;
   blueprintId: string;
   input: string;
   proofData?: string;
   publicData?: PublicProofData;
-  publicOutputs?: string[];
+  publicOutputs?: string[] | PublicOutputsSp1Response;
   externalInputs?: ExternalInputProof;
   status?: ProofStatus;
   startedAt?: Date;
@@ -39,7 +48,7 @@ export type ProofResponse = {
   proof?: string;
   public?: PublicProofData;
   external_inputs?: ExternalInputProof;
-  public_outputs?: string[];
+  public_outputs?: string[] | PublicOutputsSp1Response;
   started_at: ServerDate;
   proved_at?: ServerDate;
   status: number;
