@@ -230,7 +230,6 @@ export async function generateProofInputs(
       externalInputs,
       internalParams
     );
-    console.log("generateCircuitInputsWithDecomposedRegexesAndExternalInputs DONE: ", inputs);
 
     const json = JSON.stringify(Object.fromEntries(inputs));
     return json;
