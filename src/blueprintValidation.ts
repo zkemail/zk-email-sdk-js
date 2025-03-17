@@ -1,11 +1,14 @@
 import { z } from "zod";
 
 export const blueprintFormSchema = z.object({
-  title: z.string().min(1, {
-    message: "Title must be at least 1 characters.",
-  }).regex(/^[a-zA-Z0-9_]+$/, {
-    message: "Title can only contain letters, digits, or underscores",
-  }),
+  title: z
+    .string()
+    .min(1, {
+      message: "Title must be at least 1 characters.",
+    })
+    .regex(/^[a-zA-Z0-9_]+$/, {
+      message: "Title can only contain letters, digits, or underscores",
+    }),
   // slug: z.string().regex(/[\w\-\_\@]+\/[\w\-\_\@)]+/, {
   //   message: "Needs to match this pattern 'xxxx/yyyy'",
   // }),
@@ -37,9 +40,6 @@ export const blueprintFormSchema = z.object({
   emailBodyMaxLength: z.coerce.number().transform((n, ctx) => {
     if (n % 64 !== 0) {
       ctx.addIssue({ code: "custom", message: "Must be a multiple of 64" });
-    }
-    if (n > 9984) {
-      ctx.addIssue({ code: "custom", message: "Must be less than or equal to 9984" });
     }
     return n;
   }),
