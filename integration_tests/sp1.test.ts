@@ -11,15 +11,21 @@ import { readFile } from "fs/promises";
 
 // local use only
 const authToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDM2NTQ3NjQsImdpdGh1Yl91c2VybmFtZSI6IkRpbWlEdW1vIn0.q6OasDeWgW9NO06vk6GSkbxDJHsUCDR893plRWZ0rdU";
-
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDQ3ODQ3NjksImdpdGh1Yl91c2VybmFtZSI6IkRpbWlEdW1vIn0.aU4I_nAnkIi9_9YU6z-mAakv2PaM-VX1Aa8G1DRUTXU";
 describe("Sp1 test suite", async () => {
+  // const sdk = zkeSdk({
+  //   auth: {
+  //     getToken: async () => authToken,
+  //     onTokenExpired: async () => {},
+  //   },
+  //   baseUrl: "http://127.0.0.1:8080",
+  // });
+
   const sdk = zkeSdk({
     auth: {
       getToken: async () => authToken,
       onTokenExpired: async () => {},
     },
-    baseUrl: "http://127.0.0.1:8080",
   });
 
   const hipster = await readFile("emls/hipster.eml", "utf-8");

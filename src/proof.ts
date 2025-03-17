@@ -224,7 +224,7 @@ export class Proof {
 
     if (this.blueprint.props.zkFramework === ZkFramework.Sp1) {
       const publicOutputs = this.props.publicOutputs as PublicOutputsSp1Response;
-      return publicOutputs.outputs.from_domain_hash.toString();
+      return publicOutputs.outputs.from_domain_hash.toString().replaceAll(",", "");
     }
 
     throw new Error(`ZkFramework ${this.blueprint.props.zkFramework} not supported yet`);
