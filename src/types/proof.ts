@@ -17,18 +17,28 @@ export type ExternalInputProof = {
   [key: string]: string;
 };
 
+export type PublicOutputsSp1Response = {
+  outputs: {
+    external_inputs: ExternalInputProof;
+    public_key_hash: number[];
+    from_domain_hash: number[];
+  };
+  outputs_hex: string;
+};
+
 export type ProofProps = {
   id: string;
   blueprintId: string;
   input: string;
   proofData?: string;
   publicData?: PublicProofData;
-  publicOutputs?: string[];
+  publicOutputs?: string[] | PublicOutputsSp1Response;
   externalInputs?: ExternalInputProof;
   status?: ProofStatus;
   startedAt?: Date;
   provedAt?: Date;
   isLocal: boolean;
+  sp1VkeyHash?: string;
 };
 
 export type ProofResponse = {
@@ -38,15 +48,17 @@ export type ProofResponse = {
   proof?: string;
   public?: PublicProofData;
   external_inputs?: ExternalInputProof;
-  public_outputs?: string[];
+  public_outputs?: string[] | PublicOutputsSp1Response;
   started_at: ServerDate;
   proved_at?: ServerDate;
   status: number;
+  sp1_vkey_hash?: string;
 };
 
 export type ProofRequest = {
   blueprint_id: string;
-  input: any;
+  input?: any;
+  eml?: string;
   external_inputs: any;
 };
 

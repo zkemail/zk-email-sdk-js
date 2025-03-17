@@ -15,8 +15,9 @@ import { Auth } from "./types/auth";
 import { Proof } from "./proof";
 import { blueprintFormSchema } from "./blueprintValidation";
 import { ProverOptions } from "./types";
-import { testBlueprint } from "./relayerUtils";
+import { getMaxEmailBodyLength, testBlueprint } from "./relayerUtils";
 import * as snarkjs from "@zk-email/snarkjs";
+import { verifyProof, verifyProofData } from "./verify";
 
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
@@ -239,6 +240,27 @@ export class Blueprint {
   }
 
   /**
+   * Chooses the preferred Zk Framework according to the provided example email
+   * sets props.zkFramework
+   * @param eml - The eml for this blueprint
+   */
+  async assignPreferredZkFramework(eml: string) {
+    if (this.props.ignoreBodyHashCheck) {
+      this.props.zkFramework = ZkFramework.Circom;
+      return;
+    }
+
+    const bodyLength = await getMaxEmailBodyLength(eml, this.props.shaPrecomputeSelector);
+    console.log("bodyLength: ", bodyLength);
+
+    if (bodyLength > 10_000) {
+      this.props.zkFramework = ZkFramework.Sp1;
+    } else {
+      this.props.zkFramework = ZkFramework.Circom;
+    }
+  }
+
+  /**
    * Submits a new version of the RegexBlueprint to the registry as draft.
    * This does not compile the circuits yet and you will still be able to make changes.
    * @param newProps - The updated blueprint props.
@@ -272,6 +294,12 @@ export class Blueprint {
   async submitNewVersion(newProps: BlueprintProps) {
     if (!this.auth) {
       throw new Error("auth is required, add it with Blueprint.addAuth(auth)");
+    }
+
+    if (!this.props.zkFramework) {
+      throw new Error(
+        "Please select zkFramework. Use blueprint.assignPreferredZkFramework to choose the optimal framework"
+      );
     }
 
     await this.submitNewVersionDraft(newProps);
@@ -350,6 +378,12 @@ export class Blueprint {
         console.error("Failed to create blueprint: ", err);
         throw err;
       }
+    }
+
+    if (!this.props.zkFramework) {
+      throw new Error(
+        "Please select zkFramework. Use blueprint.assignPreferredZkFramework to choose the optimal framework"
+      );
     }
 
     const status = await this._checkStatus();
@@ -506,26 +540,14 @@ export class Blueprint {
   }
 
   /**
-   * Verifies a proof. This can be used, e.g. to verify a proof server side that was generated locally.
+   * Verifies a locally generated proof. This can be used, e.g. to verify a proof server side that was generated locally.
    * @param publicOutputs - The public outputs of the proof as string
    * @param proofData - The proof data to verify as string.
    * @returns Returns true if the verification was successfull, false if it failed.
    */
   async verifyProofData(publicOutputs: string, proofData: string): Promise<boolean> {
-    const parsedPublicOutputs = JSON.parse(publicOutputs);
-    try {
-      const pubKeyHash = parsedPublicOutputs[0];
-      const validPubKey = await verifyPubKey(this.props.senderDomain!, pubKeyHash);
-
-      if (!validPubKey) {
-        console.warn(
-          "Public key of proof is invalid. The domains of blueprint and proof don't match"
-        );
-        return false;
-      }
-    } catch (err) {
-      console.warn("Failed to verify proofs public key");
-      return false;
+    if (this.props.zkFramework !== ZkFramework.Circom) {
+      throw new Error("Can only verify a Circom proof from data. Use verifyProof instead.");
     }
 
     let vkey: string;
@@ -536,17 +558,12 @@ export class Blueprint {
       return false;
     }
 
-    try {
-      const verified = await snarkjs.groth16.verify(
-        JSON.parse(vkey),
-        parsedPublicOutputs,
-        JSON.parse(proofData)
-      );
-      return verified;
-    } catch (err) {
-      console.log("Failed to verify proof: ", err);
-    }
-    return false;
+    return verifyProofData({
+      publicOutputs,
+      proofData,
+      senderDomain: this.props.senderDomain!,
+      vkey,
+    });
   }
 
   /**
@@ -555,46 +572,7 @@ export class Blueprint {
    * @returns Returns true if the verification was successfull, false if it failed.
    */
   async verifyProof(proof: Proof): Promise<boolean> {
-    if (proof.props.blueprintId !== this.props.id) {
-      throw Error(
-        `The proof was generated using a different blueprint: ${proof.props.blueprintId}`
-      );
-    }
-
-    try {
-      const pubKeyHash = proof.props.publicOutputs![0];
-
-      const validPubKey = await verifyPubKey(this.props.senderDomain!, pubKeyHash);
-      if (!validPubKey) {
-        console.warn(
-          "Public key of proof is invalid. The domains of blueprint and proof don't match"
-        );
-        return false;
-      }
-    } catch (err) {
-      console.warn("Failed to verify proofs public key");
-      return false;
-    }
-
-    let vkey: string;
-    try {
-      vkey = await this.getVkey();
-    } catch (err) {
-      console.warn("Failed to get vkey: ", err);
-      return false;
-    }
-
-    try {
-      const verified = await snarkjs.groth16.verify(
-        JSON.parse(vkey),
-        proof.props.publicOutputs,
-        proof.props.proofData
-      );
-      return verified;
-    } catch (err) {
-      console.warn("Failed to verify proof: ", err);
-    }
-    return false;
+    return verifyProof(proof);
   }
 
   /**
@@ -651,7 +629,7 @@ export class Blueprint {
         this.auth
       );
     } catch (err) {
-      console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
+      console.error("Failed calling PATCH on /blueprint/:id in update: ", err);
       throw err;
     }
 
@@ -814,10 +792,15 @@ export class Blueprint {
   }
 
   async getVkey(): Promise<string> {
-    const downloadUrl = await this.getVkeyFileDownloadLink();
-    const response = await fetch(downloadUrl);
-    const vkey = await response.text();
-    return vkey;
+    try {
+      const downloadUrl = await this.getVkeyFileDownloadLink();
+      const response = await fetch(downloadUrl);
+      const vkey = await response.text();
+      return vkey;
+    } catch (err) {
+      console.error("error in getVkey");
+      throw err;
+    }
   }
 
   async getNumOfRemoteProofs(): Promise<number> {
