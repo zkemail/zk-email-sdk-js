@@ -242,15 +242,15 @@ export class Blueprint {
   /**
    * Chooses the preferred Zk Framework according to the provided example email
    * sets props.zkFramework
-   * @param exampleEml - The exampleEml for this blueprint
+   * @param eml - The eml for this blueprint
    */
-  async assignPreferredZkFramework(exampleEml: string) {
+  async assignPreferredZkFramework(eml: string) {
     if (this.props.ignoreBodyHashCheck) {
       this.props.zkFramework = ZkFramework.Circom;
       return;
     }
 
-    const bodyLength = await getMaxEmailBodyLength(exampleEml, this.props.shaPrecomputeSelector);
+    const bodyLength = await getMaxEmailBodyLength(eml, this.props.shaPrecomputeSelector);
     console.log("bodyLength: ", bodyLength);
 
     if (bodyLength > 10_000) {
