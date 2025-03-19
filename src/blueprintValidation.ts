@@ -6,8 +6,8 @@ export const blueprintFormSchema = z.object({
     .min(1, {
       message: "Title must be at least 1 characters.",
     })
-    .regex(/^[a-zA-Z0-9_]+$/, {
-      message: "Title can only contain letters, digits, or underscores",
+    .regex(/^[a-zA-Z0-9_ ]+$/, {
+      message: "Title can only contain letters, digits, underscores, or spaces",
     }),
   // slug: z.string().regex(/[\w\-\_\@]+\/[\w\-\_\@)]+/, {
   //   message: "Needs to match this pattern 'xxxx/yyyy'",
