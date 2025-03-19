@@ -1,6 +1,6 @@
 {
   "name": "@zk-email/sdk",
-  "version": "0.0.134",
+  "version": "0.0.135",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/zk-email-sdk.es.js",
@@ -67,6 +67,7 @@
     "@zk-email/snarkjs": "^0.0.1",
     "ethers": "^6.13.4",
     "poseidon-lite": "^0.3.0",
+    "rsa-key": "^0.0.6",
     "viem": "^2.21.53",
     "zod": "^3.23.8"
   }
