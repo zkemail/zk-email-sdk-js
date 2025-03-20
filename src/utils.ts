@@ -39,6 +39,9 @@ export async function post<T>(url: string, data?: object | null, auth?: Auth): P
     const body = await response.json();
 
     if (!response.ok) {
+      if (response.status === 401) {
+        auth!.onTokenExpired();
+      }
       throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
     }
 
@@ -79,6 +82,9 @@ export async function patch<T>(url: string, data?: object | null, auth?: Auth): 
     const body = await response.json();
 
     if (!response.ok) {
+      if (response.status === 401) {
+        auth!.onTokenExpired();
+      }
       throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
     }
 
@@ -123,6 +129,9 @@ export async function get<T>(url: string, queryParams?: object | null, auth?: Au
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        auth!.onTokenExpired();
+      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
@@ -162,6 +171,9 @@ export async function del<T>(url: string, data?: object | null, auth?: Auth): Pr
     const body = await response.json();
 
     if (!response.ok) {
+      if (response.status === 401) {
+        auth!.onTokenExpired();
+      }
       throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
     }
 
