@@ -97,8 +97,12 @@ export class Gmail implements EmailProvider {
   nextPageToken: string | null = null;
   query: string = "";
 
-  constructor() {
-    this.loginWithGoogle = new LoginWithGoogle();
+  constructor(loginWithGoogle?: LoginWithGoogle) {
+    if (loginWithGoogle) {
+      this.loginWithGoogle = loginWithGoogle;
+    } else {
+      this.loginWithGoogle = new LoginWithGoogle();
+    }
   }
 
   async authorize(options: any) {

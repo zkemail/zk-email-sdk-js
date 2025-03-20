@@ -819,7 +819,7 @@ export class Blueprint {
 
   /**
    * Validates if a given email matches the blueprint.
-   * @returns true if the given email is is valid for the blueprint and a proof can be generated.
+   * throw an error if false otherwise returns undefined
    */
   async validateEmail(eml: string): Promise<void> {
     try {
