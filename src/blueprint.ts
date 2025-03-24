@@ -137,7 +137,7 @@ export class Blueprint {
       senderDomain: response.sender_domain,
       enableHeaderMasking: response.enable_header_masking,
       enableBodyMasking: response.enable_body_masking,
-      zkFramework: response.zk_framework as ZkFramework,
+      zkFramework: (response.zk_framework as ZkFramework) || ZkFramework.Circom,
       isPublic: response.is_public,
       createdAt: new Date(response.created_at.seconds * 1000),
       updatedAt: new Date(response.updated_at.seconds * 1000),
