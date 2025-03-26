@@ -187,7 +187,8 @@ export class Blueprint {
       sender_domain: props.senderDomain,
       enable_header_masking: props.enableHeaderMasking,
       enable_body_masking: props.enableBodyMasking,
-      zk_framework: props.zkFramework,
+      // TODO: Change back for sp1
+      // zk_framework: props.zkFramework,
       is_public: props.isPublic,
       external_inputs: props.externalInputs?.map((input) => ({
         name: input.name,

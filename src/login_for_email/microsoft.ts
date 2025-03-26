@@ -6,7 +6,7 @@ import { EmailLoginProvider, EmailProvider } from ".";
 // MSAL configuration
 const msalConfig = {
   auth: {
-    clientId: "6bedcd66-9008-4ea1-88fc-979f21c28bb5",
+    clientId: "75da8323-ee0b-4fb1-a78d-b49401f04230",
     authority: "https://login.microsoftonline.com/common",
     redirectUri: "http://localhost:3000",
     navigateToLoginRequestUrl: true,

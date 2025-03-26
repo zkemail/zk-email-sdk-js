@@ -22,6 +22,7 @@ describe("Sp1 test suite", async () => {
   // });
 
   const sdk = zkeSdk({
+    baseUrl: "http://127.0.0.1:8080",
     auth: {
       getToken: async () => authToken,
       onTokenExpired: async () => {},
@@ -29,7 +30,9 @@ describe("Sp1 test suite", async () => {
   });
 
   const hipster = await readFile("emls/hipster.eml", "utf-8");
+  const hipster2 = await readFile("emls/hipster2.eml", "utf-8");
   const residency = await readFile("emls/residency.eml", "utf-8");
+  const uber = await readFile("emls/uber.eml", "utf-8");
 
   test("Should start a sp1 proof", async () => {
     const props: BlueprintProps = {
@@ -266,4 +269,13 @@ describe("Sp1 test suite", async () => {
 
     expect(verified).toBe(true);
   }, 30_000);
+
+  test("Test prod example blueprint", async () => {
+    const blueprint = await sdk.getBlueprintById("4bb958e0-935c-4b9f-a4a9-f8cbe2555d12");
+    const prover = blueprint.createProver();
+    const proof = await prover.generateProof(uber);
+    expect(proof).toBeDefined();
+    const verified = await proof.verify();
+    expect(verified).toBeTrue();
+  }, 300_000);
 });
