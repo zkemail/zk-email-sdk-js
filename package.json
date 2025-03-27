@@ -63,7 +63,7 @@
   },
   "dependencies": {
     "@peculiar/webcrypto": "^1.5.0",
-    "@zk-email/relayer-utils": "0.4.62",
+    "@zk-email/relayer-utils": "0.4.65",
     "@zk-email/snarkjs": "^0.0.1",
     "ethers": "^6.13.4",
     "poseidon-lite": "^0.3.0",
