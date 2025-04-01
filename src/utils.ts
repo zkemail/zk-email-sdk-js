@@ -18,34 +18,29 @@ export async function post<T>(url: string, data?: object | null, auth?: Auth): P
     }
   }
 
-  try {
-    const request: RequestInit = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": PUBLIC_SDK_KEY,
-        ...(!authToken ? {} : { Authorization: authToken }),
-      },
-    };
+  const request: RequestInit = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": PUBLIC_SDK_KEY,
+      ...(!authToken ? {} : { Authorization: authToken }),
+    },
+  };
 
-    if (data) {
-      request.body = JSON.stringify(data);
-    }
-
-    const response = await fetch(url, request);
-
-    const body = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
-    }
-
-    return body;
-  } catch (error) {
-    // TODO: Handle token expired
-    console.error("POST Error:", error);
-    throw error;
+  if (data) {
+    request.body = JSON.stringify(data);
   }
+
+  const response = await fetch(url, request);
+
+  if (!response.ok) {
+    console.warn(`HTTP error! status: HTTP error! status: ${response.status}`);
+    throw new Error(response.statusText);
+  }
+
+  const body = await response.json();
+
+  return body;
 }
 
 export async function patch<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
@@ -58,33 +53,29 @@ export async function patch<T>(url: string, data?: object | null, auth?: Auth): 
     }
   }
 
-  try {
-    const request: RequestInit = {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": PUBLIC_SDK_KEY,
-        ...(!authToken ? {} : { Authorization: authToken }),
-      },
-    };
+  const request: RequestInit = {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": PUBLIC_SDK_KEY,
+      ...(!authToken ? {} : { Authorization: authToken }),
+    },
+  };
 
-    if (data) {
-      request.body = JSON.stringify(data);
-    }
-
-    const response = await fetch(url, request);
-
-    const body = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
-    }
-
-    return body;
-  } catch (error) {
-    console.error("PATCH Error:", error);
-    throw error;
+  if (data) {
+    request.body = JSON.stringify(data);
   }
+
+  const response = await fetch(url, request);
+
+  if (!response.ok) {
+    console.warn(`HTTP error! status: HTTP error! status: ${response.status}`);
+    throw new Error(response.statusText);
+  }
+
+  const body = await response.json();
+
+  return body;
 }
 
 export async function get<T>(url: string, queryParams?: object | null, auth?: Auth): Promise<T> {
@@ -97,38 +88,34 @@ export async function get<T>(url: string, queryParams?: object | null, auth?: Au
     }
   }
 
-  try {
-    let fullUrl = url;
-    if (queryParams) {
-      const searchParams = new URLSearchParams();
-      Object.entries(queryParams).forEach(([key, value]) => {
-        if (value) {
-          searchParams.append(key, String(value));
-        }
-      });
-      if (searchParams.size > 0) {
-        fullUrl += `?${searchParams.toString()}`;
+  let fullUrl = url;
+  if (queryParams) {
+    const searchParams = new URLSearchParams();
+    Object.entries(queryParams).forEach(([key, value]) => {
+      if (value) {
+        searchParams.append(key, String(value));
       }
-    }
-
-    const response = await fetch(fullUrl, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": PUBLIC_SDK_KEY,
-        ...(!authToken ? {} : { Authorization: authToken }),
-      },
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (searchParams.size > 0) {
+      fullUrl += `?${searchParams.toString()}`;
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error("GET Error:", error);
-    throw error;
   }
+
+  const response = await fetch(fullUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": PUBLIC_SDK_KEY,
+      ...(!authToken ? {} : { Authorization: authToken }),
+    },
+  });
+
+  if (!response.ok) {
+    console.warn(`HTTP error! status: HTTP error! status: ${response.status}`);
+    throw new Error(response.statusText);
+  }
+
+  return await response.json();
 }
 
 export async function del<T>(url: string, data?: object | null, auth?: Auth): Promise<T> {
@@ -141,34 +128,29 @@ export async function del<T>(url: string, data?: object | null, auth?: Auth): Pr
     }
   }
 
-  try {
-    const request: RequestInit = {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": PUBLIC_SDK_KEY,
-        ...(!authToken ? {} : { Authorization: authToken }),
-      },
-    };
+  const request: RequestInit = {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": PUBLIC_SDK_KEY,
+      ...(!authToken ? {} : { Authorization: authToken }),
+    },
+  };
 
-    if (data) {
-      request.body = JSON.stringify(data);
-    }
-
-    const response = await fetch(url, request);
-
-    const body = await response.json();
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
-    }
-
-    return body;
-  } catch (error) {
-    // TODO: Handle token expired
-    console.error("DELETE Error:", error);
-    throw error;
+  if (data) {
+    request.body = JSON.stringify(data);
   }
+
+  const response = await fetch(url, request);
+
+  if (!response.ok) {
+    console.warn(`HTTP error! status: HTTP error! status: ${response.status}`);
+    throw new Error(response.statusText);
+  }
+
+  const body = await response.json();
+
+  return body;
 }
 
 export function startJsonFileDownload(json: string, name = "data") {
