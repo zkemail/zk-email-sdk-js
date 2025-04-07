@@ -10,8 +10,7 @@ import zkeSdk, {
 import { readFile } from "fs/promises";
 
 // local use only
-const authToken =
-  "";
+const authToken = "";
 describe("Sp1 test suite", async () => {
   // const sdk = zkeSdk({
   //   auth: {
@@ -26,6 +25,7 @@ describe("Sp1 test suite", async () => {
       getToken: async () => authToken,
       onTokenExpired: async () => {},
     },
+    baseUrl: "https://staging-conductor.zk.email",
   });
 
   const hipster = await readFile("emls/hipster.eml", "utf-8");
@@ -171,8 +171,6 @@ describe("Sp1 test suite", async () => {
     console.log("generating proof");
     const proof = await prover.generateProof(hipster);
 
-    console.log("proof done: ", proof);
-
     expect(proof).toBeDefined();
     expect(proof.props.status).toBe(ProofStatus.Done);
 
@@ -246,8 +244,6 @@ describe("Sp1 test suite", async () => {
     console.log("generating proof");
     const proof = await prover.generateProof(residency);
 
-    console.log("proof done: ", proof);
-
     expect(proof).toBeDefined();
     expect(proof.props.status).toBe(ProofStatus.Done);
 
@@ -258,8 +254,7 @@ describe("Sp1 test suite", async () => {
   }, 600_000);
 
   test("Should verify a proof", async () => {
-    const proof = await sdk.getProof("ef69c485-fbcc-41ff-8509-28ade98bac9b");
-    console.log("verifying proof: ", proof);
+    const proof = await sdk.getProof("a840d0ed-e7da-4c02-8066-1b8cf1577e9e");
     const verified = await proof.verify();
 
     console.log("proof verified: ", verified);
