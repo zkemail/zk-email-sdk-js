@@ -25,7 +25,7 @@ describe("Sp1 test suite", async () => {
       getToken: async () => authToken,
       onTokenExpired: async () => {},
     },
-    baseUrl: "https://staging-conductor.zk.email",
+    baseUrl: "staging-conductor.zk.email",
   });
 
   const hipster = await readFile("emls/hipster.eml", "utf-8");
