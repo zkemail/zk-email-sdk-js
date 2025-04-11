@@ -10,7 +10,8 @@ import zkeSdk, {
 import { readFile } from "fs/promises";
 
 // local use only
-const authToken = "";
+const authToken =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDY4NzU2NzgsImdpdGh1Yl91c2VybmFtZSI6IkRpbWlEdW1vIn0.5291aJQ5vENagdMzo6OtAsaEvAlN_K0L67Di1QbsZ8M";
 describe("Sp1 test suite", async () => {
   // const sdk = zkeSdk({
   //   auth: {
@@ -25,7 +26,7 @@ describe("Sp1 test suite", async () => {
       getToken: async () => authToken,
       onTokenExpired: async () => {},
     },
-    baseUrl: "staging-conductor.zk.email",
+    baseUrl: "https://staging-conductor.zk.email",
   });
 
   const hipster = await readFile("emls/hipster.eml", "utf-8");
