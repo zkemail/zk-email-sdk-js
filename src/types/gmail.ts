@@ -24,7 +24,7 @@ export type RawEmailResponse = {
  *   replaceQuery: 'from:alice@example.com'
  * }
  */
-export type FetchEmailOptoins = {
+export type FetchEmailOptions = {
   /** Search terms added as OR to the existing blueprint query */
   OR?: string;
   /** Search terms added as AND to the existing blueprint query */

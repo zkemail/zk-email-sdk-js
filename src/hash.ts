@@ -19,3 +19,27 @@ function bigIntToChunkedBytes(num: BigInt | bigint, bytesPerChunk: number, numCh
   }
   return res;
 }
+
+export async function sha256Hash(message: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(message);
+
+  // Use Web Crypto API for browsers
+  if (typeof window !== "undefined" && window.crypto?.subtle) {
+    const hashBuffer = await window.crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  // Use Node.js Web Crypto API
+  if (typeof process !== "undefined" && process.versions?.node) {
+    const { subtle } = require("crypto").webcrypto;
+    const hashBuffer = await subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  throw new Error("SHA-256 hashing is not supported in this environment.");
+}

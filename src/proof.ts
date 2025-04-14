@@ -1,13 +1,15 @@
-import { Blueprint, Status } from "./blueprint";
+import { Blueprint, Status, ZkFramework } from "./blueprint";
 import { verifyProofOnChain } from "./chain";
 import {
   ExternalInputProof,
   ProofProps,
   ProofResponse,
   ProofStatus,
+  PublicOutputsSp1Response,
   PublicProofData,
 } from "./types/proof";
 import { get } from "./utils";
+import { verifyProof } from "./verify";
 
 /**
  * A generated proof. You get get proof data and verify proofs on chain.
@@ -35,6 +37,20 @@ export class Proof {
 
   getId(): string {
     return this.props.id;
+  }
+
+  getPubKeyHash(): string {
+    let pubKeyHash: string;
+    if (this.blueprint.props.zkFramework === ZkFramework.Circom) {
+      pubKeyHash = (this.props.publicOutputs as string[])[0];
+    } else if (this.blueprint.props.zkFramework === ZkFramework.Sp1) {
+      pubKeyHash = new Uint8Array(
+        (this.props.publicOutputs as PublicOutputsSp1Response).outputs.public_key_hash
+      ).toString();
+    } else {
+      throw new Error(`No pubkey hash for zk framework ${this.blueprint.props.zkFramework}`);
+    }
+    return pubKeyHash;
   }
 
   /**
@@ -150,6 +166,10 @@ export class Proof {
       throw new Error("No proof data generated yet");
     }
 
+    if (this.blueprint.props.zkFramework !== ZkFramework.Circom) {
+      throw new Error("createCallData only implemented for Circom proofs");
+    }
+
     // TODO: this is parsed when getting the data from the backend,
     // add propper typing from the start
     // @ts-ignore
@@ -168,7 +188,7 @@ export class Proof {
         ],
       ],
       [BigInt(proofData.pi_c[0]), BigInt(proofData.pi_c[1])],
-      this.props.publicOutputs.map((output) => BigInt(output)),
+      (this.props.publicOutputs as string[]).map((output) => BigInt(output)),
     ];
   }
 
@@ -192,12 +212,22 @@ export class Proof {
     return new Proof(blueprint, proofProps);
   }
 
-  public getHeaderHash(): [string, string] {
-    if (!this.props.publicOutputs || !this.props.publicOutputs.length) {
+  public getHeaderHash(): string {
+    if (this.props.status !== ProofStatus.Done) {
       throw new Error("Poof is not Done yet.");
     }
 
-    return [this.props.publicOutputs[1], this.props.publicOutputs[2]];
+    if (this.blueprint.props.zkFramework === ZkFramework.Circom) {
+      const publicOutputs = this.props.publicOutputs as string[];
+      return publicOutputs[1] + publicOutputs[2];
+    }
+
+    if (this.blueprint.props.zkFramework === ZkFramework.Sp1) {
+      const publicOutputs = this.props.publicOutputs as PublicOutputsSp1Response;
+      return publicOutputs.outputs.from_domain_hash.toString().replaceAll(",", "");
+    }
+
+    throw new Error(`ZkFramework ${this.blueprint.props.zkFramework} not supported yet`);
   }
 
   public static responseToProofProps(response: ProofResponse): ProofProps {
@@ -213,6 +243,7 @@ export class Proof {
       startedAt: new Date(response.started_at.seconds * 1000),
       provedAt: response.proved_at ? new Date(response.proved_at.seconds * 1000) : undefined,
       isLocal: false,
+      sp1VkeyHash: response.sp1_vkey_hash,
     };
     return props;
   }
@@ -223,7 +254,7 @@ export class Proof {
   getProofData(): {
     proofData: string;
     publicData: PublicProofData;
-    publicOutputs: string[];
+    publicOutputs: string[] | PublicOutputsSp1Response;
     externalInputs: ExternalInputProof;
   } {
     if (this.props.status !== ProofStatus.Done) {
@@ -235,5 +266,9 @@ export class Proof {
       publicOutputs: this.props.publicOutputs!,
       externalInputs: this.props.externalInputs!,
     };
+  }
+
+  async verify(): Promise<boolean> {
+    return verifyProof(this);
   }
 }

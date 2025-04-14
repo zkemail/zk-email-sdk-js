@@ -3,7 +3,7 @@
   Some tests also test the prod database directly.
 */
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
-import zkeSdk, { Status } from "../src";
+import zkeSdk, { Status, ZkFramework } from "../src";
 
 describe("Blueprint prod test suite", () => {
   test("Should list by status", async () => {
@@ -359,6 +359,27 @@ describe("Blueprint prod test suite", () => {
     const blueprint = await sdk.getBlueprintById("52f21e2c-6bea-414f-965f-3b09910dc6d7");
     const numRemoteProofs = await blueprint.getNumOfRemoteProofs();
     expect(numRemoteProofs).toBeNumber();
+  });
+
+  test("Should save zkFramework ", async () => {
+    const sdk = zkeSdk({
+      baseUrl: "http://localhost:8080",
+      auth: {
+        getToken: async () =>
+          // Token only usable locally - non admin zkemail
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDAzMDQ4NTYsImdpdGh1Yl91c2VybmFtZSI6IkRpbWlEdW1vIn0.5aEA2VkPP7GHNCaNh1YUGgjy9IoEzVFJUqGmOCfhUd8",
+        onTokenExpired: async () => {},
+      },
+    });
+    const blueprint = await sdk.getBlueprintById("0026f203-2643-430e-b97c-b6c3e5300548");
+    blueprint.props.zkFramework = ZkFramework.Sp1;
+    await blueprint.submitNewVersionDraft(blueprint.getClonedProps());
+    expect(blueprint.props.zkFramework).toBe(ZkFramework.Sp1);
+
+    await blueprint.submit();
+
+    const status = await blueprint.checkStatus();
+    expect(status).toBe(Status.Done);
   });
 });
 

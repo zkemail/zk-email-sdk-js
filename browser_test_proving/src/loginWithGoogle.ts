@@ -1,5 +1,5 @@
-import zkeSdk, { Gmail, FetchEmailOptoins } from "@zk-email/sdk";
-// import zkeSdk, { FetchEmailOptoins, Gmail } from "../../src/index";
+// import zkeSdk, { Gmail, FetchEmailOptoins } from "@zk-email/sdk";
+import zkeSdk, { FetchEmailOptions, Gmail } from "../../src/index";
 
 export function setupLoginWithGoogle(element: HTMLElement) {
   const sdk = zkeSdk();
@@ -23,7 +23,7 @@ export function setupLoginWithGoogle(element: HTMLElement) {
       // Fetches emails using the email queries given in the blueprints
       console.log("fetching emails");
 
-      const queryOptions: FetchEmailOptoins = {
+      const queryOptions: FetchEmailOptions = {
         replaceQuery: "from:uber.com",
       };
 

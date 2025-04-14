@@ -1,4 +1,4 @@
-import { Blueprint } from "./blueprint";
+import { Blueprint, ZkFramework } from "./blueprint";
 import { Proof } from "./proof";
 import { generateProofInputs, parsePublicSignals, testBlueprint } from "./relayerUtils";
 import {
@@ -23,6 +23,9 @@ export class Prover {
   constructor(blueprint: Blueprint, options?: ProverOptions) {
     if (!(blueprint instanceof Blueprint)) {
       throw new Error("Invalid blueprint: must be an instance of Blueprint class");
+    }
+    if (options?.isLocal && blueprint.props.zkFramework !== ZkFramework.Circom) {
+      throw new Error("Local proving is currently only supported using Circom");
     }
 
     this.blueprint = blueprint;
@@ -96,11 +99,14 @@ export class Prover {
         externalInputs,
         params
       );
+
+      console.log("got the inputs: ", inputs);
     } catch (err) {
       console.error("Failed to generate inputs for proof");
       throw err;
     }
 
+    console.log("returning the inputs");
     return inputs;
   }
 
@@ -120,13 +126,10 @@ export class Prover {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
     }
 
-    const inputs = await this.generateProofInputs(eml, externalInputs);
-
     let response: ProofResponse;
     try {
       const requestData: ProofRequest = {
         blueprint_id: blueprintId,
-        input: JSON.parse(inputs),
         external_inputs: externalInputs.reduce(
           (acc, input) => ({
             ...acc,
@@ -136,13 +139,26 @@ export class Prover {
         ),
       };
 
+      if (this.blueprint.props.zkFramework === ZkFramework.Circom) {
+        const inputs = await this.generateProofInputs(eml, externalInputs);
+        requestData.input = JSON.parse(inputs);
+      }
+
+      if (this.blueprint.props.zkFramework === ZkFramework.Sp1) {
+        requestData.eml = eml;
+      }
+
+      console.log("calling proof endpoint");
+
       response = await post<ProofResponse>(`${this.blueprint.baseUrl}/proof`, requestData);
     } catch (err) {
       console.error("Failed calling POST on /proof/ in generateProofRequest: ", err);
       throw err;
     }
 
+    console.log("transforming proof props for sdk");
     const proofProps = Proof.responseToProofProps(response);
+
     return new Proof(this.blueprint, proofProps);
   }
 
