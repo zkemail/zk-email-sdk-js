@@ -2,6 +2,7 @@ import "./style.css";
 import { setupProver } from "./prover.ts";
 import { setupLoginWithGoogle } from "./loginWithGoogle.ts";
 import { setupLoginWithMicrosoft } from "./loginWithMicrosoft.ts";
+import { setupNoirProver } from "./noirProver.ts";
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <div>
@@ -9,6 +10,11 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
     <div id="prover" class="mb-5">
       <div className="flex mt-5">
         <button class="prove">Prove</button>
+      </div>
+    </div>
+    <div id="noir-prover" class="mb-5">
+      <div className="flex mt-5">
+        <button class="prove">Prove with Noir</button>
       </div>
     </div>
     <div id="lwg" className="mb-5">
@@ -27,3 +33,4 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
 setupProver(document.querySelector<HTMLElement>("#prover")!);
 setupLoginWithGoogle(document.querySelector<HTMLElement>("#lwg")!);
 setupLoginWithMicrosoft(document.querySelector<HTMLElement>("#lwm")!);
+setupNoirProver(document.querySelector<HTMLElement>("#noir-prover")!);
