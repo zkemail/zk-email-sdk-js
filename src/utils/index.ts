@@ -1,11 +1,11 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
-import { poseidonLarge, sha256Hash } from "./hash";
+import { poseidonLarge } from "./hash";
 // @ts-ignore no types available
 import RSAKey from "rsa-key";
 
-import { Auth } from "./types/auth";
-import { getTokenFromAuth } from "./auth";
-import { DkimRecord, HashingAlgorithm } from "./types";
+import { Auth } from "../types/auth";
+import { getTokenFromAuth } from "../auth";
+import { DkimRecord, HashingAlgorithm } from "../types";
 import { Crypto } from "@peculiar/webcrypto";
 
 const crypto = new Crypto();

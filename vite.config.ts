@@ -3,6 +3,8 @@ import { resolve } from "path";
 import typescript from "@rollup/plugin-typescript";
 import path from "path";
 import inject from "@rollup/plugin-inject";
+// import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
+// import copy from "rollup-plugin-copy";
 
 // This helps ensure .d.ts files get emitted.
 // We point to our existing tsconfig.json for strict and rootDir settings.
@@ -25,6 +27,16 @@ export default defineConfig({
     // If you don't want certain deps bundled, put them in external: [...]
     rollupOptions: {
       plugins: [
+        // copy({
+        //   targets: [
+        //     {
+        //       src: "node_modules/**/*.wasm",
+        //       dest: "node_modules/.vite/dist",
+        //     },
+        //   ],
+        //   copySync: true,
+        //   hook: "buildStart",
+        // }),
         // So we get declaration files
         typescript({
           tsconfig: "./tsconfig.json",
@@ -89,6 +101,16 @@ export default defineConfig({
     },
   },
   define: {
-    global: {},
+    global: {}, // Polyfill `global` for browser environments
   },
+  // optimizeDeps: {
+  //   esbuildOptions: {
+  //     plugins: [
+  //       NodeGlobalsPolyfillPlugin({
+  //         process: true,
+  //         buffer: true,
+  //       }),
+  //     ],
+  //   },
+  // },
 });

@@ -1,4 +1,4 @@
-import { Prover } from "./prover";
+import { IProver, Prover } from "./prover";
 import {
   BlueprintProps,
   BlueprintRequest,
@@ -9,15 +9,15 @@ import {
   Status,
   ZkFramework,
 } from "./types/blueprint";
-import { del, get, patch, post, verifyPubKey } from "./utils";
+import { del, get, patch, post } from "./utils";
 import { verifyProofOnChain } from "./chain";
 import { Auth } from "./types/auth";
 import { Proof } from "./proof";
 import { blueprintFormSchema } from "./blueprintValidation";
 import { ProverOptions } from "./types";
 import { getMaxEmailBodyLength, testBlueprint } from "./relayerUtils";
-import * as snarkjs from "@zk-email/snarkjs";
 import { verifyProof, verifyProofData } from "./verify";
+import { NoirProver } from "./prover/noir";
 
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
@@ -520,7 +520,12 @@ export class Blueprint {
    * Creates an instance of Prover with which you can create proofs.
    * @returns An instance of Prover.
    */
-  createProver(options?: ProverOptions) {
+  createProver(options?: ProverOptions): IProver {
+    if (this.props.zkFramework === ZkFramework.Noir) {
+      console.log("creating noir prover");
+      return new NoirProver(this, options);
+    }
+
     return new Prover(this, options);
   }
 
@@ -757,6 +762,53 @@ export class Blueprint {
     }
 
     return response.urls;
+  }
+
+  async getNoirCircuitDownloadLink(): Promise<string> {
+    if (this.props.status !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    if (this.props.zkFramework !== ZkFramework.Noir) {
+      throw new Error("Only a noir blueprint has a noir circuit");
+    }
+
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(
+        `${this.baseUrl}/blueprint/noir-circuit/${this.props.id}`
+      );
+    } catch (err) {
+      console.error(
+        "Failed calling GET on /blueprint/noir-circuit/:id in getNoirCircuitDownloadLink: ",
+        err
+      );
+      throw err;
+    }
+
+    return response.url;
+  }
+
+  async getNoirCircuit(): Promise<any> {
+    if (this.props.zkFramework !== ZkFramework.Noir) {
+      throw new Error("Only a noir blueprint has a noir circuit");
+    }
+
+    const circuitUrl = await this.getNoirCircuitDownloadLink();
+    console.log("got the circuit url: ", circuitUrl);
+    // Download and parse the JSON from circuitUrl
+    let circuit;
+    try {
+      const response = await fetch(circuitUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch circuit JSON: ${response.statusText}`);
+      }
+      circuit = await response.json();
+    } catch (error) {
+      console.error("Error downloading or parsing circuit JSON:", error);
+      throw new Error("Failed to download or parse the circuit JSON");
+    }
+    return circuit;
   }
 
   async getWasmFileDownloadLink(): Promise<string> {

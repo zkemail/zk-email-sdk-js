@@ -5,8 +5,12 @@ import { verifyPubKey } from "./utils";
 import * as snarkjs from "@zk-email/snarkjs";
 import { verifySp1Proof } from "./relayerUtils";
 import { HashingAlgorithm } from "./types";
+import { UltraHonkBackend } from "@aztec/bb.js";
+import { initNoirWasm } from "./prover/noir/initNoirWasm";
+// import { verifyNoirProof } from "./prover/noir/verifyNoirProof";
 
 const zkFrameworkHashingAlgo = {
+  [ZkFramework.Noir]: HashingAlgorithm.Poseidon,
   [ZkFramework.Circom]: HashingAlgorithm.Poseidon,
   [ZkFramework.Sp1]: HashingAlgorithm.Sha256,
   [ZkFramework.None]: HashingAlgorithm.None,
@@ -98,6 +102,25 @@ export async function verifyProof(proof: Proof) {
       );
       console.log("sp1 proof verified: ", verified);
       return verified;
+    } else if (proof.blueprint.props.zkFramework === ZkFramework.Noir) {
+      await initNoirWasm();
+
+      const threads = window.navigator.hardwareConcurrency;
+      const circuit = await proof.blueprint.getNoirCircuit();
+      const backend = new UltraHonkBackend(circuit.bytecode, {
+        threads,
+      });
+
+      const proofStr = proof.props.proofData;
+      const encoder = new TextEncoder();
+      const proofData = encoder.encode(proofStr);
+
+      const isValid = await backend.verifyProof({
+        proof: proofData,
+        publicInputs: proof.props.publicOutputs as string[],
+      });
+
+      return isValid;
     } else {
       console.warn(`ZkFramework ${proof.blueprint.props.zkFramework} is not supported`);
       return false;

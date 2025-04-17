@@ -1,6 +1,6 @@
-import { Blueprint, ZkFramework } from "./blueprint";
-import { Proof } from "./proof";
-import { generateProofInputs, parsePublicSignals, testBlueprint } from "./relayerUtils";
+import { Blueprint, ZkFramework } from "../blueprint";
+import { Proof } from "../proof";
+import { generateProofInputs, parsePublicSignals } from "../relayerUtils";
 import {
   ExternalInputProof,
   GenerateProofInputsParams,
@@ -8,15 +8,26 @@ import {
   ProofRequest,
   ProofResponse,
   ProofStatus,
-} from "./types/proof";
-import { ExternalInputInput, ProverOptions } from "./types/prover";
-import { patch, post } from "./utils";
-import { localProverWorkerCode } from "./localProverWorkerString";
+} from "../types/proof";
+import { ExternalInputInput, ProverOptions } from "../types/prover";
+import { patch, post } from "../utils";
+import { localProverWorkerCode } from "../localProverWorkerString";
+
+export interface IProver {
+  options: ProverOptions;
+  blueprint: Blueprint;
+
+  generateProof(eml: string, externalInputs?: ExternalInputInput[]): Promise<Proof>;
+  generateProofInputs(eml: string, externalInputs?: ExternalInputInput[]): Promise<string>;
+  generateProofRequest(eml: string, externalInputs?: ExternalInputInput[]): Promise<Proof>;
+  generateLocalProof(eml: string, externalInputs?: ExternalInputInput[]): Promise<Proof>;
+  _incNumLocalProofs(): Promise<void>;
+}
 
 /**
- * Represents a Prover generated from a blueprint that can generate Proofs
+ * Abstract base class for Provers
  */
-export class Prover {
+export abstract class AbstractProver implements IProver {
   options: ProverOptions;
   blueprint: Blueprint;
 
@@ -24,7 +35,10 @@ export class Prover {
     if (!(blueprint instanceof Blueprint)) {
       throw new Error("Invalid blueprint: must be an instance of Blueprint class");
     }
-    if (options?.isLocal && blueprint.props.zkFramework !== ZkFramework.Circom) {
+    if (
+      options?.isLocal &&
+      ![ZkFramework.Circom, ZkFramework.Noir].includes(blueprint.props.zkFramework!)
+    ) {
       throw new Error("Local proving is currently only supported using Circom");
     }
 
@@ -45,7 +59,9 @@ export class Prover {
    * Done or Failed.
    */
   async generateProof(eml: string, externalInputs: ExternalInputInput[] = []): Promise<Proof> {
+    console.log("in index generateProof");
     if (this.options.isLocal) {
+      console.log("caling generate local proof");
       return this.generateLocalProof(eml, externalInputs);
     } else {
       const proof = await this.generateProofRequest(eml, externalInputs);
@@ -169,10 +185,6 @@ export class Prover {
    * Done or Failed.
    */
   async generateLocalProof(eml: string, externalInputs: ExternalInputInput[] = []): Promise<Proof> {
-    if (!Worker) {
-      throw new Error("Local proving is only supported in the browser");
-    }
-    console.log("generating local proof");
     const blueprintId = this.blueprint.getId();
     if (!blueprintId) {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
@@ -254,7 +266,7 @@ export class Prover {
     return new Proof(this.blueprint, proofProps);
   }
 
-  private async _incNumLocalProofs(): Promise<void> {
+  async _incNumLocalProofs(): Promise<void> {
     try {
       await patch<{ success: boolean }>(
         `${this.blueprint.baseUrl}/blueprint/inc-local-proofs/${this.blueprint.props.id}`
@@ -268,3 +280,8 @@ export class Prover {
     }
   }
 }
+
+/**
+ * Represents a Prover generated from a blueprint that can generate Proofs
+ */
+export class Prover extends AbstractProver {}
