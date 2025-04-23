@@ -6,3 +6,5 @@ dist
 server.log
 
 emls
+
+zk-email-sdk*.tgz
