@@ -1,7 +1,9 @@
 import zkeSdk, { ZkFramework } from "../../src";
+import { initNoirWasm } from "@zk-email/sdk/initNoirWasm";
 
 export function setupNoirProver(element: HTMLElement) {
   const sdk = zkeSdk({ baseUrl: "http://127.0.0.1:8080" });
+  // const sdk = zkeSdk({ baseUrl: "https://dev-conductor.zk.email" });
 
   const proveButton = element.querySelector("button");
   if (proveButton) {
@@ -9,7 +11,7 @@ export function setupNoirProver(element: HTMLElement) {
       try {
         console.log("getting blueprint");
         // const blueprint = await sdk.getBlueprintById("008b5da5-fbda-4445-b7df-6b0c6dde4bb1");
-        const blueprint = await sdk.getBlueprintById("0158a1c5-aa86-4bbd-a2ef-6280ccdb4de2");
+        const blueprint = await sdk.getBlueprintById("c000d5e2-bd44-4946-827c-eceadd5a0081");
 
         console.log("blueprint: ", blueprint);
 
@@ -31,7 +33,11 @@ export function setupNoirProver(element: HTMLElement) {
           value: "0x0000",
           maxLength: 44,
         };
-        const proof = await prover.generateProof(eml!, [externalInputs]);
+        const noirWasm = await initNoirWasm();
+        const options = { noirWasm };
+        console.log("got the options: ", options);
+
+        const proof = await prover.generateProof(eml!, [], options);
         console.log("got the noir proof: ", proof);
 
         // const proof = await prover.generateProof(eml!);
@@ -40,7 +46,7 @@ export function setupNoirProver(element: HTMLElement) {
 
         // console.log("proof done in browser: ", proof);
 
-        const verified = await blueprint.verifyProof(proof);
+        const verified = await blueprint.verifyProof(proof, options);
 
         console.log("Proof verified using strigified data ", verified);
 
@@ -56,7 +62,7 @@ export function setupNoirProver(element: HTMLElement) {
 
 async function getEml() {
   try {
-    const response = await fetch("/apple.eml"); // URL is relative to the root of the project
+    const response = await fetch("/residency.eml"); // URL is relative to the root of the project
     if (!response.ok) {
       throw new Error("Network response was not ok " + response.statusText);
     }

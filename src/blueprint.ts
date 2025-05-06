@@ -9,7 +9,7 @@ import {
   Status,
   ZkFramework,
 } from "./types/blueprint";
-import { del, get, patch, post } from "./utils";
+import { del, downloadAndUnzipFile, downloadJsonFromUrl, get, patch, post } from "./utils";
 import { verifyProofOnChain } from "./chain";
 import { Auth } from "./types/auth";
 import { Proof } from "./proof";
@@ -789,26 +789,52 @@ export class Blueprint {
     return response.url;
   }
 
+  async getNoirRegexGraphsDownloadLink(): Promise<string> {
+    if (this.props.status !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    if (this.props.zkFramework !== ZkFramework.Noir) {
+      throw new Error("Only a noir blueprint has a noir circuit");
+    }
+
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(
+        `${this.baseUrl}/blueprint/noir-regex-graphs/${this.props.id}`
+      );
+    } catch (err) {
+      console.error(
+        "Failed calling GET on /blueprint/noir-regex-graphs/:id in getNoirCircuitDownloadLink: ",
+        err
+      );
+      throw err;
+    }
+
+    return response.url;
+  }
+
   async getNoirCircuit(): Promise<any> {
     if (this.props.zkFramework !== ZkFramework.Noir) {
       throw new Error("Only a noir blueprint has a noir circuit");
     }
 
     const circuitUrl = await this.getNoirCircuitDownloadLink();
-    console.log("got the circuit url: ", circuitUrl);
-    // Download and parse the JSON from circuitUrl
-    let circuit;
-    try {
-      const response = await fetch(circuitUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch circuit JSON: ${response.statusText}`);
-      }
-      circuit = await response.json();
-    } catch (error) {
-      console.error("Error downloading or parsing circuit JSON:", error);
-      throw new Error("Failed to download or parse the circuit JSON");
-    }
+    // TODO: type circuit
+    const circuit = await downloadJsonFromUrl<any>(circuitUrl);
     return circuit;
+  }
+
+  async getNoirRegexGraphs(): Promise<any> {
+    if (this.props.zkFramework !== ZkFramework.Noir) {
+      throw new Error("Only a noir blueprint has a noir circuit");
+    }
+
+    const url = await this.getNoirRegexGraphsDownloadLink();
+    const data = await downloadAndUnzipFile(url);
+    console.log("data: ", data);
+
+    return data;
   }
 
   async getWasmFileDownloadLink(): Promise<string> {

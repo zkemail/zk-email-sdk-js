@@ -9,7 +9,7 @@ import {
   ProofResponse,
   ProofStatus,
 } from "../types/proof";
-import { ExternalInputInput, ProverOptions } from "../types/prover";
+import { ExternalInputInput, GenerateProofOptions, ProverOptions } from "../types/prover";
 import { patch, post } from "../utils";
 import { localProverWorkerCode } from "../localProverWorkerString";
 
@@ -17,10 +17,22 @@ export interface IProver {
   options: ProverOptions;
   blueprint: Blueprint;
 
-  generateProof(eml: string, externalInputs?: ExternalInputInput[]): Promise<Proof>;
+  generateProof(
+    eml: string,
+    externalInputs?: ExternalInputInput[],
+    options?: GenerateProofOptions
+  ): Promise<Proof>;
   generateProofInputs(eml: string, externalInputs?: ExternalInputInput[]): Promise<string>;
-  generateProofRequest(eml: string, externalInputs?: ExternalInputInput[]): Promise<Proof>;
-  generateLocalProof(eml: string, externalInputs?: ExternalInputInput[]): Promise<Proof>;
+  generateProofRequest(
+    eml: string,
+    externalInputs?: ExternalInputInput[],
+    options?: GenerateProofOptions
+  ): Promise<Proof>;
+  generateLocalProof(
+    eml: string,
+    externalInputs?: ExternalInputInput[],
+    options?: GenerateProofOptions
+  ): Promise<Proof>;
   _incNumLocalProofs(): Promise<void>;
 }
 
@@ -58,13 +70,17 @@ export abstract class AbstractProver implements IProver {
    * @returns A promise that resolves to a new instance of Proof. The Proof will have the status
    * Done or Failed.
    */
-  async generateProof(eml: string, externalInputs: ExternalInputInput[] = []): Promise<Proof> {
-    console.log("in index generateProof");
+  async generateProof(
+    eml: string,
+    externalInputs: ExternalInputInput[] = [],
+    options?: GenerateProofOptions
+  ): Promise<Proof> {
+    console.log("in index generateProof: ", options);
     if (this.options.isLocal) {
-      console.log("caling generate local proof");
-      return this.generateLocalProof(eml, externalInputs);
+      console.log("caling generate local proof with options: ", options);
+      return this.generateLocalProof(eml, externalInputs, options);
     } else {
-      const proof = await this.generateProofRequest(eml, externalInputs);
+      const proof = await this.generateProofRequest(eml, externalInputs, options);
 
       await new Promise((r) => setTimeout(r, 6_000));
 
@@ -134,7 +150,8 @@ export abstract class AbstractProver implements IProver {
    */
   async generateProofRequest(
     eml: string,
-    externalInputs: ExternalInputInput[] = []
+    externalInputs: ExternalInputInput[] = [],
+    options?: GenerateProofOptions
   ): Promise<Proof> {
     console.log("generating remote proof");
     const blueprintId = this.blueprint.getId();
@@ -184,7 +201,12 @@ export abstract class AbstractProver implements IProver {
    * @returns A promise that resolves to a new instance of Proof. The Proof will have the status
    * Done or Failed.
    */
-  async generateLocalProof(eml: string, externalInputs: ExternalInputInput[] = []): Promise<Proof> {
+  async generateLocalProof(
+    eml: string,
+    externalInputs: ExternalInputInput[] = [],
+    options?: GenerateProofOptions
+  ): Promise<Proof> {
+    console.log("in general generateLocalProof: ", options);
     const blueprintId = this.blueprint.getId();
     if (!blueprintId) {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");

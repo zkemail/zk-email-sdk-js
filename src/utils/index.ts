@@ -2,6 +2,7 @@ const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
 import { poseidonLarge } from "./hash";
 // @ts-ignore no types available
 import RSAKey from "rsa-key";
+import JSZip from "jszip";
 
 import { Auth } from "../types/auth";
 import { getTokenFromAuth } from "../auth";
@@ -344,4 +345,80 @@ function base64UrlToBigInt(base64Url: string): bigint {
     hex += h;
   }
   return BigInt("0x" + hex);
+}
+
+export async function downloadJsonFromUrl<T>(url: string): Promise<T> {
+  // Download and parse the JSON from circuitUrl
+  let data;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch data from url: ${response.statusText}`);
+    }
+    data = await response.json();
+  } catch (error) {
+    console.error("Error downloading or parsing response data:", error);
+    throw new Error("Failed to download or parse the response data");
+  }
+  console.log("returning downloaded data: ", data);
+  return data;
+}
+
+export async function downloadAndUnzipFile(url: string): Promise<Record<string, any>> {
+  try {
+    // Fetch the file
+    const response = await fetch(url);
+
+    // Check if the request was successful
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    // Get the response as an ArrayBuffer
+    const arrayBuffer = await response.arrayBuffer();
+
+    // Create a new JSZip instance
+    const zip = new JSZip();
+
+    // Load the zip file content
+    const zipContent = await zip.loadAsync(arrayBuffer);
+
+    // Process the zip contents
+    const files: Record<string, any> = {};
+
+    // Iterate over each file in the zip
+    const filePromises = Object.keys(zipContent.files).map(async (filename) => {
+      const file = zipContent.files[filename];
+
+      // Skip directories
+      if (file.dir) return;
+
+      // Get the file content as text, blob, arrayBuffer, etc.
+      // depending on what you need
+      // For text files:
+      const content = await file.async("text");
+      files[filename] = content;
+
+      // For JSON files:
+      if (filename.endsWith(".json")) {
+        try {
+          files[filename] = JSON.parse(content);
+        } catch (e) {
+          console.error(`Error parsing JSON in ${filename}`, e);
+        }
+      }
+
+      // For binary files (like images), use:
+      // const blobContent = await file.async('blob');
+      // files[filename] = blobContent;
+    });
+
+    // Wait for all files to be processed
+    await Promise.all(filePromises);
+
+    return files;
+  } catch (error) {
+    console.error("Error downloading or unzipping the file:", error);
+    throw error;
+  }
 }

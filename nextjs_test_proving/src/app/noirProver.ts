@@ -1,6 +1,8 @@
+import { initNoirWasm } from "@/lib/initNoirWasm";
 import zkeSdk, { ZkFramework } from "@zk-email/sdk";
 
 export async function setupNoirProver() {
+  // const sdk = zkeSdk({ baseUrl: "https://staging-conductor.zk.email" });
   const sdk = zkeSdk({ baseUrl: "http://127.0.0.1:8080" });
 
   try {
@@ -28,7 +30,12 @@ export async function setupNoirProver() {
       value: "0x0000",
       maxLength: 44,
     };
-    const proof = await prover.generateProof(eml!, [externalInputs]);
+
+    const noirWasm = await initNoirWasm();
+    const options = { noirWasm };
+    console.log("got inititalized noir options: ", options);
+
+    const proof = await prover.generateProof(eml!, [externalInputs], options);
     console.log("got the noir proof: ", proof);
 
     // const proof = await prover.generateProof(eml!);
@@ -37,7 +44,7 @@ export async function setupNoirProver() {
 
     // console.log("proof done in browser: ", proof);
 
-    const verified = await blueprint.verifyProof(proof);
+    const verified = await blueprint.verifyProof(proof, options);
 
     console.log("Proof verified using strigified data ", verified);
 

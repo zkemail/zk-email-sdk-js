@@ -2,6 +2,8 @@ import { Blueprint, BlueprintProps, ListBlueprintsOptions } from "./blueprint";
 import { Proof } from "./proof";
 import { SdkOptions } from "./types/sdk";
 import { getStarredBlueprints } from "./user";
+import { type Noir } from "@noir-lang/noir_js";
+import { type UltraHonkBackend } from "@aztec/bb.js";
 
 // Export Types
 export * from "./types/blueprint";
@@ -24,7 +26,6 @@ export {
   testBlueprint,
   getMaxEmailBodyLength,
   extractEMLDetails,
-  generateDfa,
 } from "./relayerUtils";
 export { getLoginWithGithubUrl } from "./auth";
 // Re-Export zod class to avoid version mismatches if package importing this sdk has zod

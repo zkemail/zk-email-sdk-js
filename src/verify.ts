@@ -4,9 +4,10 @@ import { verifyPubKey } from "./utils";
 // @ts-ignore Ignore missing types
 import * as snarkjs from "@zk-email/snarkjs";
 import { verifySp1Proof } from "./relayerUtils";
-import { HashingAlgorithm } from "./types";
+import { GenerateProofOptions, HashingAlgorithm } from "./types";
 import { UltraHonkBackend } from "@aztec/bb.js";
-import { initNoirWasm } from "./prover/noir/initNoirWasm";
+// import { initNoirWasm } from "./prover/noir/initNoirWasm";
+// import { initNoirWasm } from "./prover/noir/initNoirWasm";
 // import { verifyNoirProof } from "./prover/noir/verifyNoirProof";
 
 const zkFrameworkHashingAlgo = {
@@ -58,7 +59,7 @@ export async function verifyProofData({
   return false;
 }
 
-export async function verifyProof(proof: Proof) {
+export async function verifyProof(proof: Proof, options?: GenerateProofOptions) {
   if (proof.props.blueprintId !== proof.blueprint.props.id) {
     throw Error(`The proof was generated using a different blueprint: ${proof.props.blueprintId}`);
   }
@@ -103,7 +104,11 @@ export async function verifyProof(proof: Proof) {
       console.log("sp1 proof verified: ", verified);
       return verified;
     } else if (proof.blueprint.props.zkFramework === ZkFramework.Noir) {
-      await initNoirWasm();
+      if (!options || !options.noirWasm) {
+        throw new Error("You must pass initialized noirWasm to the options");
+      }
+
+      const { UltraHonkBackend } = options.noirWasm;
 
       const threads = window.navigator.hardwareConcurrency;
       const circuit = await proof.blueprint.getNoirCircuit();
