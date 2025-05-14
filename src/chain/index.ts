@@ -1,7 +1,9 @@
-import { createPublicClient, http, Account, PublicClient } from "viem";
+import { createPublicClient, http } from "viem";
 import { base } from "viem/chains";
 import { Proof } from "../proof";
 import { ProofData } from "../types";
+// @ts-ignore Does not provide types
+import * as snarkjs from "snarkjs";
 
 function getVerifierContractAbi(signalLength: number) {
   return [
@@ -9,6 +11,11 @@ function getVerifierContractAbi(signalLength: number) {
       type: "function",
       name: "verify",
       inputs: [
+        {
+          name: "proofType",
+          type: "uint8",
+          internalType: "ProofType",
+        },
         {
           name: "a",
           type: "uint256[2]",
@@ -36,7 +43,7 @@ function getVerifierContractAbi(signalLength: number) {
   ];
 }
 
-export async function verifyProofOnChain(proof: Proof) {
+export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
   console.log("verifierContract: ", proof.blueprint.props.verifierContract);
   if (
     !proof.blueprint.props.verifierContract?.chain ||
@@ -47,6 +54,10 @@ export async function verifyProofOnChain(proof: Proof) {
 
   if (!proof.props.proofData || !proof.props.publicOutputs) {
     throw new Error("No proof data generated yet");
+  }
+
+  if (!proof.props.publicOutputs || !proof.props.publicOutputs.length) {
+    throw new Error("Not a correct proof type");
   }
 
   // Create public client for Base Sepolia
@@ -73,21 +84,28 @@ export async function verifyProofOnChain(proof: Proof) {
       ],
     ],
     [BigInt(proofData.pi_c[0]), BigInt(proofData.pi_c[1])],
+    // TODO: this is parsed when getting the data from the backend,
+    // add propper typing from the start
+    // @ts-ignore
     proof.props.publicOutputs.map((output) => BigInt(output)),
   ] as const;
 
-  console.log("Call data to verify: ", args);
-  console.log("contract address: ", proof.blueprint.props.verifierContract.address);
+  let calldata = await snarkjs.groth16.exportSolidityCallData(proofData, proof.props.publicOutputs);
+  calldata = JSON.parse(`[${calldata}]`);
 
   try {
     await client.readContract({
       address: proof.blueprint.props.verifierContract.address as `0x${string}`,
+      // TODO: this is parsed when getting the data from the backend,
+      // add propper typing from the start
+      // @ts-ignore
       abi: getVerifierContractAbi(proof.props.publicOutputs.length),
       functionName: "verify",
-      args,
+      args: [1, ...calldata],
     });
+    return true;
   } catch (error) {
     console.error("Error verifying proof on chain:", error);
-    throw error;
+    return false;
   }
 }

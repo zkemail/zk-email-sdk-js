@@ -2,7 +2,7 @@
 import zkeSdk from "../../src/index";
 
 export function setupProver(element: HTMLElement) {
-  const sdk = zkeSdk();
+  const sdk = zkeSdk({ baseUrl: "https://dev-conductor.zk.email" });
 
   const proveButton = element.querySelector("button");
   if (proveButton) {
@@ -10,11 +10,12 @@ export function setupProver(element: HTMLElement) {
       try {
         console.log("getting blueprint");
         // const blueprint = await sdk.getBlueprintById("008b5da5-fbda-4445-b7df-6b0c6dde4bb1");
-        const blueprint = await sdk.getBlueprintById("230f5428-e1cd-480e-a553-df0c7124bc08");
+        const blueprint = await sdk.getBlueprintById("9c4f651d-a925-45dc-b2b5-7cd51b401d0b");
 
         console.log("blueprint: ", blueprint);
 
-        const prover = blueprint.createProver();
+        const prover = blueprint.createProver({ isLocal: true });
+        console.log("prover: ", prover);
 
         const eml = await getEml();
 
@@ -23,16 +24,22 @@ export function setupProver(element: HTMLElement) {
         console.log("isValidEml: ", isValidEml);
 
         // console.log("putting in eml: ", eml);
-        const externalInputs = {
-          name: "address",
-          value: "0x0000",
-          maxLength: 44,
-        };
-        const proof = await prover.generateProof(eml!, [externalInputs]);
+        // const externalInputs = {
+        //   name: "address",
+        //   value: "0x0000",
+        //   maxLength: 44,
+        // };
+        // const proof = await prover.generateProof(eml!, [externalInputs]);
+        const proof = await prover.generateProof(eml!);
+
+        console.log("proof: ", proof);
 
         // const proof = await sdk.getProof("b80bc8ff-fb3e-4dbc-9ccb-b47a58b6faf6");
 
         // console.log("proof done in browser: ", proof);
+
+        const verifiedOnChain = await proof.verifyOnChain();
+        console.log("verified on chain: ", verifiedOnChain);
 
         const verified = await blueprint.verifyProofData(
           JSON.stringify(proof.props.publicOutputs!),
@@ -53,7 +60,7 @@ export function setupProver(element: HTMLElement) {
 
 async function getEml() {
   try {
-    const response = await fetch("/amazon2.eml"); // URL is relative to the root of the project
+    const response = await fetch("/residency.eml"); // URL is relative to the root of the project
     if (!response.ok) {
       throw new Error("Network response was not ok " + response.statusText);
     }

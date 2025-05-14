@@ -24,7 +24,7 @@ export async function verifyProofData({
   proofData,
   senderDomain,
   vkey,
-}: VerifyProofDataProps) {
+}: VerifyProofDataProps): Promise<boolean> {
   const parsedPublicOutputs = JSON.parse(publicOutputs);
   try {
     const pubKeyHash = parsedPublicOutputs[0];
