@@ -24,7 +24,6 @@ export {
   testBlueprint,
   getMaxEmailBodyLength,
   extractEMLDetails,
-  generateDfa,
 } from "./relayerUtils";
 export { getLoginWithGithubUrl } from "./auth";
 // Re-Export zod class to avoid version mismatches if package importing this sdk has zod

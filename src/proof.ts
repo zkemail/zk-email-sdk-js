@@ -151,11 +151,10 @@ export class Proof {
 
   /**
    * Verifies the proof on chain using the verifier contract defined in the blueprint.
-   * Will throw an error if it cannot verify the proof. If the function call succeeds,
-   * the proof was validated.
+   * Will return false if it cannot verify the proof.
    */
-  async verifyOnChain() {
-    await verifyProofOnChain(this);
+  async verifyOnChain(): Promise<boolean> {
+    return await verifyProofOnChain(this);
   }
 
   /**
