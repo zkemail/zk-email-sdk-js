@@ -41,14 +41,14 @@ export class Proof {
 
   getPubKeyHash(): string {
     let pubKeyHash: string;
-    if (this.blueprint.props.zkFramework === ZkFramework.Circom) {
+    if (this.props.zkFramework === ZkFramework.Circom) {
       pubKeyHash = (this.props.publicOutputs as string[])[0];
-    } else if (this.blueprint.props.zkFramework === ZkFramework.Sp1) {
+    } else if (this.props.zkFramework === ZkFramework.Sp1) {
       pubKeyHash = new Uint8Array(
         (this.props.publicOutputs as PublicOutputsSp1Response).outputs.public_key_hash
       ).toString();
     } else {
-      throw new Error(`No pubkey hash for zk framework ${this.blueprint.props.zkFramework}`);
+      throw new Error(`No pubkey hash for zk framework ${this.props.zkFramework}`);
     }
     return pubKeyHash;
   }
@@ -165,7 +165,7 @@ export class Proof {
       throw new Error("No proof data generated yet");
     }
 
-    if (this.blueprint.props.zkFramework !== ZkFramework.Circom) {
+    if (this.props.zkFramework !== ZkFramework.Circom) {
       throw new Error("createCallData only implemented for Circom proofs");
     }
 
@@ -216,17 +216,17 @@ export class Proof {
       throw new Error("Poof is not Done yet.");
     }
 
-    if (this.blueprint.props.zkFramework === ZkFramework.Circom) {
+    if (this.props.zkFramework === ZkFramework.Circom) {
       const publicOutputs = this.props.publicOutputs as string[];
       return publicOutputs[1] + publicOutputs[2];
     }
 
-    if (this.blueprint.props.zkFramework === ZkFramework.Sp1) {
+    if (this.props.zkFramework === ZkFramework.Sp1) {
       const publicOutputs = this.props.publicOutputs as PublicOutputsSp1Response;
       return publicOutputs.outputs.from_domain_hash.toString().replaceAll(",", "");
     }
 
-    throw new Error(`ZkFramework ${this.blueprint.props.zkFramework} not supported yet`);
+    throw new Error(`ZkFramework ${this.props.zkFramework} not supported yet`);
   }
 
   public static responseToProofProps(response: ProofResponse): ProofProps {
