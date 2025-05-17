@@ -1,5 +1,4 @@
-import { Dir } from "fs";
-import { ServerDate } from "./blueprint";
+import { ServerDate, ZkFramework } from "./blueprint";
 
 // According to protobufs
 export enum ProofStatus {
@@ -39,6 +38,7 @@ export type ProofProps = {
   provedAt?: Date;
   isLocal: boolean;
   sp1VkeyHash?: string;
+  zkFramework: ZkFramework;
 };
 
 export type ProofResponse = {
@@ -53,6 +53,7 @@ export type ProofResponse = {
   proved_at?: ServerDate;
   status: number;
   sp1_vkey_hash?: string;
+  zk_framework: ZkFramework;
 };
 
 export type ProofRequest = {
@@ -60,6 +61,7 @@ export type ProofRequest = {
   input?: any;
   eml?: string;
   external_inputs: any;
+  zk_framework: ZkFramework;
 };
 
 export type GenerateProofInputsParams = {

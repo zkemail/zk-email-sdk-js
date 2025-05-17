@@ -24,7 +24,7 @@ export class Prover {
     if (!(blueprint instanceof Blueprint)) {
       throw new Error("Invalid blueprint: must be an instance of Blueprint class");
     }
-    if (options?.isLocal && blueprint.props.zkFramework !== ZkFramework.Circom) {
+    if (options?.isLocal && blueprint.props.clientZkFramework !== ZkFramework.Circom) {
       throw new Error("Local proving is currently only supported using Circom");
     }
 
@@ -126,6 +126,10 @@ export class Prover {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
     }
 
+    if (!this.blueprint.props.serverZkFramework) {
+      throw new Error("This blueprint has no remote ZkFramework set up");
+    }
+
     let response: ProofResponse;
     try {
       const requestData: ProofRequest = {
@@ -137,18 +141,18 @@ export class Prover {
           }),
           {}
         ),
+        zk_framework: this.blueprint.props.serverZkFramework,
       };
 
-      if (this.blueprint.props.zkFramework === ZkFramework.Circom) {
+      if (this.blueprint.props.serverZkFramework === ZkFramework.Circom) {
         const inputs = await this.generateProofInputs(eml, externalInputs);
         requestData.input = JSON.parse(inputs);
       }
 
-      if (this.blueprint.props.zkFramework === ZkFramework.Sp1) {
+      if (this.blueprint.props.serverZkFramework === ZkFramework.Sp1) {
         requestData.eml = eml;
       }
 
-      console.log("calling proof endpoint");
 
       response = await post<ProofResponse>(`${this.blueprint.baseUrl}/proof`, requestData);
     } catch (err) {
@@ -176,6 +180,10 @@ export class Prover {
     const blueprintId = this.blueprint.getId();
     if (!blueprintId) {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
+    }
+
+    if (!this.blueprint.props.clientZkFramework) {
+      throw new Error("Blueprint has no client side proving setup");
     }
 
     const startTime = new Date();
@@ -249,6 +257,7 @@ export class Prover {
       startedAt: startTime,
       provedAt: new Date(),
       isLocal: true,
+      zkFramework: this.blueprint.props.clientZkFramework,
     };
 
     return new Proof(this.blueprint, proofProps);

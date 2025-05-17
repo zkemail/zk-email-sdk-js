@@ -4,9 +4,11 @@ import {
   BlueprintRequest,
   BlueprintResponse,
   ChunkedZkeyUrl,
+  CompilationStatus,
   DownloadUrls,
   ListBlueprintsOptions,
   Status,
+  StatusResponse,
   ZkFramework,
 } from "./types/blueprint";
 import { del, get, patch, post, verifyPubKey } from "./utils";
@@ -40,7 +42,8 @@ export class Blueprint {
       enableHeaderMasking: false,
       enableBodyMasking: false,
       isPublic: true,
-      status: Status.Draft,
+      clientStatus: Status.Draft,
+      serverStatus: Status.Draft,
       ...props,
     };
 
@@ -137,7 +140,8 @@ export class Blueprint {
       senderDomain: response.sender_domain,
       enableHeaderMasking: response.enable_header_masking,
       enableBodyMasking: response.enable_body_masking,
-      zkFramework: (response.zk_framework as ZkFramework) || ZkFramework.Circom,
+      clientZkFramework: (response.client_zk_framework as ZkFramework) || ZkFramework.None,
+      serverZkFramework: (response.server_zk_framework as ZkFramework) || ZkFramework.None,
       isPublic: response.is_public,
       createdAt: new Date(response.created_at.seconds * 1000),
       updatedAt: new Date(response.updated_at.seconds * 1000),
@@ -155,7 +159,8 @@ export class Blueprint {
         isHashed: regex.is_hashed,
         location: regex.location,
       })),
-      status: response.status as Status,
+      clientStatus: response.client_status as Status,
+      serverStatus: response.server_status as Status,
       verifierContract: {
         address: response.verifier_contract_address,
         chain: response.verifier_contract_chain,
@@ -187,7 +192,8 @@ export class Blueprint {
       sender_domain: props.senderDomain,
       enable_header_masking: props.enableHeaderMasking,
       enable_body_masking: props.enableBodyMasking,
-      zk_framework: props.zkFramework,
+      client_zk_framework: props.clientZkFramework,
+      server_zk_framework: props.serverZkFramework,
       is_public: props.isPublic,
       external_inputs: props.externalInputs?.map((input) => ({
         name: input.name,
@@ -246,17 +252,26 @@ export class Blueprint {
    */
   async assignPreferredZkFramework(eml: string) {
     if (this.props.ignoreBodyHashCheck) {
-      this.props.zkFramework = ZkFramework.Circom;
+      this.props.clientZkFramework = ZkFramework.Circom;
+      this.props.serverZkFramework = ZkFramework.Circom;
       return;
     }
 
     const bodyLength = await getMaxEmailBodyLength(eml, this.props.shaPrecomputeSelector);
     console.log("bodyLength: ", bodyLength);
 
-    if (bodyLength > 10_000) {
-      this.props.zkFramework = ZkFramework.Sp1;
+    // If compilation failes, we will automatically switch to
+    // client = Noir and server = Sp1
+    if (bodyLength < 10_000) {
+      this.props.clientZkFramework = ZkFramework.Circom;
+      this.props.clientZkFramework = ZkFramework.Circom;
+      // this.props.serverZkFramework = ZkFramework.Noir;
     } else {
-      this.props.zkFramework = ZkFramework.Circom;
+      // TODO: Add Noir when inmplemented
+      // -> Cannot create with None, have to put Circom for now
+      // this.props.clientZkFramework = ZkFramework.Noir;
+      this.props.clientZkFramework = ZkFramework.Circom;
+      this.props.serverZkFramework = ZkFramework.Sp1;
     }
   }
 
@@ -296,9 +311,9 @@ export class Blueprint {
       throw new Error("auth is required, add it with Blueprint.addAuth(auth)");
     }
 
-    if (!this.props.zkFramework) {
+    if (!this.props.clientZkFramework || !this.props.serverZkFramework) {
       throw new Error(
-        "Please select zkFramework. Use blueprint.assignPreferredZkFramework to choose the optimal framework"
+        "Please select client and server zkFramework. Use blueprint.assignPreferredZkFramework to choose the optimal framework"
       );
     }
 
@@ -380,7 +395,7 @@ export class Blueprint {
       }
     }
 
-    if (!this.props.zkFramework) {
+    if (!this.props.clientZkFramework || !this.props.serverZkFramework) {
       throw new Error(
         "Please select zkFramework. Use blueprint.assignPreferredZkFramework to choose the optimal framework"
       );
@@ -389,10 +404,10 @@ export class Blueprint {
     const status = await this._checkStatus();
 
     // TODO: Should we allow retry on failed?
-    if (Status.Done === status) {
+    if ([status.clientStatus, status.serverStatus].includes(Status.Done)) {
       throw new Error("The circuits are already compiled.");
     }
-    if (Status.InProgress === status) {
+    if ([status.clientStatus, status.serverStatus].includes(Status.InProgress)) {
       throw new Error("The circuits already being compiled, please wait.");
     }
 
@@ -412,17 +427,21 @@ export class Blueprint {
   }
 
   // Request status from server and updates props.status
-  private async _checkStatus(): Promise<Status> {
-    let response: { status: Status };
+  private async _checkStatus(): Promise<CompilationStatus> {
+    let response: StatusResponse;
     try {
-      response = await get<{ status: Status }>(`${this.baseUrl}/blueprint/status/${this.props.id}`);
+      response = await get<StatusResponse>(`${this.baseUrl}/blueprint/status/${this.props.id}`);
     } catch (err) {
       console.error("Failed calling GET /blueprint/status in getStatus(): ", err);
       throw err;
     }
 
-    this.props.status = response.status;
-    return response.status;
+    this.props.clientStatus = response.client_status;
+    this.props.serverStatus = response.server_status;
+    return {
+      clientStatus: this.props.clientStatus,
+      serverStatus: this.props.serverStatus,
+    };
   }
 
   /**
@@ -431,14 +450,23 @@ export class Blueprint {
    * amount of time the second time you call it.
    * @returns A promise with the Status.
    */
-  async checkStatus(): Promise<Status> {
+  async checkStatus(): Promise<CompilationStatus> {
     // Blueprint wasn't saved yet, return default status
+
+    const compilationStatus = {
+      clientStatus: this.props.clientStatus!,
+      serverStatus: this.props.serverStatus!,
+    };
+
     if (!this.props.id) {
-      return this.props.status!;
+      return compilationStatus;
     }
 
-    if ([Status.Failed, Status.Done].includes(this.props.status!)) {
-      return this.props.status!;
+    if (
+      [Status.Failed, Status.Done].includes(compilationStatus.clientStatus) &&
+      [Status.Failed, Status.Done].includes(compilationStatus.serverStatus)
+    ) {
+      return compilationStatus;
     }
 
     // Waits for a fixed period of time before you can call checkStatus again
@@ -446,8 +474,7 @@ export class Blueprint {
     if (!this.lastCheckedStatus) {
       this.lastCheckedStatus = new Date();
     } else {
-      // TODO: change for prod to one minute
-      const waitTime = 0.5 * 1_000; // TODO: should be one minute;
+      const waitTime = 10_000;
       const sinceLastChecked = new Date().getTime() - this.lastCheckedStatus.getTime();
       if (sinceLastChecked < waitTime) {
         await new Promise((r) => setTimeout(r, waitTime - sinceLastChecked));
@@ -472,7 +499,7 @@ export class Blueprint {
    * @returns The the url to download the ZKeys.
    */
   async getZKeyDownloadLink(): Promise<DownloadUrls> {
-    if (this.props.status !== Status.Done) {
+    if (this.props.clientStatus !== Status.Done || this.props.serverStatus != Status.Done) {
       throw new Error("The circuits are not compiled yet, nothing to download.");
     }
 
@@ -546,7 +573,7 @@ export class Blueprint {
    * @returns Returns true if the verification was successfull, false if it failed.
    */
   async verifyProofData(publicOutputs: string, proofData: string): Promise<boolean> {
-    if (this.props.zkFramework !== ZkFramework.Circom) {
+    if (this.props.clientZkFramework !== ZkFramework.Circom) {
       throw new Error("Can only verify a Circom proof from data. Use verifyProof instead.");
     }
 
@@ -602,7 +629,11 @@ export class Blueprint {
    * @returns true if it can be updated
    */
   canUpdate(): boolean {
-    return !!(this.props.id && ![Status.Done, Status.InProgress].includes(this.props.status!));
+    return !!(
+      this.props.id &&
+      ![Status.Done, Status.InProgress].includes(this.props.clientStatus!) &&
+      ![Status.Done, Status.InProgress].includes(this.props.serverStatus!)
+    );
   }
 
   /**
@@ -706,7 +737,7 @@ export class Blueprint {
   }
 
   async cancelCompilation(): Promise<void> {
-    if (this.props.status !== Status.InProgress) {
+    if ([this.props.clientStatus, this.props.serverStatus].includes(Status.InProgress)) {
       throw new Error("Can only cancel compilation of a blueprint that is in progress");
     }
     try {
@@ -739,7 +770,11 @@ export class Blueprint {
   }
 
   async getChunkedZkeyDownloadLinks(): Promise<ChunkedZkeyUrl[]> {
-    if (this.props.status !== Status.Done) {
+    if (this.props.clientStatus !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    if (this.props.clientZkFramework !== ZkFramework.Circom) {
       throw new Error("The circuits are not compiled yet, nothing to download.");
     }
 
@@ -760,8 +795,17 @@ export class Blueprint {
   }
 
   async getWasmFileDownloadLink(): Promise<string> {
-    if (this.props.status !== Status.Done) {
-      throw new Error("The circuits are not compiled yet, nothing to download.");
+    const hasValidClientCircuit =
+      this.props.clientStatus === Status.Done &&
+      this.props.clientZkFramework === ZkFramework.Circom;
+    const hasValidServerCircuit =
+      this.props.serverStatus === Status.Done &&
+      this.props.serverZkFramework === ZkFramework.Circom;
+
+    if (!hasValidClientCircuit && !hasValidServerCircuit) {
+      throw new Error(
+        "At least one circuit (client or server) must be compiled with Circom to download."
+      );
     }
 
     let response: { url: string };
@@ -776,8 +820,17 @@ export class Blueprint {
   }
 
   async getVkeyFileDownloadLink(): Promise<string> {
-    if (this.props.status !== Status.Done) {
-      throw new Error("The circuits are not compiled yet, nothing to download.");
+    const hasValidClientCircuit =
+      this.props.clientStatus === Status.Done &&
+      this.props.clientZkFramework === ZkFramework.Circom;
+    const hasValidServerCircuit =
+      this.props.serverStatus === Status.Done &&
+      this.props.serverZkFramework === ZkFramework.Circom;
+
+    if (!hasValidClientCircuit && !hasValidServerCircuit) {
+      throw new Error(
+        "At least one circuit (client or server) must be compiled with Circom to download."
+      );
     }
 
     let response: { url: string };

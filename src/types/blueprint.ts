@@ -15,13 +15,15 @@ export type BlueprintProps = {
   senderDomain?: string;
   enableHeaderMasking?: boolean;
   enableBodyMasking?: boolean;
-  zkFramework?: ZkFramework;
+  clientZkFramework?: ZkFramework;
+  serverZkFramework?: ZkFramework;
   isPublic?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
   externalInputs?: ExternalInput[];
   decomposedRegexes: DecomposedRegex[];
-  status?: Status;
+  clientStatus?: Status;
+  serverStatus?: Status;
   verifierContract?: VerifierContract;
   version?: number;
   stars?: number;
@@ -98,11 +100,13 @@ export type BlueprintRequest = {
   sender_domain?: string;
   enable_header_masking?: boolean;
   enable_body_masking?: boolean;
-  zk_framework?: number;
+  client_zk_framework?: number;
+  server_zk_framework?: number;
   is_public?: boolean;
   external_inputs?: ExternalInputResponse[];
   decomposed_regexes: DecomposedRegexResponse[];
-  status?: string;
+  client_status?: string;
+  server_status?: string;
   verifier_contract_address?: string;
   verifier_contract_chain?: number;
   version?: number;
@@ -125,13 +129,15 @@ export type BlueprintResponse = {
   sender_domain: string;
   enable_header_masking?: boolean;
   enable_body_masking?: boolean;
-  zk_framework: number;
+  client_zk_framework: number;
+  server_zk_framework: number;
   is_public: boolean;
   created_at: ServerDate;
   updated_at: ServerDate;
   external_inputs: ExternalInputResponse[];
   decomposed_regexes: DecomposedRegexResponse[];
-  status: number;
+  client_status: number;
+  server_status: number;
   verifier_contract_address: string;
   verifier_contract_chain: number;
   version: number;
@@ -177,4 +183,14 @@ export type DownloadUrls = Record<string, string>;
 export type ChunkedZkeyUrl = {
   url: string;
   suffix: "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k";
+};
+
+export type StatusResponse = {
+  client_status: Status;
+  server_status: Status;
+};
+
+export type CompilationStatus = {
+  clientStatus: Status;
+  serverStatus: Status;
 };

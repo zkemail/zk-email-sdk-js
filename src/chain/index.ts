@@ -56,6 +56,7 @@ export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
     throw new Error("No proof data generated yet");
   }
 
+  // @ts-ignore
   if (!proof.props.publicOutputs || !proof.props.publicOutputs.length) {
     throw new Error("Not a correct proof type");
   }
