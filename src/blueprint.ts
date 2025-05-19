@@ -264,7 +264,7 @@ export class Blueprint {
     // client = Noir and server = Sp1
     if (bodyLength < 10_000) {
       this.props.clientZkFramework = ZkFramework.Circom;
-      this.props.clientZkFramework = ZkFramework.Circom;
+      this.props.serverZkFramework = ZkFramework.Circom;
       // this.props.serverZkFramework = ZkFramework.Noir;
     } else {
       // TODO: Add Noir when inmplemented
@@ -573,7 +573,10 @@ export class Blueprint {
    * @returns Returns true if the verification was successfull, false if it failed.
    */
   async verifyProofData(publicOutputs: string, proofData: string): Promise<boolean> {
-    if (this.props.clientZkFramework !== ZkFramework.Circom) {
+    if (
+      this.props.clientZkFramework !== ZkFramework.Circom &&
+      this.props.serverZkFramework !== ZkFramework.Circom
+    ) {
       throw new Error("Can only verify a Circom proof from data. Use verifyProof instead.");
     }
 
@@ -624,15 +627,17 @@ export class Blueprint {
 
   /**
    * Returns true if the blueprint can be updated. A blueprint can be updated if the circuits
-   * haven't beed compiled yet, i.e. the status is not Done. The blueprint also must be saved
-   * already before it can be updated.
+   * haven't beed compiled yet or are not currently compiling, i.e. the status is not Done or InProgress.
+   * The blueprint also must be saved already before it can be updated.
    * @returns true if it can be updated
    */
   canUpdate(): boolean {
     return !!(
       this.props.id &&
-      ![Status.Done, Status.InProgress].includes(this.props.clientStatus!) &&
-      ![Status.Done, Status.InProgress].includes(this.props.serverStatus!)
+      this.props.clientStatus !== Status.Done &&
+      this.props.clientStatus !== Status.InProgress &&
+      this.props.serverStatus !== Status.Done &&
+      this.props.serverStatus !== Status.InProgress
     );
   }
 
