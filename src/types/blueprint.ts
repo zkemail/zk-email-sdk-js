@@ -26,6 +26,7 @@ export type BlueprintProps = {
   version?: number;
   stars?: number;
   numLocalProofs?: number;
+  totalProofs?: number;
 };
 
 export type DecomposedRegex = {
@@ -137,6 +138,7 @@ export type BlueprintResponse = {
   version: number;
   stars: number;
   num_local_proofs: number;
+  total_proofs: number;
 };
 
 export type ServerDate = {
@@ -166,7 +168,7 @@ export type ListBlueprintsOptions = {
   skip?: number;
   limit?: number;
   sort?: -1 | 1;
-  sortBy?: "updatedAt" | "stars";
+  sortBy?: "updatedAt" | "stars" | "totalProofs";
   status?: Status[];
   isPublic?: boolean;
   search?: string;

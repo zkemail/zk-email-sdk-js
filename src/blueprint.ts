@@ -163,6 +163,7 @@ export class Blueprint {
       version: response.version,
       stars: response.stars,
       numLocalProofs: response.num_local_proofs,
+      totalProofs: response.total_proofs,
     };
 
     return props;
@@ -334,7 +335,9 @@ export class Blueprint {
     if (options?.sortBy) {
       // Backend accepts snake case only
       // @ts-ignore
-      options.sortBy = options.sortBy === "updatedAt" ? "updated_at" : options.sortBy;
+      options.sortBy = options.sortBy === "updatedAt" ? "updated_at" : 
+                      options.sortBy === "totalProofs" ? "total_proofs" : 
+                      options.sortBy;
     }
 
     let response: { blueprints?: BlueprintResponse[] };
