@@ -65,7 +65,7 @@ export async function verifyProof(proof: Proof) {
     const validPubKey = await verifyPubKey(
       proof.blueprint.props.senderDomain!,
       pubKeyHash,
-      zkFrameworkHashingAlgo[proof.blueprint.props.zkFramework!]
+      zkFrameworkHashingAlgo[proof.props.zkFramework]
     );
     if (!validPubKey) {
       console.warn(
@@ -79,7 +79,7 @@ export async function verifyProof(proof: Proof) {
   }
 
   try {
-    if (proof.blueprint.props.zkFramework === ZkFramework.Circom) {
+    if (proof.props.zkFramework === ZkFramework.Circom) {
       const vkey = await proof.blueprint.getVkey();
       const verified = await snarkjs.groth16.verify(
         JSON.parse(vkey),
@@ -87,7 +87,7 @@ export async function verifyProof(proof: Proof) {
         proof.props.proofData
       );
       return verified;
-    } else if (proof.blueprint.props.zkFramework === ZkFramework.Sp1) {
+    } else if (proof.props.zkFramework === ZkFramework.Sp1) {
       // @ts-ignore
       const verified = await verifySp1Proof(
         // @ts-ignore
@@ -99,7 +99,7 @@ export async function verifyProof(proof: Proof) {
       console.log("sp1 proof verified: ", verified);
       return verified;
     } else {
-      console.warn(`ZkFramework ${proof.blueprint.props.zkFramework} is not supported`);
+      console.warn(`ZkFramework ${proof.props.zkFramework} is not supported`);
       return false;
     }
   } catch (err) {
