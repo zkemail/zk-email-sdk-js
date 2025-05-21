@@ -202,7 +202,7 @@ export async function generateProofInputs(
       ignoreBodyHashCheck: params.ignoreBodyHashCheck,
       // TODO:
       // @ts-ignore This will be renamed again after merge of noir
-      removeSoftLineBreaks: params.removeSoftLinebreaks,
+      removeSoftLinesBreaks: params.removeSoftLinebreaks,
       shaPrecomputeSelector: params.shaPrecomputeSelector,
     };
 
