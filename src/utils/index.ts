@@ -1,11 +1,15 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
-import { poseidonLarge, sha256Hash } from "./hash";
+import { poseidonLarge } from "./hash";
 // @ts-ignore no types available
 import RSAKey from "rsa-key";
+import JSZip from "jszip";
+import { Buffer } from "buffer";
+import * as NoirBignum from "@mach-34/noir-bignum-paramgen";
+import { hashRSAPublicKey } from "@zk-email/zkemail-nr";
 
-import { Auth } from "./types/auth";
-import { getTokenFromAuth } from "./auth";
-import { DkimRecord, HashingAlgorithm } from "./types";
+import { Auth } from "../types/auth";
+import { getTokenFromAuth } from "../auth";
+import { DkimRecord, HashingAlgorithm, ZkFramework } from "../types";
 import { Crypto } from "@peculiar/webcrypto";
 
 const crypto = new Crypto();
@@ -236,11 +240,11 @@ export function getDKIMSelector(emlContent: string): string | null {
 export async function verifyPubKey(
   senderDomain: string,
   hashedPublicKey: string,
-  algo: HashingAlgorithm
+  zkFramework: ZkFramework
 ): Promise<boolean> {
   const pKeys = await getPKeys(senderDomain);
 
-  if (algo === HashingAlgorithm.Sha256) {
+  if (zkFramework === ZkFramework.Sp1) {
     for (const pKey of pKeys) {
       const key = new RSAKey(pKey);
       let pkcs1Key = key.exportKey("pkcs1", "der");
@@ -254,7 +258,7 @@ export async function verifyPubKey(
     return false;
   }
 
-  if (algo === HashingAlgorithm.Poseidon) {
+  if (zkFramework === ZkFramework.Circom) {
     for (const pKey of pKeys) {
       const jwt = await importPEMPublicKey(pKey);
 
@@ -265,6 +269,30 @@ export async function verifyPubKey(
       const poseidonHash = await poseidonLarge(modulusBigInt, 9, 242);
 
       if (poseidonHash.toString() === hashedPublicKey) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  if (zkFramework === ZkFramework.Noir) {
+    for (const pKey of pKeys) {
+      const jwt = await importPEMPublicKey(pKey);
+
+      // Make sure the key has an 'n' property
+      if (!jwt.n) continue;
+
+      const modulusBigInt = base64UrlToBigInt(jwt.n); // pubkey
+      const modulus = NoirBignum.bnToLimbStrArray(modulusBigInt, 2048).map((limb: string) =>
+        BigInt(limb)
+      );
+      const redc = NoirBignum.bnToRedcLimbStrArray(modulusBigInt, 2048).map((limb: string) =>
+        BigInt(limb)
+      );
+
+      const pubKeyHash = (await hashRSAPublicKey(modulus, redc)).toString();
+
+      if (pubKeyHash === hashedPublicKey) {
         return true;
       }
     }
@@ -344,4 +372,84 @@ function base64UrlToBigInt(base64Url: string): bigint {
     hex += h;
   }
   return BigInt("0x" + hex);
+}
+
+export async function downloadJsonFromUrl<T>(url: string): Promise<T> {
+  // Download and parse the JSON from circuitUrl
+  let data;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch data from url: ${response.statusText}`);
+    }
+    data = await response.json();
+  } catch (error) {
+    console.error("Error downloading or parsing response data:", error);
+    throw new Error("Failed to download or parse the response data");
+  }
+  console.log("returning downloaded data: ", data);
+  return data;
+}
+
+export async function downloadAndUnzipFile(url: string): Promise<Record<string, any>> {
+  try {
+    // Fetch the file
+    const response = await fetch(url);
+
+    // Check if the request was successful
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    // Get the response as an ArrayBuffer
+    const arrayBuffer = await response.arrayBuffer();
+
+    // Create a new JSZip instance
+    const zip = new JSZip();
+
+    // Load the zip file content
+    const zipContent = await zip.loadAsync(arrayBuffer);
+
+    // Process the zip contents
+    const files: Record<string, any> = {};
+
+    // Iterate over each file in the zip
+    const filePromises = Object.keys(zipContent.files).map(async (filename) => {
+      const file = zipContent.files[filename];
+
+      // Skip directories
+      if (file.dir) return;
+
+      // Get the file content as text, blob, arrayBuffer, etc.
+      // depending on what you need
+      // For text files:
+      const content = await file.async("text");
+      files[filename] = content;
+
+      // For JSON files:
+      if (filename.endsWith(".json")) {
+        try {
+          files[filename] = JSON.parse(content);
+        } catch (e) {
+          console.error(`Error parsing JSON in ${filename}`, e);
+        }
+      }
+    });
+
+    // Wait for all files to be processed
+    await Promise.all(filePromises);
+
+    return files;
+  } catch (error) {
+    console.error("Error downloading or unzipping the file:", error);
+    throw error;
+  }
+}
+
+export function hexToUint8Array(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+  }
+  return bytes;
 }
