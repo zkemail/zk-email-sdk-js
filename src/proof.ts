@@ -10,6 +10,7 @@ import {
 } from "./types/proof";
 import { get } from "./utils";
 import { verifyProof } from "./verify";
+import { hashRSAPublicKey } from "@zk-email/zkemail-nr";
 
 /**
  * A generated proof. You get get proof data and verify proofs on chain.
@@ -39,7 +40,7 @@ export class Proof {
     return this.props.id;
   }
 
-  getPubKeyHash(): string {
+  async getPubKeyHash(): Promise<string> {
     let pubKeyHash: string;
     if (this.props.zkFramework === ZkFramework.Circom) {
       pubKeyHash = (this.props.publicOutputs as string[])[0];
@@ -47,6 +48,8 @@ export class Proof {
       pubKeyHash = new Uint8Array(
         (this.props.publicOutputs as PublicOutputsSp1Response).outputs.public_key_hash
       ).toString();
+    } else if (this.props.zkFramework === ZkFramework.Noir) {
+      return BigInt((this.props.publicOutputs as string[])[0]).toString();
     } else {
       throw new Error(`No pubkey hash for zk framework ${this.props.zkFramework}`);
     }
@@ -243,6 +246,7 @@ export class Proof {
       provedAt: response.proved_at ? new Date(response.proved_at.seconds * 1000) : undefined,
       isLocal: false,
       sp1VkeyHash: response.sp1_vkey_hash,
+      zkFramework: response.zk_framework,
     };
     return props;
   }

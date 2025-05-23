@@ -8,3 +8,6 @@ server.log
 emls
 
 zk-email-sdk*.tgz
+public/wasm
+
+*.tgz
