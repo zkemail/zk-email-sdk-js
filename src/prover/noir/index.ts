@@ -2,7 +2,6 @@ import { AbstractProver, IProver } from "..";
 import { Proof } from "../../proof";
 import {
   DecomposedRegex,
-  ExternalInput,
   ExternalInputInput,
   ExternalInputProof,
   GenerateProofOptions,
@@ -10,18 +9,10 @@ import {
   PublicProofData,
   ZkFramework,
 } from "../../types";
-import { type Noir } from "@noir-lang/noir_js";
-import { type UltraHonkBackend } from "@aztec/bb.js";
 import {
   parseEmail,
   generateNoirCircuitInputsWithRegexesAndExternalInputs,
 } from "@zk-email/relayer-utils";
-import { external } from "jszip";
-
-type NoirParams = {
-  Noir: typeof Noir;
-  UltraHonkBackend: typeof UltraHonkBackend;
-};
 
 export class NoirProver extends AbstractProver implements IProver {
   async generateLocalProof(
@@ -75,8 +66,8 @@ export class NoirProver extends AbstractProver implements IProver {
     const noirParams = {
       maxHeaderLength: this.blueprint.props.emailHeaderMaxLength || 512,
       maxBodyLength: this.blueprint.props.emailBodyMaxLength || 0,
-      ignoreBodyHashCheck: this.blueprint.props.ignoreBodyHashCheck || false,
-      removeSoftLineBreaks: this.blueprint.props.removeSoftLinebreaks || false,
+      ignoreBodyHashCheck: this.blueprint.props.ignoreBodyHashCheck || true,
+      removeSoftLineBreaks: this.blueprint.props.removeSoftLinebreaks || true,
       shaPrecomputeSelector: this.blueprint.props.shaPrecomputeSelector,
       proverEthAddress: "0x0000000000000000000000000000000000000000",
     };
@@ -113,8 +104,6 @@ export class NoirProver extends AbstractProver implements IProver {
     for (const [key, value] of circuitInputs) {
       if (value && typeof value === "object" && value instanceof Map) {
         circuitInputsObject[key] = Object.fromEntries(value);
-      } else if (value && typeof value === "object") {
-        circuitInputsObject[key] = value;
       } else if (value) {
         circuitInputsObject[key] = value;
       }
@@ -130,8 +119,8 @@ export class NoirProver extends AbstractProver implements IProver {
     const proof = await backend.generateProof(witness);
     console.timeEnd("prove");
 
-    this._incNumLocalProofs().catch((err) =>
-      console.warn("Failed to increase num of local proofs")
+    this.incNumLocalProofs().catch((err) =>
+      console.warn("Failed to increase num of local proofs: ", err)
     );
 
     const { publicData, externalInputsProof } = parseNoirPublicOutputs(

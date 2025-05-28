@@ -347,7 +347,7 @@ describe("Blueprint prod test suite", () => {
     const prover = blueprint.createProver({ isLocal: true });
 
     // bypass private
-    await (prover as any)._incNumLocalProofs();
+    await (prover as any).incNumLocalProofs();
 
     const updatedBlueprint = await sdk.getBlueprintById("0026f203-2643-430e-b97c-b6c3e5300548");
 

@@ -33,7 +33,7 @@ export interface IProver {
     externalInputs?: ExternalInputInput[],
     options?: GenerateProofOptions
   ): Promise<Proof>;
-  _incNumLocalProofs(): Promise<void>;
+  incNumLocalProofs(): Promise<void>;
 }
 
 /**
@@ -270,8 +270,8 @@ export abstract class AbstractProver implements IProver {
     );
 
     // Do not await, local proof should not fail if this fails
-    this._incNumLocalProofs().catch((err) => {
-      console.error("Failed to increase local proofs after generating proof");
+    this.incNumLocalProofs().catch((err) => {
+      console.error("Failed to increase local proofs after generating proof: ", err);
     });
 
     const proofProps: ProofProps = {
@@ -292,14 +292,14 @@ export abstract class AbstractProver implements IProver {
     return new Proof(this.blueprint, proofProps);
   }
 
-  async _incNumLocalProofs(): Promise<void> {
+  async incNumLocalProofs(): Promise<void> {
     try {
       await patch<{ success: boolean }>(
         `${this.blueprint.baseUrl}/blueprint/inc-local-proofs/${this.blueprint.props.id}`
       );
     } catch (err) {
       console.error(
-        "Failed calling PATCH on /blueprint/inc-local-proofs in _incNumLocalProofs: ",
+        "Failed calling PATCH on /blueprint/inc-local-proofs in incNumLocalProofs: ",
         err
       );
       throw err;
