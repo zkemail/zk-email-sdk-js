@@ -1,4 +1,4 @@
-import { Prover } from "./prover";
+import { IProver, Prover } from "./prover";
 import {
   BlueprintProps,
   BlueprintRequest,
@@ -11,15 +11,15 @@ import {
   StatusResponse,
   ZkFramework,
 } from "./types/blueprint";
-import { del, get, patch, post, verifyPubKey } from "./utils";
+import { del, downloadAndUnzipFile, downloadJsonFromUrl, get, patch, post } from "./utils";
 import { verifyProofOnChain } from "./chain";
 import { Auth } from "./types/auth";
 import { Proof } from "./proof";
 import { blueprintFormSchema } from "./blueprintValidation";
-import { ProverOptions } from "./types";
+import { GenerateProofOptions, ProverOptions } from "./types";
 import { getMaxEmailBodyLength, testBlueprint } from "./relayerUtils";
-import * as snarkjs from "@zk-email/snarkjs";
 import { verifyProof, verifyProofData } from "./verify";
+import { NoirProver } from "./prover/noir";
 
 /**
  * Represents a Regex Blueprint including the decomposed regex access to the circuit.
@@ -266,12 +266,8 @@ export class Blueprint {
     if (bodyLength < 10_000) {
       this.props.clientZkFramework = ZkFramework.Circom;
       this.props.serverZkFramework = ZkFramework.Circom;
-      // this.props.serverZkFramework = ZkFramework.Noir;
     } else {
-      // TODO: Add Noir when inmplemented
-      // -> Cannot create with None, have to put Circom for now
-      // this.props.clientZkFramework = ZkFramework.Noir;
-      this.props.clientZkFramework = ZkFramework.Circom;
+      this.props.clientZkFramework = ZkFramework.Noir;
       this.props.serverZkFramework = ZkFramework.Sp1;
     }
   }
@@ -350,9 +346,12 @@ export class Blueprint {
     if (options?.sortBy) {
       // Backend accepts snake case only
       // @ts-ignore
-      options.sortBy = options.sortBy === "updatedAt" ? "updated_at" : 
-                      options.sortBy === "totalProofs" ? "total_proofs" : 
-                      options.sortBy;
+      options.sortBy =
+        options.sortBy === "updatedAt"
+          ? "updated_at"
+          : options.sortBy === "totalProofs"
+            ? "total_proofs"
+            : options.sortBy;
     }
 
     let response: { blueprints?: BlueprintResponse[] };
@@ -550,7 +549,11 @@ export class Blueprint {
    * Creates an instance of Prover with which you can create proofs.
    * @returns An instance of Prover.
    */
-  createProver(options?: ProverOptions) {
+  createProver(options?: ProverOptions): IProver {
+    if (this.props.clientZkFramework === ZkFramework.Noir) {
+      return new NoirProver(this, options);
+    }
+
     return new Prover(this, options);
   }
 
@@ -604,8 +607,8 @@ export class Blueprint {
    * @param proof - The generated proof you want to verify.
    * @returns Returns true if the verification was successfull, false if it failed.
    */
-  async verifyProof(proof: Proof): Promise<boolean> {
-    return verifyProof(proof);
+  async verifyProof(proof: Proof, options?: GenerateProofOptions): Promise<boolean> {
+    return verifyProof(proof, options);
   }
 
   /**
@@ -800,6 +803,104 @@ export class Blueprint {
     }
 
     return response.urls;
+  }
+
+  async getNoirCircuitDownloadLink(): Promise<string> {
+    if (this.props.clientStatus !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    if (this.props.clientZkFramework !== ZkFramework.Noir) {
+      throw new Error("Only a noir blueprint has a noir circuit");
+    }
+
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(
+        `${this.baseUrl}/blueprint/noir-circuit/${this.props.id}`
+      );
+    } catch (err) {
+      console.error(
+        "Failed calling GET on /blueprint/noir-circuit/:id in getNoirCircuitDownloadLink: ",
+        err
+      );
+      throw err;
+    }
+
+    return response.url;
+  }
+
+  async getNoirCircuitJsonDownloadLink(): Promise<string> {
+    if (this.props.clientStatus !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    if (this.props.clientZkFramework !== ZkFramework.Noir) {
+      throw new Error("Only a noir blueprint has a noir circuit");
+    }
+
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(
+        `${this.baseUrl}/blueprint/noir-circuit-json/${this.props.id}`
+      );
+    } catch (err) {
+      console.error(
+        "Failed calling GET on /blueprint/noir-circuit/:id in getNoirCircuitDownloadLink: ",
+        err
+      );
+      throw err;
+    }
+
+    return response.url;
+  }
+
+  async getNoirRegexGraphsDownloadLink(): Promise<string> {
+    if (this.props.clientStatus !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    if (this.props.clientZkFramework !== ZkFramework.Noir) {
+      throw new Error("Only a noir blueprint has a noir circuit");
+    }
+
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(
+        `${this.baseUrl}/blueprint/noir-regex-graphs/${this.props.id}`
+      );
+    } catch (err) {
+      console.error(
+        "Failed calling GET on /blueprint/noir-regex-graphs/:id in getNoirCircuitDownloadLink: ",
+        err
+      );
+      throw err;
+    }
+
+    return response.url;
+  }
+
+  async getNoirCircuit(): Promise<any> {
+    if (this.props.clientZkFramework !== ZkFramework.Noir) {
+      throw new Error("Only a noir blueprint has a noir circuit");
+    }
+
+    const circuitUrl = await this.getNoirCircuitJsonDownloadLink();
+    // TODO: type circuit
+    const circuit = await downloadJsonFromUrl<any>(circuitUrl);
+    return circuit;
+  }
+
+  async getNoirRegexGraphs(): Promise<any> {
+    if (this.props.clientZkFramework !== ZkFramework.Noir) {
+      throw new Error("Only a noir blueprint has a noir circuit");
+    }
+
+    const url = await this.getNoirRegexGraphsDownloadLink();
+    const data = await downloadAndUnzipFile(url);
+    console.log("data: ", data);
+
+    return data;
   }
 
   async getWasmFileDownloadLink(): Promise<string> {

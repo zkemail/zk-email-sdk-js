@@ -67,6 +67,7 @@ export enum ZkFramework {
   None,
   Circom,
   Sp1,
+  Noir,
 }
 
 // According to protobufs

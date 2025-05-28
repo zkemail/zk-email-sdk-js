@@ -1,15 +1,20 @@
 {
   "name": "@zk-email/sdk",
-  "version": "1.0.1",
+  "version": "1.1.0-53",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/zk-email-sdk.es.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/zk-email-sdk.cjs.js",
-      "import": "./dist/zk-email-sdk.es.js",
+      "require": "./dist/zk-email-sdk.index.cjs.js",
+      "import": "./dist/zk-email-sdk.index.es.js",
       "types": "./dist/types/index.d.ts"
+    },
+    "./initNoirWasm": {
+      "require": "./dist/zk-email-sdk.initNoirWasm.cjs.js",
+      "import": "./dist/zk-email-sdk.initNoirWasm.es.js",
+      "types": "./dist/types/initNoirWasm.d.ts"
     }
   },
   "files": [
@@ -24,7 +29,6 @@
     "publish": "bun run build && npm publish --access public",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublishOnly": "bun run build",
     "clean": "rm -rf dist",
     "publish-nightly": "bun run build && npm publish --access public --tag nightly"
   },
@@ -37,6 +41,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@aztec/bb.js": "0.82.2",
+    "@noir-lang/noir_js": "1.0.0-beta.2",
+    "@noir-lang/noirc_abi": "1.0.0-beta.2",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@rollup/plugin-inject": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
@@ -62,10 +69,13 @@
   },
   "dependencies": {
     "@azure/msal-browser": "^4.5.1",
+    "@mach-34/noir-bignum-paramgen": "^1.1.2",
     "@peculiar/webcrypto": "^1.5.0",
-    "@zk-email/relayer-utils": "0.4.65",
+    "@zk-email/relayer-utils": "0.4.66-nightly.20250523-1",
     "@zk-email/snarkjs": "^0.0.1",
+    "@zk-email/zkemail-nr": "1.3.3-3",
     "ethers": "^6.13.4",
+    "jszip": "^3.10.1",
     "poseidon-lite": "^0.3.0",
     "rsa-key": "^0.0.6",
     "snarkjs": "^0.7.5",

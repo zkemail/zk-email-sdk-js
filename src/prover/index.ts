@@ -1,6 +1,6 @@
-import { Blueprint, ZkFramework } from "./blueprint";
-import { Proof } from "./proof";
-import { generateProofInputs, parsePublicSignals, testBlueprint } from "./relayerUtils";
+import { Blueprint, ZkFramework } from "../blueprint";
+import { Proof } from "../proof";
+import { generateProofInputs, parsePublicSignals } from "../relayerUtils";
 import {
   ExternalInputProof,
   GenerateProofInputsParams,
@@ -8,15 +8,38 @@ import {
   ProofRequest,
   ProofResponse,
   ProofStatus,
-} from "./types/proof";
-import { ExternalInputInput, ProverOptions } from "./types/prover";
-import { patch, post } from "./utils";
-import { localProverWorkerCode } from "./localProverWorkerString";
+} from "../types/proof";
+import { ExternalInputInput, GenerateProofOptions, ProverOptions } from "../types/prover";
+import { patch, post } from "../utils";
+import { localProverWorkerCode } from "../localProverWorkerString";
+
+export interface IProver {
+  options: ProverOptions;
+  blueprint: Blueprint;
+
+  generateProof(
+    eml: string,
+    externalInputs?: ExternalInputInput[],
+    options?: GenerateProofOptions
+  ): Promise<Proof>;
+  generateProofInputs(eml: string, externalInputs?: ExternalInputInput[]): Promise<string>;
+  generateProofRequest(
+    eml: string,
+    externalInputs?: ExternalInputInput[],
+    options?: GenerateProofOptions
+  ): Promise<Proof>;
+  generateLocalProof(
+    eml: string,
+    externalInputs?: ExternalInputInput[],
+    options?: GenerateProofOptions
+  ): Promise<Proof>;
+  incNumLocalProofs(): Promise<void>;
+}
 
 /**
- * Represents a Prover generated from a blueprint that can generate Proofs
+ * Abstract base class for Provers
  */
-export class Prover {
+export abstract class AbstractProver implements IProver {
   options: ProverOptions;
   blueprint: Blueprint;
 
@@ -24,7 +47,11 @@ export class Prover {
     if (!(blueprint instanceof Blueprint)) {
       throw new Error("Invalid blueprint: must be an instance of Blueprint class");
     }
-    if (options?.isLocal && blueprint.props.clientZkFramework !== ZkFramework.Circom) {
+    console.log("blueprint.props.clientZkFramework!: ", blueprint.props.clientZkFramework!);
+    if (
+      options?.isLocal &&
+      ![ZkFramework.Circom, ZkFramework.Noir].includes(blueprint.props.clientZkFramework!)
+    ) {
       throw new Error("Local proving is currently only supported using Circom");
     }
 
@@ -44,11 +71,15 @@ export class Prover {
    * @returns A promise that resolves to a new instance of Proof. The Proof will have the status
    * Done or Failed.
    */
-  async generateProof(eml: string, externalInputs: ExternalInputInput[] = []): Promise<Proof> {
+  async generateProof(
+    eml: string,
+    externalInputs: ExternalInputInput[] = [],
+    options?: GenerateProofOptions
+  ): Promise<Proof> {
     if (this.options.isLocal) {
-      return this.generateLocalProof(eml, externalInputs);
+      return this.generateLocalProof(eml, externalInputs, options);
     } else {
-      const proof = await this.generateProofRequest(eml, externalInputs);
+      const proof = await this.generateProofRequest(eml, externalInputs, options);
 
       await new Promise((r) => setTimeout(r, 6_000));
 
@@ -92,7 +123,6 @@ export class Prover {
         removeSoftLinebreaks: this.blueprint.props.removeSoftLinebreaks || true,
         shaPrecomputeSelector: this.blueprint.props.shaPrecomputeSelector,
       };
-      console.log("generating proof inputs");
       inputs = await generateProofInputs(
         eml,
         this.blueprint.props.decomposedRegexes,
@@ -100,13 +130,12 @@ export class Prover {
         params
       );
 
-      console.log("got the inputs: ", inputs);
+      console.log("got proof inputs: ", inputs);
     } catch (err) {
       console.error("Failed to generate inputs for proof");
       throw err;
     }
 
-    console.log("returning the inputs");
     return inputs;
   }
 
@@ -118,7 +147,8 @@ export class Prover {
    */
   async generateProofRequest(
     eml: string,
-    externalInputs: ExternalInputInput[] = []
+    externalInputs: ExternalInputInput[] = [],
+    options?: GenerateProofOptions
   ): Promise<Proof> {
     console.log("generating remote proof");
     const blueprintId = this.blueprint.getId();
@@ -153,14 +183,12 @@ export class Prover {
         requestData.eml = eml;
       }
 
-
       response = await post<ProofResponse>(`${this.blueprint.baseUrl}/proof`, requestData);
     } catch (err) {
       console.error("Failed calling POST on /proof/ in generateProofRequest: ", err);
       throw err;
     }
 
-    console.log("transforming proof props for sdk");
     const proofProps = Proof.responseToProofProps(response);
 
     return new Proof(this.blueprint, proofProps);
@@ -172,11 +200,12 @@ export class Prover {
    * @returns A promise that resolves to a new instance of Proof. The Proof will have the status
    * Done or Failed.
    */
-  async generateLocalProof(eml: string, externalInputs: ExternalInputInput[] = []): Promise<Proof> {
-    if (!Worker) {
-      throw new Error("Local proving is only supported in the browser");
-    }
-    console.log("generating local proof");
+  async generateLocalProof(
+    eml: string,
+    externalInputs: ExternalInputInput[] = [],
+    options?: GenerateProofOptions
+  ): Promise<Proof> {
+    console.log("in general generateLocalProof: ", options);
     const blueprintId = this.blueprint.getId();
     if (!blueprintId) {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
@@ -241,8 +270,8 @@ export class Prover {
     );
 
     // Do not await, local proof should not fail if this fails
-    this._incNumLocalProofs().catch((err) => {
-      console.error("Failed to increase local proofs after generating proof");
+    this.incNumLocalProofs().catch((err) => {
+      console.error("Failed to increase local proofs after generating proof: ", err);
     });
 
     const proofProps: ProofProps = {
@@ -263,17 +292,22 @@ export class Prover {
     return new Proof(this.blueprint, proofProps);
   }
 
-  private async _incNumLocalProofs(): Promise<void> {
+  async incNumLocalProofs(): Promise<void> {
     try {
       await patch<{ success: boolean }>(
         `${this.blueprint.baseUrl}/blueprint/inc-local-proofs/${this.blueprint.props.id}`
       );
     } catch (err) {
       console.error(
-        "Failed calling PATCH on /blueprint/inc-local-proofs in _incNumLocalProofs: ",
+        "Failed calling PATCH on /blueprint/inc-local-proofs in incNumLocalProofs: ",
         err
       );
       throw err;
     }
   }
 }
+
+/**
+ * Represents a Prover generated from a blueprint that can generate Proofs
+ */
+export class Prover extends AbstractProver {}
