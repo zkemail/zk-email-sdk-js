@@ -8,11 +8,11 @@ export function setupLoginWithMicrosoft(element: HTMLElement) {
   const loginButton = element.querySelector("button");
   if (loginButton) {
     loginButton.addEventListener("click", async () => {
-      const blueprint = await sdk.getBlueprintById("0935faed-002d-4b94-8cbf-476b3b05d9a6");
+      const blueprint = await sdk.getBlueprintById("963fbbe8-7f08-4a9c-8608-f378b144aec3");
       // const blueprint = await sdk.getBlueprintById("008b5da5-fbda-4445-b7df-6b0c6dde4bb1");
       // const blueprint2 = await sdk.getBlueprintById("0935faed-002d-4b94-8cbf-476b3b05d9a6");
 
-      blueprint.props.emailQuery = "from:account-security-noreply@accountprotection.microsoft.com";
+      // blueprint.props.emailQuery = "from:x.com password reset";
 
       // optional - manually start Login with Google flow and authorize before fetching emails
       console.log("Manually authorizing");
