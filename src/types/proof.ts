@@ -76,7 +76,7 @@ export type GenerateProofInputsParamsInternal = {
   maxHeaderLength: number;
   maxBodyLength: number;
   ignoreBodyHashCheck: boolean;
-  removeSoftLinesBreaks: boolean;
+  removeSoftLineBreaks: boolean;
   shaPrecomputeSelector?: string;
 };
 

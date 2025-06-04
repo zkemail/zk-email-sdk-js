@@ -200,9 +200,7 @@ export async function generateProofInputs(
       maxHeaderLength: params.emailHeaderMaxLength,
       maxBodyLength: params.emailBodyMaxLength,
       ignoreBodyHashCheck: params.ignoreBodyHashCheck,
-      // TODO:
-      // @ts-ignore This will be renamed again after merge of noir
-      removeSoftLinesBreaks: params.removeSoftLinebreaks,
+      removeSoftLineBreaks: params.removeSoftLinebreaks,
       shaPrecomputeSelector: params.shaPrecomputeSelector,
     };
 
