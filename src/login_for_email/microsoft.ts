@@ -181,20 +181,20 @@ export class Outlook implements EmailProvider {
   }
 
   private convertToGraphQuery(gmailQuery: string): string {
-    // Handle from: queries
-    if (gmailQuery.startsWith("from:")) {
-      const emailAddress = gmailQuery.substring(5).trim();
-      return `from/emailAddress/address eq '${emailAddress}'`;
+    const parts = gmailQuery.split(" ");
+    let finalQuery = "";
+
+    for (const part of parts) {
+      if (part.startsWith("from:")) {
+        finalQuery += `from:${part.substring(5).trim()} `;
+      } else if (part.startsWith("subject:")) {
+        finalQuery += `subject:${part.substring(8).trim()} `;
+      } else {
+        finalQuery += `body:${part} `;
+      }
     }
 
-    // Handle subject: queries
-    if (gmailQuery.startsWith("subject:")) {
-      const subject = gmailQuery.substring(8).trim();
-      return `contains(subject,'${subject}')`;
-    }
-
-    // Default case - search in subject or body
-    return `contains(subject,'${gmailQuery}') or contains(bodyPreview,'${gmailQuery}')`;
+    return finalQuery;
   }
 
   async fetchMore(): Promise<RawOutlookEmailResponse[]> {
@@ -217,14 +217,14 @@ export class Outlook implements EmailProvider {
     const params = new URLSearchParams();
 
     // Add top parameter (similar to maxResults in Gmail)
-    params.append("$top", "2");
+    params.append("$top", "5");
 
     // Add select parameter to get only needed fields
     params.append("$select", "id,subject,receivedDateTime,internetMessageId,body,bodyPreview");
 
     // Add filter if query exists
     if (this.query) {
-      params.append("$filter", this.query);
+      params.append("$search", `"${this.query}"`);
     }
 
     // Construct the final URL
