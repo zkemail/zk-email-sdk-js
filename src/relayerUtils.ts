@@ -35,9 +35,29 @@ init()
   });
 
 const emlPubKeyCache = new Map();
+const parsedEmlCache: Map<string, ParsedEmail> = new Map();
+
+function simpleHash(str: string): string {
+  let hash = 0;
+  if (str.length === 0) return hash.toString();
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return hash.toString();
+}
 
 export async function parseEmail(eml: string, ignoreBodyHashCheck = false): Promise<ParsedEmail> {
+  const emlHash = simpleHash(eml);
+  const existingParsedEml = parsedEmlCache.get(emlHash);
+  if (existingParsedEml) {
+    return existingParsedEml;
+  }
+
   try {
+    console.time("parseEmail");
     await relayerUtilsInit;
 
     const publicKey = emlPubKeyCache.get(eml);
@@ -48,9 +68,8 @@ export async function parseEmail(eml: string, ignoreBodyHashCheck = false): Prom
       // will internally not verify the pubkey if it is provided
       parsedEmail = await parseEmailUtils(eml, publicKey);
     } else {
-      console.log("parsing email no pub key");
       parsedEmail = await parseEmailUtils(eml, null, ignoreBodyHashCheck);
-      console.log("parsed email");
+      parsedEmlCache.set(emlHash, parsedEmail);
       emlPubKeyCache.set(eml, parsedEmail.publicKey);
 
       try {
@@ -70,9 +89,11 @@ export async function parseEmail(eml: string, ignoreBodyHashCheck = false): Prom
       }
     }
 
+    console.timeEnd("parseEmail");
     return parsedEmail as ParsedEmail;
   } catch (err) {
     console.error("Failed to parse email: ", err);
+    console.timeEnd("parseEmail");
     throw err;
   }
 }
