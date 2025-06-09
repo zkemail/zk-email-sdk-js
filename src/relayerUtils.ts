@@ -57,7 +57,6 @@ export async function parseEmail(eml: string, ignoreBodyHashCheck = false): Prom
   }
 
   try {
-    console.time("parseEmail");
     await relayerUtilsInit;
 
     const publicKey = emlPubKeyCache.get(eml);
@@ -89,11 +88,9 @@ export async function parseEmail(eml: string, ignoreBodyHashCheck = false): Prom
       }
     }
 
-    console.timeEnd("parseEmail");
     return parsedEmail as ParsedEmail;
   } catch (err) {
     console.error("Failed to parse email: ", err);
-    console.timeEnd("parseEmail");
     throw err;
   }
 }
