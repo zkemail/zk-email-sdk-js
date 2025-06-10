@@ -12,6 +12,7 @@ import {
 import { ExternalInputInput, GenerateProofOptions, ProverOptions } from "../types/prover";
 import { patch, post } from "../utils";
 import { localProverWorkerCode } from "../localProverWorkerString";
+import { addMaxLengthToExternalInputs } from "../utils/maxLenghExternalInputs";
 
 export interface IProver {
   options: ProverOptions;
@@ -113,6 +114,11 @@ export abstract class AbstractProver implements IProver {
       );
     }
 
+    const externalInputsWithMaxLength = addMaxLengthToExternalInputs(
+      externalInputs,
+      this.blueprint.props.externalInputs
+    );
+
     let inputs: string;
     try {
       // TODO: Do we use defaults?
@@ -126,7 +132,7 @@ export abstract class AbstractProver implements IProver {
       inputs = await generateProofInputs(
         eml,
         this.blueprint.props.decomposedRegexes,
-        externalInputs,
+        externalInputsWithMaxLength,
         params
       );
 
