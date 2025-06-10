@@ -210,7 +210,7 @@ export async function testDecomposedRegex(
 export async function generateProofInputs(
   eml: string,
   decomposedRegexes: DecomposedRegex[],
-  externalInputs: ExternalInputInput[],
+  externalInputs: (ExternalInputInput & { maxLength: number })[],
   params: GenerateProofInputsParams
 ): Promise<string> {
   try {

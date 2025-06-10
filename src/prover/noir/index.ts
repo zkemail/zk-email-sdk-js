@@ -13,6 +13,7 @@ import {
   parseEmail,
   generateNoirCircuitInputsWithRegexesAndExternalInputs,
 } from "@zk-email/relayer-utils";
+import { addMaxLengthToExternalInputs } from "../../utils/maxLenghExternalInputs";
 
 export class NoirProver extends AbstractProver implements IProver {
   async generateLocalProof(
@@ -76,10 +77,15 @@ export class NoirProver extends AbstractProver implements IProver {
     console.log("generating inputs externalInputs: ", externalInputs);
     console.log("generating inputs noirParams: ", noirParams);
 
+    const externalInputsWithMaxLength = addMaxLengthToExternalInputs(
+      externalInputs,
+      this.blueprint.props.externalInputs
+    );
+
     const circuitInputs = await generateNoirCircuitInputsWithRegexesAndExternalInputs(
       eml,
       regexInputs,
-      externalInputs || [],
+      externalInputsWithMaxLength,
       noirParams
     );
 
@@ -126,7 +132,7 @@ export class NoirProver extends AbstractProver implements IProver {
     const { publicData, externalInputsProof } = parseNoirPublicOutputs(
       proof.publicInputs,
       this.blueprint.props.decomposedRegexes,
-      externalInputs
+      externalInputsWithMaxLength
     );
 
     // Convert to hex

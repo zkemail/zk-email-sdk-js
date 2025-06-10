@@ -1,6 +1,6 @@
 {
   "name": "@zk-email/sdk",
-  "version": "1.1.0-57",
+  "version": "1.2.0-2",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/zk-email-sdk.es.js",

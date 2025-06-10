@@ -8,7 +8,6 @@ export type ProverOptions = {
 export type ExternalInputInput = {
   name: string;
   value: string;
-  maxLength: number;
 };
 
 export type NoirWasm = {
