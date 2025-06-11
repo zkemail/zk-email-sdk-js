@@ -1,5 +1,6 @@
 import { Blueprint, Status, ZkFramework } from "./blueprint";
 import { verifyProofOnChain } from "./chain";
+import { GenerateProofOptions } from "./types";
 import {
   ExternalInputProof,
   ProofProps,
@@ -271,7 +272,7 @@ export class Proof {
     };
   }
 
-  async verify(): Promise<boolean> {
-    return verifyProof(this);
+  async verify(options?: GenerateProofOptions): Promise<boolean> {
+    return verifyProof(this, options);
   }
 }
