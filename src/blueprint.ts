@@ -637,14 +637,30 @@ export class Blueprint {
    * The blueprint also must be saved already before it can be updated.
    * @returns true if it can be updated
    */
-  canUpdate(): boolean {
-    return !!(
-      this.props.id &&
-      this.props.clientStatus !== Status.Done &&
-      this.props.clientStatus !== Status.InProgress &&
-      this.props.serverStatus !== Status.Done &&
-      this.props.serverStatus !== Status.InProgress
-    );
+  canUpdate(newProps: BlueprintProps): boolean {
+    // Create a copy of current props without description and emailQuery
+    const currentPropsWithoutFields = { ...this.props };
+    delete currentPropsWithoutFields.description;
+    delete currentPropsWithoutFields.emailQuery;
+
+    // Create a copy of new props without description and emailQuery
+    const newPropsWithoutFields = { ...newProps };
+    delete newPropsWithoutFields.description;
+    delete newPropsWithoutFields.emailQuery;
+
+    // Compare the remaining fields - if they are different, return false
+    if (JSON.stringify(currentPropsWithoutFields) !== JSON.stringify(newPropsWithoutFields)) {
+      return !!(
+        this.props.id &&
+        this.props.clientStatus !== Status.Done &&
+        this.props.clientStatus !== Status.InProgress &&
+        this.props.serverStatus !== Status.Done &&
+        this.props.serverStatus !== Status.InProgress
+      );
+    }
+
+    // If we get here, only description and emailQuery might have changed
+    return true;
   }
 
   /**
@@ -657,7 +673,7 @@ export class Blueprint {
       throw new Error("auth is required, add it with Blueprint.addAuth(auth)");
     }
 
-    if (!this.canUpdate()) {
+    if (!this.canUpdate(newProps)) {
       throw new Error("Blueprint already compied, cannot update");
     }
 
