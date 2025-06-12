@@ -316,8 +316,10 @@ export class Outlook implements EmailProvider {
   }
 
   // Get a specific email by ID in its raw format
-  async fetchEmailRawById(accessToken: string, emailId: string): Promise<RawOutlookEmailResponse> {
-    const url = `https://graph.microsoft.com/v1.0/me/messages/${emailId}?$select=id,subject,receivedDateTime,internetMessageId,body`;
+  async fetchEmailRawById(emailId: string): Promise<RawOutlookEmailResponse> {
+    const accessToken = await this.loginWithMicrosoft.getAccessToken();
+    // We need internetMessageHeaders to get the DKIM signature and other headers
+    const url = `https://graph.microsoft.com/v1.0/me/messages/${emailId}?$select=id,subject,receivedDateTime,internetMessageId,body,internetMessageHeaders`;
 
     const response = await fetch(url, {
       headers: {

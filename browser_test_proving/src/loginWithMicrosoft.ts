@@ -20,7 +20,9 @@ export function setupLoginWithMicrosoft(element: HTMLElement) {
       console.log("after authorize: ", outlook);
 
       const emails = await outlook.fetchEmails([blueprint]);
-      console.log("emails: ", emails);
+
+      const email = await outlook.fetchEmailRawById(emails[0].emailMessageId);
+      console.log("email: ", email);
 
       let moreEmails = await outlook.fetchMore();
       console.log("moreEmails: ", moreEmails);
