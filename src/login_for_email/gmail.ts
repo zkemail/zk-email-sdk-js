@@ -1,6 +1,7 @@
 import { EmailLoginProvider, EmailProvider } from ".";
 import { Blueprint } from "../blueprint";
 import { FetchEmailOptions, GmailMessagesListResponse, RawEmailResponse } from "../types/gmail";
+import { decodeMimeEncodedText } from "../utils";
 
 const clientId = "773062743658-rauj7nb18ikr1lrfs5bl8lt3b31r2nen.apps.googleusercontent.com";
 /**
@@ -124,6 +125,11 @@ export class Gmail implements EmailProvider {
       accessToken,
       emailList.messages.map((msg) => msg.id)
     );
+    
+    emails.forEach((email) => {
+      email.subject = decodeMimeEncodedText(email.subject);
+    });
+    
     return emails;
   }
 
