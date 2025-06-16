@@ -60,5 +60,8 @@ export default (sdkOptions?: SdkOptions) => {
       }
       return getStarredBlueprints(baseUrl, sdkOptions!.auth!);
     },
+    async unPackProof(packedProof: string): Promise<Proof> {
+      return Proof.unPackProof(packedProof, baseUrl);
+    },
   };
 };

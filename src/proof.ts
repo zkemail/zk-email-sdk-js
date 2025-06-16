@@ -1,4 +1,4 @@
-import { Blueprint, Status, ZkFramework } from "./blueprint";
+import { Blueprint, ZkFramework } from "./blueprint";
 import { verifyProofOnChain } from "./chain";
 import { GenerateProofOptions } from "./types";
 import {
@@ -11,7 +11,6 @@ import {
 } from "./types/proof";
 import { get } from "./utils";
 import { verifyProof } from "./verify";
-import { hashRSAPublicKey } from "@zk-email/zkemail-nr";
 
 /**
  * A generated proof. You get get proof data and verify proofs on chain.
@@ -274,5 +273,51 @@ export class Proof {
 
   async verify(options?: GenerateProofOptions): Promise<boolean> {
     return verifyProof(this, options);
+  }
+
+  /**
+   * Use this function if you have to send a proof from the client to the server
+   * You can unpack the proof server-side with unPackProof
+   * @returns returns a minimal stringified version of the proof
+   */
+  packProof(): string {
+    const strProofProps = JSON.stringify(this.props);
+    return strProofProps;
+  }
+
+  /**
+   * Use this function if you want to unpack a packed proof sent from the client
+   * @returns returns an instance of Proof
+   */
+  public static async unPackProof(
+    packedProof: string | ProofProps,
+    baseUrl: string
+  ): Promise<Proof> {
+    let proofProps: ProofProps;
+
+    // In some instances the proof might have been automatically parsed
+    // e.g. when passing the packed proof as body directly to a POST request
+    // and then calling request.json() server side
+    if (typeof packedProof === "object") {
+      if (!packedProof.blueprintId) {
+        throw new Error("Failed to unpack proof. Please use the packPoof function");
+      }
+      proofProps = packedProof;
+    } else {
+      try {
+        proofProps = JSON.parse(packedProof);
+      } catch (err) {
+        console.error(
+          "Failed to parse packed proof. Please use the packProof function. Err: ",
+          err
+        );
+        throw err;
+      }
+    }
+
+    const blueprint = await Blueprint.getBlueprintById(proofProps.blueprintId, baseUrl);
+    const proof = new Proof(blueprint, proofProps);
+
+    return proof;
   }
 }

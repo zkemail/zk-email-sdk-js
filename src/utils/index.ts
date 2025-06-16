@@ -387,7 +387,6 @@ export async function downloadJsonFromUrl<T>(url: string): Promise<T> {
     console.error("Error downloading or parsing response data:", error);
     throw new Error("Failed to download or parse the response data");
   }
-  console.log("returning downloaded data: ", data);
   return data;
 }
 
@@ -452,51 +451,4 @@ export function hexToUint8Array(hex: string): Uint8Array {
     bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
   }
   return bytes;
-}
-
-export function decodeMimeEncodedText(encodedText: string): string {
-  // If no encoded parts found, return the text as is
-  if (!encodedText.includes("=?") || !encodedText.includes("?=")) {
-    return encodedText;
-  }
-
-  // Find the first encoded part
-  const firstEncodedMatch = encodedText.match(/=\?([^?]+)\?([BQbq])\?([^?]+)\?=/);
-  if (!firstEncodedMatch) return encodedText;
-
-  const startIndex = firstEncodedMatch.index!;
-  const endIndex = startIndex + firstEncodedMatch[0].length;
-
-  // Get the text before the encoded part
-  const textBefore = encodedText.substring(0, startIndex);
-
-  // Process the encoded part
-  const charset = firstEncodedMatch[1];
-  const encoding = firstEncodedMatch[2].toUpperCase();
-  const encodedContent = firstEncodedMatch[3];
-
-  let decodedContent: string;
-  if (encoding === "Q") {
-    // Decode Quoted-Printable
-    decodedContent = encodedContent
-      .replace(/_/g, " ")
-      .replace(/=([A-Fa-f0-9]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-    decodedContent = new TextDecoder(charset).decode(
-      new Uint8Array([...decodedContent].map((c) => c.charCodeAt(0)))
-    );
-  } else if (encoding === "B") {
-    // Decode Base64
-    const decoded = atob(encodedContent);
-    decodedContent = new TextDecoder(charset).decode(
-      new Uint8Array([...decoded].map((c) => c.charCodeAt(0)))
-    );
-  } else {
-    return encodedText;
-  }
-
-  // Get the remaining text after the encoded part
-  const remainingText = encodedText.substring(endIndex);
-
-  // Recursively process any remaining encoded parts
-  return textBefore + decodedContent + decodeMimeEncodedText(remainingText);
 }

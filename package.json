@@ -1,6 +1,6 @@
 {
   "name": "@zk-email/sdk",
-  "version": "1.2.0-3",
+  "version": "1.2.0-22",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/zk-email-sdk.es.js",
@@ -42,8 +42,8 @@
   "license": "MIT",
   "devDependencies": {
     "@aztec/bb.js": "0.82.2",
-    "@noir-lang/noir_js": "1.0.0-beta.2",
-    "@noir-lang/noirc_abi": "1.0.0-beta.2",
+    "@noir-lang/noir_js": "1.0.0-beta.6",
+    "@noir-lang/noirc_abi": "1.0.0-beta.6",
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@rollup/plugin-inject": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
