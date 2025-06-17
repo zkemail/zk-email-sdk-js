@@ -2,6 +2,7 @@ import { AbstractProver, IProver } from "..";
 import { Proof } from "../../proof";
 import {
   DecomposedRegex,
+  ExternalInput,
   ExternalInputInput,
   ExternalInputProof,
   GenerateProofOptions,
@@ -129,6 +130,7 @@ export class NoirProver extends AbstractProver implements IProver {
     const { publicData, externalInputsProof } = parseNoirPublicOutputs(
       proof.publicInputs,
       this.blueprint.props.decomposedRegexes,
+      this.blueprint.props.externalInputs,
       externalInputsWithMaxLength
     );
 
@@ -158,7 +160,8 @@ export class NoirProver extends AbstractProver implements IProver {
 export function parseNoirPublicOutputs(
   publicOutputs: string[],
   decomposedRegexes: DecomposedRegex[],
-  externalInputs?: ExternalInputInput[]
+  externalInputDefinition?: ExternalInput[],
+  externalInputs?: ExternalInputInput[],
 ): { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } {
   // 0: pubkey hash
   // 1: header_hash[0]
@@ -166,16 +169,19 @@ export function parseNoirPublicOutputs(
   // 3: prover_address
   let publicOutputIterator = 4;
 
-  const parsedExternalInputs = {};
-
   const publicStruct: { [key: string]: string[] } = {};
   const result: { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } = {
     publicData: publicStruct,
   };
 
   if (externalInputs) {
+    const externalInputsWithMaxLength = addMaxLengthToExternalInputs(
+      externalInputs,
+      externalInputDefinition
+    );
+    
     result.externalInputsProof = {};
-    externalInputs.forEach((externalInput) => {
+    externalInputsWithMaxLength.forEach((externalInput) => {
       const signalLength =
         Math.floor(externalInput.maxLength / 31) + (externalInput.maxLength % 31 !== 0 ? 1 : 0);
       publicOutputIterator += signalLength;
