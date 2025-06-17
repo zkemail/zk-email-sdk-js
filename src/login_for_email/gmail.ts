@@ -125,11 +125,11 @@ export class Gmail implements EmailProvider {
       accessToken,
       emailList.messages.map((msg) => msg.id)
     );
-
+    
     emails.forEach((email) => {
       email.subject = decodeMimeEncodedText(email.subject);
     });
-
+    
     return emails;
   }
 

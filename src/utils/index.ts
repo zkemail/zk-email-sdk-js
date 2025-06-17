@@ -387,7 +387,6 @@ export async function downloadJsonFromUrl<T>(url: string): Promise<T> {
     console.error("Error downloading or parsing response data:", error);
     throw new Error("Failed to download or parse the response data");
   }
-  console.log("returning downloaded data: ", data);
   return data;
 }
 

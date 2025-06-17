@@ -4,8 +4,7 @@ import { hexToUint8Array, verifyPubKey } from "./utils";
 // @ts-ignore Ignore missing types
 import * as snarkjs from "@zk-email/snarkjs";
 import { verifySp1Proof } from "./relayerUtils";
-import { GenerateProofOptions, HashingAlgorithm, NoirWasm } from "./types";
-import { UltraHonkBackend } from "@aztec/bb.js";
+import { GenerateProofOptions, NoirWasm } from "./types";
 
 type VerifyProofDataProps = {
   publicOutputs: string;
@@ -125,10 +124,9 @@ export async function verifyNoirProof(
 ): Promise<boolean> {
   const { UltraHonkBackend } = noirWasm;
 
-  const threads = window.navigator.hardwareConcurrency;
-  const backend = new UltraHonkBackend(circuit.bytecode, {
-    threads,
-  });
+  // TODO: we can use threads here, although not defining threads is the same speed
+  // const backend = new UltraHonkBackend(circuit.bytecode, threads ? { threads } : {});
+  const backend = new UltraHonkBackend(circuit.bytecode);
 
   const proofParsed = hexToUint8Array(proofDataHex);
 
@@ -137,6 +135,11 @@ export async function verifyNoirProof(
     publicInputs: publicOutputs,
   };
 
-  const isValid = await backend.verifyProof(noirProof);
-  return isValid;
+  try {
+    const isValid = await backend.verifyProof(noirProof);
+    return isValid;
+  } catch (err) {
+    console.error("err for noir backend.verifyProof: ", err);
+    return false;
+  }
 }

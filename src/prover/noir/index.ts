@@ -97,13 +97,10 @@ export class NoirProver extends AbstractProver implements IProver {
 
     const compiledProgram = circuit as any;
 
-    const threads = window.navigator.hardwareConcurrency;
-    // @ts-ignore
     const noir = new Noir(compiledProgram);
-    // @ts-ignore
-    const backend = new UltraHonkBackend(compiledProgram.bytecode, {
-      threads,
-    });
+    // TODO: we can use threads here, although not defining threads is the same speed
+    // const backend = new UltraHonkBackend(circuit.bytecode, threads ? { threads } : {});
+    const backend = new UltraHonkBackend(compiledProgram.bytecode);
 
     // Convert from Map to object
     const circuitInputsObject: any = {};
