@@ -153,9 +153,9 @@ export class Blueprint {
         parts: (regex?.parts || []).map((part) => ({
           isPublic: part.is_public,
           regexDef: part.regex_def,
+          maxLength: part.max_length
         })),
         name: regex.name,
-        maxLength: regex.max_length,
         isHashed: regex.is_hashed,
         location: regex.location,
       })),
@@ -206,9 +206,10 @@ export class Blueprint {
           is_public: part.isPublic || part.is_public,
           // @ts-ignore
           regex_def: part.regexDef || part.regex_def,
+          // @ts-ignore
+          max_length: part.maxLength || part.max_length,
         })),
         name: regex.name,
-        max_length: regex.maxLength,
         is_hashed: regex.isHashed,
         location: regex.location,
       })),

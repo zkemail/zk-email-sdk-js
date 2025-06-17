@@ -71,7 +71,6 @@ export const blueprintFormSchema = z.object({
           }
           return value;
         }),
-      maxLength: z.coerce.number().positive().default(64),
       isHashed: z.boolean().optional(),
       location: z.string().regex(/(body)|(header)/),
       parts: z
@@ -121,6 +120,20 @@ export const blueprintFormSchema = z.object({
               });
               return z.NEVER;
             }
+            
+            // For parts with isPublic=true, they need a maxLength field
+            if (part.isPublic) {
+              if (!("maxLength" in part)) {
+                // Set default maxLength of 64 for public parts
+                part.maxLength = 64;
+              } else if (typeof part.maxLength !== "number" || part.maxLength <= 0) {
+                ctx.addIssue({
+                  code: "custom",
+                  message: `Part ${i} with isPublic=true must have a positive number 'maxLength' field`,
+                });
+                return z.NEVER;
+              }
+            }
           }
           try {
             // try to map and see if it works
@@ -145,7 +158,7 @@ export const blueprintFormSchema = z.object({
     .optional(),
 });
 
-function getPrefixRegex(parts: { isPublic: boolean; regexDef: string }[]): string {
+function getPrefixRegex(parts: { isPublic: boolean; regexDef: string; maxLength?: number }[]): string {
   let prefixRegex = "";
   for (let part of parts) {
     if (!part.isPublic) prefixRegex = prefixRegex + part.regexDef;

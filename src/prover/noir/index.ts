@@ -54,12 +54,15 @@ export class NoirProver extends AbstractProver implements IProver {
           ? this.blueprint.props.emailHeaderMaxLength
           : this.blueprint.props.emailBodyMaxLength;
 
+      // TODO: switch this to new noir implementation once ready
+      const maxLength = dr.parts.find(p => p.maxLength > 0)?.maxLength;
+      
       return {
         name: dr.name,
         regex_graph_json: JSON.stringify(regexGraph),
         haystack,
         max_haystack_length: maxHaystackLength,
-        max_match_length: dr.maxLength,
+        max_match_length: maxLength,
         proving_framework: "noir",
       };
     });
