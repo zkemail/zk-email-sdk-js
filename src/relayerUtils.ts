@@ -187,13 +187,16 @@ export async function testDecomposedRegex(
     throw Error(`Unsupported location ${decomposedRegex.location}`);
   }
 
+  // TODO: change to check for maxLength per public part
+  const maxLengthPart = decomposedRegex.parts.find(p => 'maxLength' in p || 'max_length' in p);
   const maxLength =
-    "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
+    // @ts-ignore
+    "maxLength" in maxLengthPart! ? maxLengthPart.maxLength : maxLengthPart?.max_length;
 
   await relayerUtilsInit;
   const privateResult = extractSubstr(inputStr, inputDecomposedRegex, false);
 
-  if (privateResult[0].length > maxLength) {
+  if (privateResult[0].length > maxLength!) {
     throw new Error(
       `Max length of ${maxLength} of extracted result was exceeded for decomposed regex ${decomposedRegex.name}`
     );
@@ -329,42 +332,99 @@ export function getSenderDomain(parsedEmail: ParsedEmail): string {
 // Translated from our existing go code internal/temporal/workflows/circom_workflows.go
 export function parsePublicSignals(
   publicSignals: string[],
-  decomposedRegexes: DecomposedRegex[]
+  decomposedRegexes: DecomposedRegex[],
+  internalVersion: string
 ): PublicProofData {
   let publicOutputIterator = 3; // like publicOutputIterator in Go
   const publicStruct: { [key: string]: string[] } = {};
 
   decomposedRegexes.forEach((decomposedRegex) => {
-    let signalLength = 1;
-    if (!decomposedRegex.isHashed) {
-      signalLength = Math.ceil(decomposedRegex.maxLength / 31);
-    }
-
     const partOutputs: string[] = [];
 
-    decomposedRegex.parts.forEach((part) => {
-      if (part.isPublic) {
-        // Slice out the relevant subset from publicSignals
-        const publicOutputsSlice = publicSignals.slice(
-          publicOutputIterator,
-          publicOutputIterator + signalLength
-        );
-
-        // Decode using the replicated Go logic
-        let output = "";
-        if (decomposedRegex.isHashed) {
-          output = publicOutputsSlice + "";
-        } else {
-          output = processIntegers(publicOutputsSlice);
+    if (internalVersion === "0001_max_length_per_decomposed_regex") {
+      // Version 0001: Use single maxLength from first public part for entire decomposed regex
+      let maxLength = 0;
+      for (const part of decomposedRegex.parts) {
+        // @ts-ignore maxLength is always defined for a public part
+        if (part.isPublic && part.maxLength! > 0) {
+          maxLength = part.maxLength!;
+          break;
         }
-
-        // Store the decoded result
-        partOutputs.push(output);
-
-        // Advance the iterator
-        publicOutputIterator += signalLength;
       }
-    });
+
+      let signalLength = 1;
+      if (!decomposedRegex.isHashed) {
+        signalLength = Math.ceil(maxLength / 31);
+      }
+
+      decomposedRegex.parts.forEach((part) => {
+        if (part.isPublic) {
+          // Check bounds
+          if (publicOutputIterator + signalLength > publicSignals.length) {
+            throw new Error("public output array index out of bounds - this circuit might need recompilation");
+          }
+
+          // Slice out the relevant subset from publicSignals
+          const publicOutputsSlice = publicSignals.slice(
+            publicOutputIterator,
+            publicOutputIterator + signalLength
+          );
+
+          // Decode using the replicated Go logic
+          let output = "";
+          if (decomposedRegex.isHashed) {
+            output = publicOutputsSlice.join("");
+          } else {
+            output = processIntegers(publicOutputsSlice);
+          }
+
+          // Store the decoded result
+          partOutputs.push(output);
+
+          // Advance the iterator
+          publicOutputIterator += signalLength;
+        }
+      });
+    } else {
+      // Version 0002 (or default): Use individual maxLength per regex part
+      decomposedRegex.parts.forEach((part) => {
+        if (part.isPublic) {
+          // Calculate signal length for this specific part
+          let signalLength = 1;
+          if (!decomposedRegex.isHashed && part.maxLength! > 0) {
+            signalLength = Math.ceil(part.maxLength! / 31);
+          } else if (!decomposedRegex.isHashed) {
+            // Skip parts without maxLength
+            return;
+          }
+
+          // Check bounds
+          if (publicOutputIterator + signalLength > publicSignals.length) {
+            throw new Error("public output array index out of bounds - this circuit might need recompilation");
+          }
+
+          // Slice out the relevant subset from publicSignals
+          const publicOutputsSlice = publicSignals.slice(
+            publicOutputIterator,
+            publicOutputIterator + signalLength
+          );
+
+          // Decode using the replicated Go logic
+          let output = "";
+          if (decomposedRegex.isHashed) {
+            output = publicOutputsSlice.join("");
+          } else {
+            output = processIntegers(publicOutputsSlice);
+          }
+
+          // Store the decoded result
+          partOutputs.push(output);
+
+          // Advance the iterator
+          publicOutputIterator += signalLength;
+        }
+      });
+    }
 
     // Collect all part outputs for this decomposedRegex
     publicStruct[decomposedRegex.name] = partOutputs;

@@ -285,7 +285,7 @@ export abstract class AbstractProver implements IProver {
       blueprintId: this.blueprint.props.id!,
       input: inputs,
       proofData: proof,
-      publicData: parsePublicSignals(publicSignals, this.blueprint.props.decomposedRegexes),
+      publicData: parsePublicSignals(publicSignals, this.blueprint.props.decomposedRegexes, this.blueprint.props.internalVersion!),
       publicOutputs: publicSignals,
       externalInputs: proofExternalInputs,
       status: ProofStatus.Done,

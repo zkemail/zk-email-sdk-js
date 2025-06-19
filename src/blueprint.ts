@@ -169,6 +169,7 @@ export class Blueprint {
       stars: response.stars,
       numLocalProofs: response.num_local_proofs,
       totalProofs: response.total_proofs,
+      internalVersion: response.internal_version
     };
 
     return props;

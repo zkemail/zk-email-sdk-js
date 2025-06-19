@@ -29,6 +29,7 @@ export type BlueprintProps = {
   stars?: number;
   numLocalProofs?: number;
   totalProofs?: number;
+  internalVersion?: string;
 };
 
 export type DecomposedRegex = {
@@ -41,13 +42,12 @@ export type DecomposedRegex = {
 export type DecomposedRegexPart = {
   isPublic: boolean;
   regexDef: string;
-  maxLength: number;
+  maxLength?: number;
 };
 
 export type DecomposedRegexJson = {
   parts: DecomposedRegexPartJson[];
   name: string;
-  max_length: number;
   is_hashed?: boolean;
   location: "body" | "header";
 };
@@ -55,6 +55,7 @@ export type DecomposedRegexJson = {
 export type DecomposedRegexPartJson = {
   is_public: boolean;
   regex_def: string;
+  max_length?: number;
 };
 
 export type ExternalInput = {
@@ -146,6 +147,7 @@ export type BlueprintResponse = {
   stars: number;
   num_local_proofs: number;
   total_proofs: number;
+  internal_version: string;
 };
 
 export type ServerDate = {
@@ -168,7 +170,7 @@ export type DecomposedRegexResponse = {
 export type DecomposedRegexPartResponse = {
   is_public: boolean;
   regex_def: string;
-  max_length: number;
+  max_length?: number;
 };
 
 export type ListBlueprintsOptions = {
