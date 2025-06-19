@@ -2,6 +2,7 @@ import { EmailLoginProvider, EmailProvider } from ".";
 import { Blueprint } from "../blueprint";
 import { FetchEmailOptions, GmailMessagesListResponse, RawEmailResponse } from "../types/gmail";
 import { decodeMimeEncodedText } from "../utils";
+import { logger } from "../utils/logger";
 
 const clientId = "773062743658-rauj7nb18ikr1lrfs5bl8lt3b31r2nen.apps.googleusercontent.com";
 /**
@@ -40,7 +41,7 @@ export class LoginWithGoogle implements EmailLoginProvider {
         ...(!isPlainObject(options) ? {} : options),
         scope: "https://www.googleapis.com/auth/gmail.readonly",
         callback: (response: { access_token: string }) => {
-          console.log("response: ", response);
+          logger.debug("response: ", response);
           if (response.access_token) {
             this.accessToken = response.access_token;
             resolve(response.access_token);
@@ -85,9 +86,9 @@ export class LoginWithGoogle implements EmailLoginProvider {
       },
     }).then((response) => {
       if (response.ok) {
-        console.log("Token revoked successfully");
+        logger.info("Token revoked successfully");
       } else {
-        console.error("Failed to revoke token");
+        logger.error("Failed to revoke token");
       }
     });
   }
@@ -117,7 +118,7 @@ export class Gmail implements EmailProvider {
     this.nextPageToken = null;
     const accessToken = await this.loginWithGoogle.getAccessToken();
     this.query = this.buildQuery(blueprints, options);
-    console.log("Fetching emails with query: ", this.query);
+    logger.info("Fetching emails with query: ", this.query);
     const emailList = await this.fetchEmailInfoList(accessToken);
     this.nextPageToken = emailList.nextPageToken || null;
     if (!emailList.messages?.length) return [];
@@ -194,7 +195,7 @@ export class Gmail implements EmailProvider {
 
       return data;
     } else {
-      console.error("Failed to fetch emails:", response);
+      logger.error("Failed to fetch emails:", response);
       throw new Error("Failed to fetch emails");
     }
   }
@@ -240,7 +241,7 @@ export class Gmail implements EmailProvider {
 
       return results;
     } catch (error) {
-      console.error("Error fetching emails:", error);
+      logger.error("Error fetching emails:", error);
 
       throw new Error("Error fetching emails");
     }

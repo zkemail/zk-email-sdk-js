@@ -13,6 +13,7 @@ import { ExternalInputInput, GenerateProofOptions, ProverOptions } from "../type
 import { patch, post } from "../utils";
 import { localProverWorkerCode } from "../localProverWorkerString";
 import { addMaxLengthToExternalInputs } from "../utils/maxLenghExternalInputs";
+import { logger } from "../utils/logger";
 
 export interface IProver {
   options: ProverOptions;
@@ -48,7 +49,7 @@ export abstract class AbstractProver implements IProver {
     if (!(blueprint instanceof Blueprint)) {
       throw new Error("Invalid blueprint: must be an instance of Blueprint class");
     }
-    console.log("blueprint.props.clientZkFramework!: ", blueprint.props.clientZkFramework!);
+    logger.debug("blueprint.props.clientZkFramework!: ", blueprint.props.clientZkFramework!);
     if (
       options?.isLocal &&
       ![ZkFramework.Circom, ZkFramework.Noir].includes(blueprint.props.clientZkFramework!)
@@ -136,9 +137,9 @@ export abstract class AbstractProver implements IProver {
         params
       );
 
-      console.log("got proof inputs: ", inputs);
+      logger.debug("got proof inputs: ", inputs);
     } catch (err) {
-      console.error("Failed to generate inputs for proof");
+      logger.error("Failed to generate inputs for proof");
       throw err;
     }
 
@@ -156,7 +157,7 @@ export abstract class AbstractProver implements IProver {
     externalInputs: ExternalInputInput[] = [],
     options?: GenerateProofOptions
   ): Promise<Proof> {
-    console.log("generating remote proof");
+    logger.info("generating remote proof");
     const blueprintId = this.blueprint.getId();
     if (!blueprintId) {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
@@ -191,7 +192,7 @@ export abstract class AbstractProver implements IProver {
 
       response = await post<ProofResponse>(`${this.blueprint.baseUrl}/proof`, requestData);
     } catch (err) {
-      console.error("Failed calling POST on /proof/ in generateProofRequest: ", err);
+      logger.error("Failed calling POST on /proof/ in generateProofRequest: ", err);
       throw err;
     }
 
@@ -211,7 +212,7 @@ export abstract class AbstractProver implements IProver {
     externalInputs: ExternalInputInput[] = [],
     options?: GenerateProofOptions
   ): Promise<Proof> {
-    console.log("in general generateLocalProof: ", options);
+    logger.debug("in general generateLocalProof: ", options);
     const blueprintId = this.blueprint.getId();
     if (!blueprintId) {
       throw new Error("Blueprint of Proover must be initialized in order to create a Proof");
@@ -244,17 +245,17 @@ export abstract class AbstractProver implements IProver {
         const { type, message, error } = event.data;
         switch (type) {
           case "progress":
-            console.log(`Progress: ${message}`);
+            logger.info(`Progress: ${message}`);
             break;
           case "message":
-            console.log(message);
+            logger.info(message);
             break;
           case "result":
             message.publicData = publicData;
             resolve(message as { proof: string; publicSignals: string[]; publicData: string });
             break;
           case "error":
-            console.error("Error in worker:", error);
+            logger.error("Error in worker:", error);
             reject(error);
             break;
         }
@@ -264,6 +265,7 @@ export abstract class AbstractProver implements IProver {
         chunkedZkeyUrls,
         inputs,
         wasmUrl,
+        loggingConfig: logger.getConfig()
       });
     });
 
@@ -277,7 +279,7 @@ export abstract class AbstractProver implements IProver {
 
     // Do not await, local proof should not fail if this fails
     this.incNumLocalProofs().catch((err) => {
-      console.error("Failed to increase local proofs after generating proof: ", err);
+      logger.error("Failed to increase local proofs after generating proof: ", err);
     });
 
     const proofProps: ProofProps = {
@@ -304,7 +306,7 @@ export abstract class AbstractProver implements IProver {
         `${this.blueprint.baseUrl}/blueprint/inc-local-proofs/${this.blueprint.props.id}`
       );
     } catch (err) {
-      console.error(
+      logger.error(
         "Failed calling PATCH on /blueprint/inc-local-proofs in incNumLocalProofs: ",
         err
       );

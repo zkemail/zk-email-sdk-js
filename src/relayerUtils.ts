@@ -20,6 +20,7 @@ import {
   generateCircuitInputsWithDecomposedRegexesAndExternalInputs,
   verifySp1Proof as verifySp1ProofUtils,
 } from "@zk-email/relayer-utils";
+import { logger } from "./utils/logger";
 
 let relayerUtilsResolver: (value: any) => void;
 const relayerUtilsInit: Promise<void> = new Promise((resolve) => {
@@ -31,7 +32,7 @@ init()
     relayerUtilsResolver(null);
   })
   .catch((err) => {
-    console.log("Failed to initialize wasm for relayer-utils: ", err);
+    logger.error("Failed to initialize wasm for relayer-utils: ", err);
   });
 
 const emlPubKeyCache = new Map();
@@ -84,13 +85,13 @@ export async function parseEmail(eml: string, ignoreBodyHashCheck = false): Prom
 
         // Do not stop function flow if this fails - warn only
       } catch (err) {
-        console.warn("Failed to findOrCreateDSP: ", err);
+        logger.warn("Failed to findOrCreateDSP: ", err);
       }
     }
 
     return parsedEmail as ParsedEmail;
   } catch (err) {
-    console.error("Failed to parse email: ", err);
+    logger.error("Failed to parse email: ", err);
     throw err;
   }
 }
@@ -236,7 +237,7 @@ export async function generateProofInputs(
       };
     });
 
-    console.log("calling generateCircuitInputsWithDecomposedRegexesAndExternalInputs");
+    logger.debug("calling generateCircuitInputsWithDecomposedRegexesAndExternalInputs");
     const inputs = await generateCircuitInputsWithDecomposedRegexesAndExternalInputs(
       eml,
       decomposedRegexesCleaned,
@@ -247,7 +248,7 @@ export async function generateProofInputs(
     const json = JSON.stringify(Object.fromEntries(inputs));
     return json;
   } catch (err) {
-    console.error("Failed to generate inputs for proof");
+    logger.error("Failed to generate inputs for proof");
     throw err;
   }
 }
@@ -383,7 +384,7 @@ function processIntegers(integers: string[]): string {
     try {
       n = BigInt(numStr);
     } catch (err) {
-      console.warn("Failed to parse integer:", numStr, err);
+      logger.warn("Failed to parse integer:", numStr, err);
       continue;
     }
 

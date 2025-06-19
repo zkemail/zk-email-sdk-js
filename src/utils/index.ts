@@ -11,6 +11,7 @@ import { Auth } from "../types/auth";
 import { getTokenFromAuth } from "../auth";
 import { DkimRecord, HashingAlgorithm, ZkFramework } from "../types";
 import { Crypto } from "@peculiar/webcrypto";
+import { logger } from "./logger";
 
 const crypto = new Crypto();
 
@@ -20,7 +21,7 @@ export async function post<T>(url: string, data?: object | null, auth?: Auth): P
     try {
       authToken = await getTokenFromAuth(auth);
     } catch (err) {
-      console.error("Could not get token from auth", err);
+      logger.error("Could not get token from auth", err);
     }
   }
 
@@ -52,7 +53,7 @@ export async function post<T>(url: string, data?: object | null, auth?: Auth): P
     return body;
   } catch (error) {
     // TODO: Handle token expired
-    console.error("POST Error:", error);
+    logger.error("POST Error:", error);
     throw error;
   }
 }
@@ -63,7 +64,7 @@ export async function patch<T>(url: string, data?: object | null, auth?: Auth): 
     try {
       authToken = await getTokenFromAuth(auth);
     } catch (err) {
-      console.warn("Could not get token from auth", err);
+      logger.warn("Could not get token from auth", err);
     }
   }
 
@@ -94,7 +95,7 @@ export async function patch<T>(url: string, data?: object | null, auth?: Auth): 
 
     return body;
   } catch (error) {
-    console.error("PATCH Error:", error);
+    logger.error("PATCH Error:", error);
     throw error;
   }
 }
@@ -105,7 +106,7 @@ export async function get<T>(url: string, queryParams?: object | null, auth?: Au
     try {
       authToken = await getTokenFromAuth(auth);
     } catch (err) {
-      console.warn("Could not get token from auth", err);
+      logger.warn("Could not get token from auth", err);
     }
   }
 
@@ -141,7 +142,7 @@ export async function get<T>(url: string, queryParams?: object | null, auth?: Au
 
     return await response.json();
   } catch (error) {
-    console.error("GET Error:", error);
+    logger.error("GET Error:", error);
     throw error;
   }
 }
@@ -152,7 +153,7 @@ export async function del<T>(url: string, data?: object | null, auth?: Auth): Pr
     try {
       authToken = await getTokenFromAuth(auth);
     } catch (err) {
-      console.error("Could not get token from auth", err);
+      logger.error("Could not get token from auth", err);
     }
   }
 
@@ -184,7 +185,7 @@ export async function del<T>(url: string, data?: object | null, auth?: Auth): Pr
     return body;
   } catch (error) {
     // TODO: Handle token expired
-    console.error("DELETE Error:", error);
+    logger.error("DELETE Error:", error);
     throw error;
   }
 }
@@ -309,7 +310,7 @@ async function getPKeys(senderDomain: string): Promise<string[]> {
       method: "GET",
     });
   } catch (err) {
-    console.error("Failed to get pubkey records from archive", err);
+    logger.error("Failed to get pubkey records from archive", err);
     return [];
   }
 
@@ -384,7 +385,7 @@ export async function downloadJsonFromUrl<T>(url: string): Promise<T> {
     }
     data = await response.json();
   } catch (error) {
-    console.error("Error downloading or parsing response data:", error);
+    logger.error("Error downloading or parsing response data:", error);
     throw new Error("Failed to download or parse the response data");
   }
   return data;
@@ -430,7 +431,7 @@ export async function downloadAndUnzipFile(url: string): Promise<Record<string, 
         try {
           files[filename] = JSON.parse(content);
         } catch (e) {
-          console.error(`Error parsing JSON in ${filename}`, e);
+          logger.error(`Error parsing JSON in ${filename}`, e);
         }
       }
     });
@@ -440,7 +441,7 @@ export async function downloadAndUnzipFile(url: string): Promise<Record<string, 
 
     return files;
   } catch (error) {
-    console.error("Error downloading or unzipping the file:", error);
+    logger.error("Error downloading or unzipping the file:", error);
     throw error;
   }
 }

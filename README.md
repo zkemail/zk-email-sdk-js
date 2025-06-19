@@ -14,6 +14,63 @@ To install run:
 npm i @zk-email/sdk
 ```
 
+## Logging Configuration
+
+The SDK includes comprehensive logging capabilities that are **silent by default**. You can configure logging when initializing the SDK:
+
+### Basic Usage
+
+```ts
+import zkeSdk from "@zk-email/sdk";
+
+// Silent by default (no logs)
+const sdk = zkSdk();
+
+// Enable error-level logging only
+const sdk = zkSdk({ logging: { enabled: true } });
+
+// Enable all logs including debug information
+const sdk = zkSdk({ logging: { level: 'debug', enabled: true } });
+
+// Completely disable all logging
+const sdk = zkSdk({ logging: { enabled: false } });
+```
+
+### Log Levels
+
+The SDK supports the following log levels in order of verbosity:
+
+- `silent` - No logs (default)
+- `error` - Critical errors only
+- `warn` - Warnings and errors
+- `info` - General information, warnings, and errors
+- `debug` - All logs including timing information
+
+### Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `enabled` | boolean | `true` | Whether logging is enabled |
+| `level` | LogLevel | `'silent'` or `'error'`* | Maximum log level to show |
+
+*When `enabled: true` is specified without a level, it defaults to `'error'` level.
+
+### Examples
+
+```ts
+// Show only errors (recommended for production)
+const sdk = zkSdk({ logging: { enabled: true } });
+
+// Show errors and warnings
+const sdk = zkSdk({ logging: { level: 'warn', enabled: true } });
+
+// Show all logs for debugging
+const sdk = zkSdk({ logging: { level: 'debug', enabled: true } });
+
+// Completely silent
+const sdk = zkSdk({ logging: { enabled: false } });
+```
+
 ## Create a blueprint
 
 Go to our [registry](https://registry.zk.email) and create a blueprint there. You can also create one with the SDK,

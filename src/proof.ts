@@ -11,6 +11,7 @@ import {
 } from "./types/proof";
 import { get } from "./utils";
 import { verifyProof } from "./verify";
+import { logger } from "./utils/logger";
 
 /**
  * A generated proof. You get get proof data and verify proofs on chain.
@@ -71,7 +72,7 @@ export class Proof {
         `${this.blueprint.baseUrl}/proof/files/${this.props.id}`
       );
     } catch (err) {
-      console.error("Failed calling GET on /proof/files/:id in getProofDataDownloadLink: ", err);
+      logger.error("Failed calling GET on /proof/files/:id in getProofDataDownloadLink: ", err);
       throw err;
     }
 
@@ -87,7 +88,7 @@ export class Proof {
     try {
       url = await this.getProofDataDownloadLink();
     } catch (err) {
-      console.error("Failed to start download of ZKeys: ", err);
+      logger.error("Failed to start download of ZKeys: ", err);
       throw err;
     }
 
@@ -129,7 +130,7 @@ export class Proof {
         `${this.blueprint.baseUrl}/proof/status/${this.props.id}`
       );
     } catch (err) {
-      console.error("Failed calling GET /blueprint/status in getStatus(): ", err);
+      logger.error("Failed calling GET /blueprint/status in getStatus(): ", err);
       throw err;
     }
 
@@ -204,7 +205,7 @@ export class Proof {
     try {
       proofResponse = await get<ProofResponse>(`${baseUrl}/proof/${id}`);
     } catch (err) {
-      console.error("Failed calling /proof/:id in getProofById: ", err);
+      logger.error("Failed calling /proof/:id in getProofById: ", err);
       throw err;
     }
 
@@ -307,7 +308,7 @@ export class Proof {
       try {
         proofProps = JSON.parse(packedProof);
       } catch (err) {
-        console.error(
+        logger.error(
           "Failed to parse packed proof. Please use the packProof function. Err: ",
           err
         );

@@ -4,6 +4,7 @@ import { Proof } from "../proof";
 import { ProofData } from "../types";
 // @ts-ignore Does not provide types
 import * as snarkjs from "snarkjs";
+import { logger } from "../utils/logger";
 
 function getVerifierContractAbi(signalLength: number) {
   return [
@@ -44,7 +45,7 @@ function getVerifierContractAbi(signalLength: number) {
 }
 
 export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
-  console.log("verifierContract: ", proof.blueprint.props.verifierContract);
+  logger.debug("verifierContract: ", proof.blueprint.props.verifierContract);
   if (
     !proof.blueprint.props.verifierContract?.chain ||
     !proof.blueprint.props.verifierContract?.address
@@ -106,7 +107,7 @@ export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
     });
     return true;
   } catch (error) {
-    console.error("Error verifying proof on chain:", error);
+    logger.error("Error verifying proof on chain:", error);
     return false;
   }
 }
