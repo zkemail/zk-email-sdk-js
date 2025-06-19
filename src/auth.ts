@@ -1,4 +1,5 @@
 import { Auth } from "./types/auth";
+import { logger } from "./utils/logger";
 
 // prod
 const GITHUB_CLIENT_ID = "Ov23li0KABFCUsxBEQkn";
@@ -28,7 +29,7 @@ export async function getTokenFromAuth(auth: Auth): Promise<string> {
 
     return `Bearer ${token}`;
   } catch (err) {
-    console.error("Failed to get token from auth");
+    logger.error("Failed to get token from auth");
     throw err;
   }
 }

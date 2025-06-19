@@ -4,9 +4,20 @@ import pako from "pako";
 
 const circuitName = "circuit";
 
+// Simple logger for web worker that respects the parent's logging configuration
+let loggingEnabled = false;
+const logger = {
+  info: (...args) => {
+    if (loggingEnabled) console.log(...args);
+  },
+  debug: (...args) => {
+    if (loggingEnabled) console.log(...args);
+  }
+};
+
 async function downloadWithRetries(link, downloadAttempts) {
   for (let i = 1; i <= downloadAttempts; i++) {
-    console.log(`download attempt ${i} for ${link}`);
+    logger.debug(`download attempt ${i} for ${link}`);
     const response = await fetch(link, { method: "GET" });
     if (response.status === 200) {
       return response;
@@ -36,13 +47,18 @@ export async function downloadFromUrl(fileUrl, targetFileName, compressed = fals
     // uncompress the data
     const fileUncompressed = await uncompressGz(buff);
     await localforage.setItem(targetFileName, fileUncompressed);
-    console.log("stored file in localforage", targetFileName);
+    logger.debug("stored file in localforage", targetFileName);
   }
-  console.log(`Storage of ${targetFileName} successful!`);
+  logger.info(`Storage of ${targetFileName} successful!`);
 }
 
 self.onmessage = async function (event) {
-  const { chunkedZkeyUrls, inputs, wasmUrl } = event.data;
+  const { chunkedZkeyUrls, inputs, wasmUrl, loggingConfig } = event.data;
+  
+  // Configure logging based on parent's settings
+  if (loggingConfig) {
+    loggingEnabled = loggingConfig.enabled && loggingConfig.level !== 'silent';
+  }
 
   self.postMessage({ type: "message", message: "Worker started" });
   self.postMessage({ type: "progress", message: "Downloading zkeys" });
@@ -69,7 +85,7 @@ self.onmessage = async function (event) {
 
     // self.postMessage({ type: "result", result });
 
-    console.log("shutting down worker");
+    logger.info("shutting down worker");
     self.close(); // Shut down the worker
   } catch (error) {
     // @ts-ignore

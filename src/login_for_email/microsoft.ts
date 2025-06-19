@@ -2,6 +2,7 @@ import * as msal from "@azure/msal-browser";
 import { Blueprint } from "../blueprint";
 import { FetchEmailOptions } from "../types/gmail";
 import { EmailLoginProvider, EmailProvider } from ".";
+import { logger } from "../utils/logger";
 
 // MSAL configuration
 const msalConfig = {
@@ -38,12 +39,12 @@ export class LoginWithMicrosoft implements EmailLoginProvider {
     };
 
     try {
-      console.log("launching loginPopup");
+      logger.info("launching loginPopup");
       const response = await msalInstance.loginPopup(loginRequest);
-      console.log("response: ", response);
+      logger.debug("response: ", response);
 
       const account = response.account;
-      console.log("account: ", account);
+      logger.debug("account: ", account);
 
       if (account) {
         const tokenResponse = await msalInstance.acquireTokenSilent({
@@ -51,7 +52,7 @@ export class LoginWithMicrosoft implements EmailLoginProvider {
           account,
         });
 
-        console.log("tokenResponse: ", tokenResponse);
+        logger.debug("tokenResponse: ", tokenResponse);
 
         this.accessToken = tokenResponse.accessToken;
         return this.accessToken;
@@ -59,7 +60,7 @@ export class LoginWithMicrosoft implements EmailLoginProvider {
         throw new Error("Microsoft login failed");
       }
     } catch (error) {
-      console.error("Login failed:", error);
+      logger.error("Login failed:", error);
       throw error;
     }
   }
@@ -131,7 +132,7 @@ export class Outlook implements EmailProvider {
     this.nextPageLink = null;
     const accessToken = await this.loginWithMicrosoft.getAccessToken();
     this.query = this.buildQuery(blueprints, options);
-    console.log("Fetching emails with query: ", this.query);
+    logger.info("Fetching emails with query: ", this.query);
 
     const emailList = await this.fetchEmailInfoList(accessToken);
     this.nextPageLink = emailList["@odata.nextLink"] || null;
@@ -241,7 +242,7 @@ export class Outlook implements EmailProvider {
       const data: OutlookEmailsListResponse = await response.json();
       return data;
     } else {
-      console.error("Failed to fetch emails:", response);
+      logger.error("Failed to fetch emails:", response);
       throw new Error("Failed to fetch emails");
     }
   }
@@ -262,7 +263,7 @@ export class Outlook implements EmailProvider {
       const data: OutlookEmailsListResponse = await response.json();
       return data;
     } else {
-      console.error("Failed to fetch more emails:", response);
+      logger.error("Failed to fetch more emails:", response);
       throw new Error("Failed to fetch more emails");
     }
   }
@@ -293,7 +294,7 @@ export class Outlook implements EmailProvider {
         };
       });
     } catch (error) {
-      console.error("Error processing emails:", error);
+      logger.error("Error processing emails:", error);
       throw new Error("Error processing emails");
     }
   }
@@ -342,7 +343,7 @@ export class Outlook implements EmailProvider {
         decodedContents: rawContent,
       };
     } else {
-      console.error(`Failed to fetch email with ID: ${emailId}`, response);
+      logger.error(`Failed to fetch email with ID: ${emailId}`, response);
       throw new Error(`Failed to fetch email with ID: ${emailId}`);
     }
   }

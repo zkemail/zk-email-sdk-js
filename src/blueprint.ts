@@ -18,6 +18,7 @@ import { Proof } from "./proof";
 import { blueprintFormSchema } from "./blueprintValidation";
 import { GenerateProofOptions, ProverOptions } from "./types";
 import { getMaxEmailBodyLength, testBlueprint } from "./relayerUtils";
+import { logger } from "./utils/logger";
 import { verifyProof, verifyProofData } from "./verify";
 import { NoirProver } from "./prover/noir";
 
@@ -65,12 +66,12 @@ export class Blueprint {
     baseUrl: string,
     auth?: Auth
   ): Promise<Blueprint> {
-    console.log("getting blueprint by id");
+    logger.info("getting blueprint by id");
     let blueprintResponse: BlueprintResponse;
     try {
       blueprintResponse = await get<BlueprintResponse>(`${baseUrl}/blueprint/${id}`);
     } catch (err) {
-      console.error("Failed calling /blueprint/:id in getBlueprintById: ", err);
+      logger.error("Failed calling /blueprint/:id in getBlueprintById: ", err);
       throw err;
     }
 
@@ -110,7 +111,7 @@ export class Blueprint {
       const url = `${baseUrl}/blueprint/by-slug/${slug}/${version}`;
       blueprintResponse = await get<BlueprintResponse>(url);
     } catch (err) {
-      console.error("Failed calling /blueprint/by-slug/:slug/:id in getBlueprintById: ", err);
+      logger.error("Failed calling /blueprint/by-slug/:slug/:id in getBlueprintById: ", err);
       throw err;
     }
 
@@ -239,7 +240,7 @@ export class Blueprint {
     try {
       response = await post<BlueprintResponse>(`${this.baseUrl}/blueprint`, requestData, this.auth);
     } catch (err) {
-      console.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
+      logger.error("Failed calling POST on /blueprint/ in submitDraft: ", err);
       throw err;
     }
 
@@ -259,7 +260,7 @@ export class Blueprint {
     }
 
     const bodyLength = await getMaxEmailBodyLength(eml, this.props.shaPrecomputeSelector);
-    console.log("bodyLength: ", bodyLength);
+    logger.debug("bodyLength: ", bodyLength);
 
     // If compilation failes, we will automatically switch to
     // client = Noir and server = Sp1
@@ -289,7 +290,7 @@ export class Blueprint {
     try {
       response = await post<BlueprintResponse>(`${this.baseUrl}/blueprint`, requestData, this.auth);
     } catch (err) {
-      console.error("Failed calling POST on /blueprint/ in submitNewVersionDraft: ", err);
+      logger.error("Failed calling POST on /blueprint/ in submitNewVersionDraft: ", err);
       throw err;
     }
 
@@ -328,7 +329,7 @@ export class Blueprint {
     } catch (err) {
       // We don't set the status here, since the api call can't fail due to the actual job failing
       // It can only due to connectivity issues or the job runner not being available
-      console.error("Failed calling POST on /blueprint/compile in submit: ", err);
+      logger.error("Failed calling POST on /blueprint/compile in submit: ", err);
       throw err;
     }
   }
@@ -362,7 +363,7 @@ export class Blueprint {
         auth
       );
     } catch (err) {
-      console.error("Failed calling GET on /blueprint/ in listBlueprints: ", err);
+      logger.error("Failed calling GET on /blueprint/ in listBlueprints: ", err);
       throw err;
     }
 
@@ -392,7 +393,7 @@ export class Blueprint {
       try {
         await this.submitDraft();
       } catch (err) {
-        console.error("Failed to create blueprint: ", err);
+        logger.error("Failed to create blueprint: ", err);
         throw err;
       }
     }
@@ -423,7 +424,7 @@ export class Blueprint {
     } catch (err) {
       // We don't set the status here, since the api call can't fail due to the actual job failing
       // It can only due to connectivity issues or the job runner not being available
-      console.error("Failed calling POST on /blueprint/compile in submit: ", err);
+      logger.error("Failed calling POST on /blueprint/compile in submit: ", err);
       throw err;
     }
   }
@@ -434,7 +435,7 @@ export class Blueprint {
     try {
       response = await get<StatusResponse>(`${this.baseUrl}/blueprint/status/${this.props.id}`);
     } catch (err) {
-      console.error("Failed calling GET /blueprint/status in getStatus(): ", err);
+      logger.error("Failed calling GET /blueprint/status in getStatus(): ", err);
       throw err;
     }
 
@@ -511,7 +512,7 @@ export class Blueprint {
         `${this.baseUrl}/blueprint/zkey/${this.props.id}`
       );
     } catch (err) {
-      console.error("Failed calling GET on /blueprint/zkey/:id in getZKeyDownloadLink: ", err);
+      logger.error("Failed calling GET on /blueprint/zkey/:id in getZKeyDownloadLink: ", err);
       throw err;
     }
 
@@ -531,7 +532,7 @@ export class Blueprint {
     try {
       urls = await this.getZKeyDownloadLink();
     } catch (err) {
-      console.error("Failed to start download of ZKeys: ", err);
+      logger.error("Failed to start download of ZKeys: ", err);
       throw err;
     }
 
@@ -566,7 +567,7 @@ export class Blueprint {
     try {
       await verifyProofOnChain(proof);
     } catch (err) {
-      console.error("Failed to verify proof on chain: ", err);
+      logger.error("Failed to verify proof on chain: ", err);
       return false;
     }
     return true;
@@ -590,7 +591,7 @@ export class Blueprint {
     try {
       vkey = await this.getVkey();
     } catch (err) {
-      console.log("Failed to get vkey: ", err);
+      logger.error("Failed to get vkey: ", err);
       return false;
     }
 
@@ -687,7 +688,7 @@ export class Blueprint {
         this.auth
       );
     } catch (err) {
-      console.error("Failed calling PATCH on /blueprint/:id in update: ", err);
+      logger.error("Failed calling PATCH on /blueprint/:id in update: ", err);
       throw err;
     }
 
@@ -704,7 +705,7 @@ export class Blueprint {
         `${this.baseUrl}/blueprint/versions/${encodeURIComponent(this.props.slug!)}`
       );
     } catch (err) {
-      console.error("Failed calling GET on /blueprint/versions/:slug in listAllVersions: ", err);
+      logger.error("Failed calling GET on /blueprint/versions/:slug in listAllVersions: ", err);
       throw err;
     }
 
@@ -727,7 +728,7 @@ export class Blueprint {
       );
       return await this.getStars();
     } catch (err) {
-      console.error("Failed calling POST on /blueprint/${slug}/stars in addStar: ", err);
+      logger.error("Failed calling POST on /blueprint/${slug}/stars in addStar: ", err);
       throw err;
     }
   }
@@ -745,7 +746,7 @@ export class Blueprint {
       );
       return await this.getStars();
     } catch (err) {
-      console.error("Failed calling DELETE on /blueprint/${id}/stars in addStar: ", err);
+      logger.error("Failed calling DELETE on /blueprint/${id}/stars in addStar: ", err);
       throw err;
     }
   }
@@ -758,7 +759,7 @@ export class Blueprint {
       this.props.stars = stars || 0;
       return stars || 0;
     } catch (err) {
-      console.error("Failed calling POST on /blueprint/${id}/stars in addStar: ", err);
+      logger.error("Failed calling POST on /blueprint/${id}/stars in addStar: ", err);
       throw err;
     }
   }
@@ -774,7 +775,7 @@ export class Blueprint {
         this.auth
       );
     } catch (err) {
-      console.error("Failed calling DELETE on /blueprint/cancel/${id} in cancelCompilation: ", err);
+      logger.error("Failed calling DELETE on /blueprint/cancel/${id} in cancelCompilation: ", err);
       throw err;
     }
   }
@@ -791,7 +792,7 @@ export class Blueprint {
         this.auth
       );
     } catch (err) {
-      console.error("Failed calling DELETE on /blueprint/${id} in cancelCompilation: ", err);
+      logger.error("Failed calling DELETE on /blueprint/${id} in cancelCompilation: ", err);
       throw err;
     }
   }
@@ -811,7 +812,7 @@ export class Blueprint {
         `${this.baseUrl}/blueprint/chunked-zkey/${this.props.id}`
       );
     } catch (err) {
-      console.error(
+      logger.error(
         "Failed calling GET on /blueprint/chunked-zkey/:id in getChunkedZkeyDownloadLinks: ",
         err
       );
@@ -914,7 +915,7 @@ export class Blueprint {
 
     const url = await this.getNoirRegexGraphsDownloadLink();
     const data = await downloadAndUnzipFile(url);
-    console.log("data: ", data);
+    logger.debug("data: ", data);
 
     return data;
   }
@@ -937,7 +938,7 @@ export class Blueprint {
     try {
       response = await get<{ url: string }>(`${this.baseUrl}/blueprint/wasm/${this.props.id}`);
     } catch (err) {
-      console.error("Failed calling GET on /blueprint/wasm/:id in getWasmFileDownloadLink: ", err);
+      logger.error("Failed calling GET on /blueprint/wasm/:id in getWasmFileDownloadLink: ", err);
       throw err;
     }
 
@@ -962,7 +963,7 @@ export class Blueprint {
     try {
       response = await get<{ url: string }>(`${this.baseUrl}/blueprint/vkey/${this.props.id}`);
     } catch (err) {
-      console.error("Failed calling GET on /blueprint/vkey/:id in getVkeyFileDownloadLink: ", err);
+      logger.error("Failed calling GET on /blueprint/vkey/:id in getVkeyFileDownloadLink: ", err);
       throw err;
     }
 
@@ -976,7 +977,7 @@ export class Blueprint {
       const vkey = await response.text();
       return vkey;
     } catch (err) {
-      console.error("error in getVkey");
+      logger.error("error in getVkey");
       throw err;
     }
   }
@@ -988,7 +989,7 @@ export class Blueprint {
         `${this.baseUrl}/blueprint/count-remote-proofs/${this.props.id}`
       );
     } catch (err) {
-      console.error("Failed calling /blueprint/:id in getBlueprintById: ", err);
+      logger.error("Failed calling /blueprint/:id in getBlueprintById: ", err);
       throw err;
     }
 
@@ -1003,7 +1004,7 @@ export class Blueprint {
     try {
       await testBlueprint(eml, this.props, false);
     } catch (err) {
-      console.warn("Email is invalid: ", err);
+      logger.warn("Email is invalid: ", err);
       throw err;
     }
   }

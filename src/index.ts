@@ -2,6 +2,7 @@ import { Blueprint, BlueprintProps, ListBlueprintsOptions } from "./blueprint";
 import { Proof } from "./proof";
 import { SdkOptions } from "./types/sdk";
 import { getStarredBlueprints } from "./user";
+import { logger } from "./utils/logger";
 
 // Export Types
 export * from "./types/blueprint";
@@ -17,6 +18,8 @@ export type { ValidationErrors } from "./blueprintValidation";
 
 // Exports that don't need initialization or options
 export { startJsonFileDownload, getDKIMSelector } from "./utils";
+export { logger } from "./utils/logger";
+export type { LogLevel, LoggingOptions } from "./types/sdk";
 export {
   testDecomposedRegex,
   parseEmail,
@@ -34,6 +37,10 @@ export { Outlook, LoginWithMicrosoft } from "./login_for_email/microsoft";
 // Exported sdk, functions that need initialization
 export default (sdkOptions?: SdkOptions) => {
   const baseUrl = sdkOptions?.baseUrl || "https://conductor.zk.email";
+  
+  // Configure logging
+  logger.configure(sdkOptions?.logging);
+  
   return {
     createBlueprint(props: BlueprintProps) {
       if (!sdkOptions && !sdkOptions!.auth) {

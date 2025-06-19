@@ -14,6 +14,7 @@ import {
   generateNoirCircuitInputsWithRegexesAndExternalInputs,
 } from "@zk-email/relayer-utils";
 import { addMaxLengthToExternalInputs } from "../../utils/maxLenghExternalInputs";
+import { logger } from "../../utils/logger";
 
 export class NoirProver extends AbstractProver implements IProver {
   async generateLocalProof(
@@ -73,9 +74,9 @@ export class NoirProver extends AbstractProver implements IProver {
       proverEthAddress: "0x0000000000000000000000000000000000000000",
     };
 
-    console.log("generating inputs regexInputs: ", regexInputs);
-    console.log("generating inputs externalInputs: ", externalInputs);
-    console.log("generating inputs noirParams: ", noirParams);
+    logger.debug("generating inputs regexInputs: ", regexInputs);
+    logger.debug("generating inputs externalInputs: ", externalInputs);
+    logger.debug("generating inputs noirParams: ", noirParams);
 
     const externalInputsWithMaxLength = addMaxLengthToExternalInputs(
       externalInputs,
@@ -89,7 +90,7 @@ export class NoirProver extends AbstractProver implements IProver {
       noirParams
     );
 
-    console.log("circuitInputs: ", circuitInputs);
+    logger.debug("circuitInputs: ", circuitInputs);
 
     if (!circuitInputs) {
       throw new Error("Could not generate circuit inputs for noir");
@@ -114,16 +115,16 @@ export class NoirProver extends AbstractProver implements IProver {
 
     delete circuitInputsObject.dkim_header_sequence;
 
-    console.time("witness");
+    logger.time("witness");
     const { witness } = await noir.execute(circuitInputsObject);
-    console.timeEnd("witness");
+    logger.timeEnd("witness");
 
-    console.time("prove");
+    logger.time("prove");
     const proof = await backend.generateProof(witness);
-    console.timeEnd("prove");
+    logger.timeEnd("prove");
 
     this.incNumLocalProofs().catch((err) =>
-      console.warn("Failed to increase num of local proofs: ", err)
+      logger.warn("Failed to increase num of local proofs: ", err)
     );
 
     const { publicData, externalInputsProof } = parseNoirPublicOutputs(
