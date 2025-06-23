@@ -34,8 +34,7 @@ export { ZodError } from "./blueprintValidation";
 export { LoginWithGoogle, Gmail } from "./login_for_email/gmail";
 export { Outlook, LoginWithMicrosoft } from "./login_for_email/microsoft";
 
-// Exported sdk, functions that need initialization
-export default (sdkOptions?: SdkOptions) => {
+export function initZkEmailSdk(sdkOptions?: SdkOptions) {
   const baseUrl = sdkOptions?.baseUrl || "https://conductor.zk.email";
   
   // Configure logging
@@ -71,4 +70,9 @@ export default (sdkOptions?: SdkOptions) => {
       return Proof.unPackProof(packedProof, baseUrl);
     },
   };
+}
+
+// Exported sdk, functions that need initialization
+export default (sdkOptions?: SdkOptions) => {
+  return initZkEmailSdk(sdkOptions);
 };
