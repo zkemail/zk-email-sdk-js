@@ -1,20 +1,20 @@
 {
   "name": "@zk-email/sdk",
-  "version": "1.4.0-1",
+  "version": "1.4.0-6",
   "description": "ZK Email SDK for TypeScript",
-  "main": "./dist/index.js",
-  "module": "./dist/zk-email-sdk.es.js",
+  "main": "./dist/zk-email-sdk.index.cjs",
+  "module": "./dist/zk-email-sdk.index.mjs",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/zk-email-sdk.index.cjs.js",
-      "import": "./dist/zk-email-sdk.index.es.js",
-      "types": "./dist/types/index.d.ts"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/zk-email-sdk.index.mjs",
+      "require": "./dist/zk-email-sdk.index.cjs"
     },
     "./initNoirWasm": {
-      "require": "./dist/zk-email-sdk.initNoirWasm.cjs.js",
-      "import": "./dist/zk-email-sdk.initNoirWasm.es.js",
-      "types": "./dist/types/initNoirWasm.d.ts"
+      "types": "./dist/types/initNoirWasm.d.ts",
+      "import": "./dist/zk-email-sdk.initNoirWasm.mjs",
+      "require": "./dist/zk-email-sdk.initNoirWasm.cjs"
     }
   },
   "files": [

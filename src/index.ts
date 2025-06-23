@@ -73,6 +73,6 @@ export function initZkEmailSdk(sdkOptions?: SdkOptions) {
 }
 
 // Exported sdk, functions that need initialization
-export default (sdkOptions?: SdkOptions) => {
-  return initZkEmailSdk(sdkOptions);
-};
+// export default (sdkOptions?: SdkOptions) => {
+//   return initZkEmailSdk(sdkOptions);
+// };
