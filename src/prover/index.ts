@@ -190,6 +190,7 @@ export abstract class AbstractProver implements IProver {
         requestData.eml = eml;
       }
 
+      // TODO: remove this once we have main and staging in sync
       // @ts-ignore
       delete requestData.zk_framework;
 
@@ -197,6 +198,11 @@ export abstract class AbstractProver implements IProver {
     } catch (err) {
       logger.error("Failed calling POST on /proof/ in generateProofRequest: ", err);
       throw err;
+    }
+
+    // TODO: remove this once we have main and staging in sync
+    if (response.zk_framework === undefined) {
+      response.zk_framework = ZkFramework.Circom;
     }
 
     const proofProps = Proof.responseToProofProps(response);
