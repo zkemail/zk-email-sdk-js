@@ -190,6 +190,9 @@ export abstract class AbstractProver implements IProver {
         requestData.eml = eml;
       }
 
+      // @ts-ignore
+      delete requestData.zk_framework;
+
       response = await post<ProofResponse>(`${this.blueprint.baseUrl}/proof`, requestData);
     } catch (err) {
       logger.error("Failed calling POST on /proof/ in generateProofRequest: ", err);
