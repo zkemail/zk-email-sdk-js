@@ -103,6 +103,7 @@ export async function testBlueprint(
   revealPrivate = false
 ): Promise<string[][]> {
   const parsedEmail = await parseEmail(eml, blueprint.ignoreBodyHashCheck);
+  console.log("parsedEmail: ", parsedEmail);
   const domain = getSenderDomain(parsedEmail);
 
   if (blueprint.senderDomain !== domain) {
@@ -119,6 +120,7 @@ export async function testBlueprint(
   let body = parsedEmail.cleanedBody;
   if (blueprint.shaPrecomputeSelector) {
     const splitEmail = body.split(blueprint.shaPrecomputeSelector)[1];
+    console.log("splitEmail: ", splitEmail);
     if (!splitEmail) {
       throw new Error(
         `Precompute selector was not found in email, selector: ${blueprint.shaPrecomputeSelector}`
@@ -129,7 +131,9 @@ export async function testBlueprint(
 
   const header = parsedEmail.canonicalizedHeader;
 
+  console.log("checkInputLengths");
   await checkInputLengths(header, body, blueprint);
+  console.log("checkInputLengths done");
 
   const output = await Promise.all(
     blueprint.decomposedRegexes.flatMap((dcr: DecomposedRegex) => [
@@ -154,11 +158,15 @@ async function checkInputLengths(header: string, body: string, blueprint: Bluepr
   if (!blueprint.ignoreBodyHashCheck) {
     const bodyData = encoder.encode(body);
 
+    console.log("body.length: ", body.length);
     const bodyShaLength = ((body.length + 63 + 65) / 64) * 64;
+    console.log("bodyShaLength: ", bodyShaLength);
 
     const maxShaBytes = Math.max(bodyShaLength, blueprint.emailBodyMaxLength!);
+    console.log("maxShaBytes: ", maxShaBytes);
 
     const bodyLength = (await sha256Pad(bodyData, maxShaBytes)).get("messageLength");
+    console.log("bodyLength: ", bodyLength);
 
     if (bodyLength > blueprint.emailBodyMaxLength!) {
       throw new Error(`emailBodyMaxLength of ${blueprint.emailBodyMaxLength} was exceeded`);
@@ -191,6 +199,8 @@ export async function testDecomposedRegex(
   const maxLength =
     "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
 
+  console.log("inputStr: ", inputStr);
+  console.log("inputDecomposedRegex: ", inputDecomposedRegex);
   await relayerUtilsInit;
   const privateResult = extractSubstr(inputStr, inputDecomposedRegex, false);
 
@@ -204,6 +214,10 @@ export async function testDecomposedRegex(
     return privateResult;
   }
 
+  console.log("calling extractSubstr");
+  console.log("revealPrivate: ", revealPrivate);
+  console.log("inputDecomposedRegex: ", inputDecomposedRegex);
+  console.log("inputStr: ", inputStr);
   const result = extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
   return result;
 }

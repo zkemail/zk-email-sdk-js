@@ -48,8 +48,17 @@ export class NoirProver extends AbstractProver implements IProver {
         throw new Error(`No regexGraph was compiled for decomposedRegexe ${dr.name}`);
       }
 
-      const haystack =
-        dr.location === "header" ? parsedEmail.canonicalizedHeader : parsedEmail.cleanedBody;
+      // const haystack =
+      //   dr.location === "header" ? parsedEmail.canonicalizedHeader : parsedEmail.cleanedBody;
+
+      let haystack;
+      if (dr.location === "header") {
+        haystack = parsedEmail.canonicalizedHeader;
+      } else if (this.blueprint.props.shaPrecomputeSelector) {
+        haystack = parsedEmail.cleanedBody.split(this.blueprint.props.shaPrecomputeSelector)[1];
+      } else {
+        haystack = parsedEmail.cleanedBody;
+      }
 
       const maxHaystackLength =
         dr.location === "header"
@@ -69,8 +78,8 @@ export class NoirProver extends AbstractProver implements IProver {
     const noirParams = {
       maxHeaderLength: this.blueprint.props.emailHeaderMaxLength || 512,
       maxBodyLength: this.blueprint.props.emailBodyMaxLength || 0,
-      ignoreBodyHashCheck: this.blueprint.props.ignoreBodyHashCheck || true,
-      removeSoftLineBreaks: this.blueprint.props.removeSoftLinebreaks || true,
+      ignoreBodyHashCheck: this.blueprint.props.ignoreBodyHashCheck,
+      removeSoftLineBreaks: this.blueprint.props.removeSoftLinebreaks,
       shaPrecomputeSelector: this.blueprint.props.shaPrecomputeSelector,
       proverEthAddress: "0x0000000000000000000000000000000000000000",
     };
@@ -84,12 +93,15 @@ export class NoirProver extends AbstractProver implements IProver {
       this.blueprint.props.externalInputs
     );
 
+    console.log("externalInputsWithMaxLength: ", externalInputsWithMaxLength);
+
     const circuitInputs = await generateNoirCircuitInputsWithRegexesAndExternalInputs(
       eml,
       regexInputs,
       externalInputsWithMaxLength,
       noirParams
     );
+    console.log("circuitInputs: ", circuitInputs);
 
     logger.debug("circuitInputs: ", circuitInputs);
 
@@ -114,7 +126,8 @@ export class NoirProver extends AbstractProver implements IProver {
       }
     }
 
-    delete circuitInputsObject.dkim_header_sequence;
+    console.log("circuitInputsObject: ", circuitInputsObject);
+    // delete circuitInputsObject.dkim_header_sequence;
 
     logger.time("witness");
     const { witness } = await noir.execute(circuitInputsObject);
@@ -162,7 +175,7 @@ export function parseNoirPublicOutputs(
   publicOutputs: string[],
   decomposedRegexes: DecomposedRegex[],
   externalInputDefinition?: ExternalInput[],
-  externalInputs?: ExternalInputInput[],
+  externalInputs?: ExternalInputInput[]
 ): { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } {
   // 0: pubkey hash
   // 1: header_hash[0]
@@ -180,7 +193,7 @@ export function parseNoirPublicOutputs(
       externalInputs,
       externalInputDefinition
     );
-    
+
     result.externalInputsProof = {};
     externalInputsWithMaxLength.forEach((externalInput) => {
       const signalLength =

@@ -75,7 +75,11 @@ export class Blueprint {
       throw err;
     }
 
+    console.log("blueprintResponse: ", blueprintResponse);
+
     const blueprintProps = this.responseToBlueprintProps(blueprintResponse);
+
+    console.log("blueprintProps: ", blueprintProps);
 
     const blueprint = new Blueprint(blueprintProps, baseUrl, auth);
 
@@ -132,18 +136,18 @@ export class Blueprint {
       tags: response.tags,
       emailQuery: response.email_query,
       circuitName: response.circuit_name,
-      ignoreBodyHashCheck: response.ignore_body_hash_check,
+      ignoreBodyHashCheck: response.ignore_body_hash_check || false,
       shaPrecomputeSelector: response.sha_precompute_selector,
       emailBodyMaxLength: response.email_body_max_length,
       emailHeaderMaxLength: response.email_header_max_length,
-      removeSoftLinebreaks: response.remove_soft_linebreaks,
+      removeSoftLinebreaks: response.remove_soft_linebreaks || false,
       githubUsername: response.github_username,
       senderDomain: response.sender_domain,
-      enableHeaderMasking: response.enable_header_masking,
-      enableBodyMasking: response.enable_body_masking,
+      enableHeaderMasking: response.enable_header_masking || false,
+      enableBodyMasking: response.enable_body_masking || false,
       clientZkFramework: (response.client_zk_framework as ZkFramework) || ZkFramework.None,
       serverZkFramework: (response.server_zk_framework as ZkFramework) || ZkFramework.None,
-      isPublic: response.is_public,
+      isPublic: response.is_public || false,
       createdAt: new Date(response.created_at.seconds * 1000),
       updatedAt: new Date(response.updated_at.seconds * 1000),
       externalInputs: response.external_inputs?.map((input) => ({
