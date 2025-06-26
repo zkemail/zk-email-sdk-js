@@ -953,11 +953,12 @@ export class Blueprint {
       this.props.serverStatus === Status.Done &&
       this.props.serverZkFramework === ZkFramework.Circom;
 
-    if (!hasValidClientCircuit && !hasValidServerCircuit) {
-      throw new Error(
-        "At least one circuit (client or server) must be compiled with Circom to download."
-      );
-    }
+    // TODO: add back
+    // if (!hasValidClientCircuit && !hasValidServerCircuit) {
+    //   throw new Error(
+    //     "At least one circuit (client or server) must be compiled with Circom to download."
+    //   );
+    // }
 
     let response: { url: string };
     try {
