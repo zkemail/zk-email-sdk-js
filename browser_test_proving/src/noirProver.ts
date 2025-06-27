@@ -2,8 +2,8 @@ import zkeSdk, { GenerateProofOptions } from "../../src";
 import { initNoirWasm } from "@zk-email/sdk/initNoirWasm";
 
 export function setupNoirProver(element: HTMLElement) {
-  const sdk = zkeSdk({ baseUrl: "http://127.0.0.1:8080" });
-  // const sdk = zkeSdk({ baseUrl: "https://dev-conductor.zk.email" });
+  // const sdk = zkeSdk({ baseUrl: "http://127.0.0.1:8080" });
+  const sdk = zkeSdk({ baseUrl: "https://staging-conductor.zk.email" });
 
   const proveButton = element.querySelector("button");
   if (proveButton) {
@@ -11,7 +11,7 @@ export function setupNoirProver(element: HTMLElement) {
       try {
         console.log("getting blueprint");
         // const blueprint = await sdk.getBlueprintById("008b5da5-fbda-4445-b7df-6b0c6dde4bb1");
-        const blueprint = await sdk.getBlueprintById("58a1b5c0-6633-4eb0-9fa8-9e5d605069ab");
+        const blueprint = await sdk.getBlueprintById("b31e09ef-86fa-4a70-a062-e016a8780af8");
 
         console.log("blueprint: ", blueprint);
 
@@ -35,7 +35,7 @@ export function setupNoirProver(element: HTMLElement) {
         const options: GenerateProofOptions = { noirWasm };
         console.log("got the options: ", options);
 
-        const proof = await prover.generateProof(eml!, [externalInputs], options);
+        const proof = await prover.generateProof(eml!, [], options);
         console.log("got the noir proof: ", proof);
 
         // const proof = await prover.generateProof(eml!);
@@ -57,7 +57,7 @@ export function setupNoirProver(element: HTMLElement) {
 
 async function getEml() {
   try {
-    const response = await fetch("/residency.eml"); // URL is relative to the root of the project
+    const response = await fetch("/x.eml"); // URL is relative to the root of the project
     if (!response.ok) {
       throw new Error("Network response was not ok " + response.statusText);
     }
