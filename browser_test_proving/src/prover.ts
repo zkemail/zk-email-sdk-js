@@ -1,8 +1,8 @@
 // import zkeSdk from "@zk-email/sdk";
-import zkeSdk from "../../src/index";
+import { initZkEmailSdk } from "@zk-email/sdk";
 
 export function setupProver(element: HTMLElement) {
-  const sdk = zkeSdk({ baseUrl: "https://dev-conductor.zk.email" });
+  const sdk = initZkEmailSdk({ baseUrl: "https://dev-conductor.zk.email" });
 
   const proveButton = element.querySelector("button");
   if (proveButton) {
