@@ -177,7 +177,7 @@ export class Gmail implements EmailProvider {
    */
   async fetchEmailInfoList(accessToken: string): Promise<GmailMessagesListResponse> {
     const defaultParams = {
-      maxResults: 5,
+      maxResults: 20,
       pageToken: this.nextPageToken || 0,
     };
 
