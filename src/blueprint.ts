@@ -792,7 +792,7 @@ export class Blueprint {
         this.auth
       );
     } catch (err) {
-      logger.error("Failed calling DELETE on /blueprint/${id} in cancelCompilation: ", err);
+      logger.error("Failed calling DELETE on /blueprint/${id} in delete: ", err);
       throw err;
     }
   }

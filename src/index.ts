@@ -1,5 +1,7 @@
 import { Blueprint, BlueprintProps, ListBlueprintsOptions } from "./blueprint";
+import { BlueprintGroup } from "./blueprintGroup";
 import { Proof } from "./proof";
+import { BlueprintGroupProps } from "./types/blueprintGroup";
 import { SdkOptions } from "./types/sdk";
 import { getStarredBlueprints } from "./user";
 import { logger } from "./utils/logger";
@@ -69,6 +71,16 @@ export function initZkEmailSdk(sdkOptions?: SdkOptions) {
     async unPackProof(packedProof: string): Promise<Proof> {
       return Proof.unPackProof(packedProof, baseUrl);
     },
+    createBlueprintGroup(props: BlueprintGroupProps): BlueprintGroup {
+      if (!sdkOptions && !sdkOptions!.auth) {
+        throw new Error("You need to specify options.auth to use createBlueprintGroup");
+      }
+      const blueprintGroup = new BlueprintGroup(props, baseUrl, sdkOptions!.auth);
+      return blueprintGroup;
+    },
+    async getBlueprintGroupById(id: string): Promise<BlueprintGroup> {
+      return BlueprintGroup.getBlueprintGroupById(id, baseUrl);
+    }
   };
 }
 

@@ -120,14 +120,14 @@ export class Gmail implements EmailProvider {
     this.query = this.buildQuery(blueprints, options);
     logger.info("Fetching emails with query: ", this.query);
     const emailList = await this.fetchEmailInfoList(accessToken);
-    console.log("emailList: ", emailList);
+    logger.debug("emailList: ", emailList);
     this.nextPageToken = emailList.nextPageToken || null;
     if (!emailList.messages?.length) return [];
     const emails = await this.fetchEmailsRaw(
       accessToken,
       emailList.messages.map((msg) => msg.id)
     );
-    console.log("emails: ", emails);
+    logger.debug("emails: ", emails);
     
     emails.forEach((email) => {
       email.subject = decodeMimeEncodedText(email.subject);
@@ -227,7 +227,7 @@ export class Gmail implements EmailProvider {
             }
 
             const decodedContents = atob(rawBase64);
-            console.log("decodedContents: ", decodedContents);
+            logger.debug("decodedContents: ", decodedContents);
 
             const subject = decodedContents.match(/Subject: (.*)/)?.[1] || "No Subject";
 
