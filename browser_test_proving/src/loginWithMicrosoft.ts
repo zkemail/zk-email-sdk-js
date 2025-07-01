@@ -1,4 +1,4 @@
-import zkeSdk, { FetchEmailOptions, Outlook } from "../../src/index";
+import zkeSdk, { FetchEmailOptions, Outlook, parseEmail, testBlueprint } from "../../src/index";
 // import zkeSdk, { FetchEmailOptoins, Gmail } from "../../src/index";
 
 export function setupLoginWithMicrosoft(element: HTMLElement) {
@@ -23,6 +23,12 @@ export function setupLoginWithMicrosoft(element: HTMLElement) {
 
       const email = await outlook.fetchEmailRawById(emails[0].emailMessageId);
       console.log("email: ", email);
+
+      
+      const parsedEmail = await parseEmail(email.decodedContents);
+      await testBlueprint(email.decodedContents, blueprint?.props!);
+
+      console.log("parsedEmail: ", parsedEmail);
 
       let moreEmails = await outlook.fetchMore();
       console.log("moreEmails: ", moreEmails);
