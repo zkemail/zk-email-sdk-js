@@ -363,7 +363,8 @@ export class Outlook implements EmailProvider {
   async fetchEmailRawById(emailId: string): Promise<RawOutlookEmailResponse> {
     const accessToken = await this.loginWithMicrosoft.getAccessToken();
     // We need internetMessageHeaders to get the DKIM signature and other headers
-    const url = `https://graph.microsoft.com/v1.0/me/messages/${emailId}?$select=id,subject,receivedDateTime,internetMessageId,body,internetMessageHeaders`;
+    // const url = `https://graph.microsoft.com/v1.0/me/messages/${emailId}?$select=id,subject,receivedDateTime,internetMessageId,body,internetMessageHeaders`;
+    const url = `https://graph.microsoft.com/v1.0/me/messages/${emailId}/$value`;
 
     const response = await fetch(url, {
       headers: {
@@ -373,26 +374,29 @@ export class Outlook implements EmailProvider {
     });
 
     if (response.ok) {
-      const email: OutlookEmailResponse = await response.json();
+      const rawEmail = await response.text();
+      console.log("rawEmail: ", rawEmail);
+      // const email: OutlookEmailResponse = await response.json();
 
-      // Convert to raw format
-      let rawContent = email.body.content;
-      if (email.body.contentType === "html") {
-        rawContent = this.constructRawEmail(email);
-      }
+      // // Convert to raw format
+      // let rawContent = email.body.content;
+      // if (email.body.contentType === "html") {
+      //   rawContent = this.constructRawEmail(email);
+      // }
 
-      const fullEmlContent = this.createRawValidEmail(email);
+      // const fullEmlContent = this.createRawValidEmail(email);
 
-      console.log("email: ", email, fullEmlContent);
+      // console.log("email: ", email, fullEmlContent);
 
       return {
-        emailMessageId: email.id,
-        subject: email.subject || "No Subject",
-        internalDate: email.receivedDateTime,
-        decodedContents: rawContent,
-        dkimSignature: email?.internetMessageHeaders?.find(
-          (header) => header.name === "DKIM-Signature"
-        )?.value,
+        rawEmail: rawEmail,
+        // emailMessageId: email.id,
+        // subject: email.subject || "No Subject",
+        // internalDate: email.receivedDateTime,
+        // decodedContents: rawContent,
+        // dkimSignature: email?.internetMessageHeaders?.find(
+        //   (header) => header.name === "DKIM-Signature"
+        // )?.value,
       };
     } else {
       console.error(`Failed to fetch email with ID: ${emailId}`, response);

@@ -25,8 +25,8 @@ export function setupLoginWithMicrosoft(element: HTMLElement) {
       console.log("email: ", email);
 
       
-      const parsedEmail = await parseEmail(email.decodedContents);
-      await testBlueprint(email.decodedContents, blueprint?.props!);
+      const parsedEmail = await parseEmail(email.rawEmail);
+      await testBlueprint(email.rawEmail, blueprint?.props!);
 
       console.log("parsedEmail: ", parsedEmail);
 
