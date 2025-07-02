@@ -8,7 +8,7 @@ export function setupLoginWithMicrosoft(element: HTMLElement) {
   const loginButton = element.querySelector("button");
   if (loginButton) {
     loginButton.addEventListener("click", async () => {
-      const blueprint = await sdk.getBlueprintById("963fbbe8-7f08-4a9c-8608-f378b144aec3");
+      const blueprint = await sdk.getBlueprintById("fcbcc3e2-b615-4ae5-bc72-616996a74e18");
       // const blueprint = await sdk.getBlueprintById("008b5da5-fbda-4445-b7df-6b0c6dde4bb1");
       // const blueprint2 = await sdk.getBlueprintById("0935faed-002d-4b94-8cbf-476b3b05d9a6");
 
@@ -25,8 +25,8 @@ export function setupLoginWithMicrosoft(element: HTMLElement) {
       console.log("email: ", email);
 
       
-      const parsedEmail = await parseEmail(email.rawEmail);
-      await testBlueprint(email.rawEmail, blueprint?.props!);
+      const parsedEmail = await parseEmail(email.decodedContents);
+      // await testBlueprint(email.rawEmail, blueprint?.props!);
 
       console.log("parsedEmail: ", parsedEmail);
 

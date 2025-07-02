@@ -362,41 +362,24 @@ export class Outlook implements EmailProvider {
   // Get a specific email by ID in its raw format
   async fetchEmailRawById(emailId: string): Promise<RawOutlookEmailResponse> {
     const accessToken = await this.loginWithMicrosoft.getAccessToken();
-    // We need internetMessageHeaders to get the DKIM signature and other headers
-    // const url = `https://graph.microsoft.com/v1.0/me/messages/${emailId}?$select=id,subject,receivedDateTime,internetMessageId,body,internetMessageHeaders`;
+
     const url = `https://graph.microsoft.com/v1.0/me/messages/${emailId}/$value`;
 
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
       },
     });
 
     if (response.ok) {
       const rawEmail = await response.text();
-      console.log("rawEmail: ", rawEmail);
-      // const email: OutlookEmailResponse = await response.json();
-
-      // // Convert to raw format
-      // let rawContent = email.body.content;
-      // if (email.body.contentType === "html") {
-      //   rawContent = this.constructRawEmail(email);
-      // }
-
-      // const fullEmlContent = this.createRawValidEmail(email);
-
-      // console.log("email: ", email, fullEmlContent);
+      const subject = rawEmail.match(/Subject: (.*)/)?.[1] || "No Subject";
 
       return {
-        rawEmail: rawEmail,
-        // emailMessageId: email.id,
-        // subject: email.subject || "No Subject",
-        // internalDate: email.receivedDateTime,
-        // decodedContents: rawContent,
-        // dkimSignature: email?.internetMessageHeaders?.find(
-        //   (header) => header.name === "DKIM-Signature"
-        // )?.value,
+        decodedContents: rawEmail,
+        emailMessageId: emailId,
+        subject,
+        internalDate: rawEmail.match(/Date: (.*)/)?.[1] || new Date().toISOString(),
       };
     } else {
       console.error(`Failed to fetch email with ID: ${emailId}`, response);
