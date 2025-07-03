@@ -59,6 +59,13 @@ export class NoirProver extends AbstractProver implements IProver {
       } else {
         haystack = parsedEmail.cleanedBody;
       }
+      
+      let haystack_location;
+      if (dr.location === "header") {
+        haystack_location = "Header";
+      } else {
+        haystack_location = "Body";
+      }
 
       const maxHaystackLength =
         dr.location === "header"
@@ -68,7 +75,7 @@ export class NoirProver extends AbstractProver implements IProver {
       return {
         name: dr.name,
         regex_graph_json: JSON.stringify(regexGraph),
-        haystack,
+        haystack_location,
         max_haystack_length: maxHaystackLength,
         max_match_length: dr.maxLength,
         proving_framework: "noir",
