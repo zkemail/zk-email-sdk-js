@@ -4,13 +4,23 @@ import { FetchEmailOptions, GmailMessagesListResponse, RawEmailResponse } from "
 import { decodeMimeEncodedText } from "../utils";
 import { logger } from "../utils/logger";
 
-const clientId = "773062743658-rauj7nb18ikr1lrfs5bl8lt3b31r2nen.apps.googleusercontent.com";
+const DEFAULT_CLIENT_ID = "773062743658-rauj7nb18ikr1lrfs5bl8lt3b31r2nen.apps.googleusercontent.com";
 /**
  * A class for handling Google OAuth login flow.
  * Note: This will only work if you first register your callback URL with the zkemail team.
  */
+
+interface LoginWithGoogleOptions {
+  clientId?: string;
+}
+
 export class LoginWithGoogle implements EmailLoginProvider {
   accessToken: string | null = null;
+  private clientId: string;
+
+  constructor({clientId}: LoginWithGoogleOptions = {}) {
+    this.clientId = clientId || DEFAULT_CLIENT_ID;
+  }
 
   private loadGoogleScript(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -29,13 +39,13 @@ export class LoginWithGoogle implements EmailLoginProvider {
     });
   }
 
-  async authorize(options: any): Promise<string> {
+  async authorize(options?: any): Promise<string> {
     // Load Google's OAuth2 library dynamically
     await this.loadGoogleScript();
 
     return new Promise((resolve, reject) => {
       const client = google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
+        client_id: this.clientId,
         // prompt: "consent",
         // access_type: "offline",
         ...(!isPlainObject(options) ? {} : options),
@@ -120,12 +130,14 @@ export class Gmail implements EmailProvider {
     this.query = this.buildQuery(blueprints, options);
     logger.info("Fetching emails with query: ", this.query);
     const emailList = await this.fetchEmailInfoList(accessToken);
+    logger.debug("emailList: ", emailList);
     this.nextPageToken = emailList.nextPageToken || null;
     if (!emailList.messages?.length) return [];
     const emails = await this.fetchEmailsRaw(
       accessToken,
       emailList.messages.map((msg) => msg.id)
     );
+    logger.debug("emails: ", emails);
     
     emails.forEach((email) => {
       email.subject = decodeMimeEncodedText(email.subject);
@@ -174,13 +186,16 @@ export class Gmail implements EmailProvider {
    * Full email content can be retrieved later using fetchEmailRaw method.
    */
   async fetchEmailInfoList(accessToken: string): Promise<GmailMessagesListResponse> {
-    const defaultParams = {
-      maxResults: 5,
-      pageToken: this.nextPageToken || 0,
+    const params: Record<string, string> = {
+      maxResults: "20",
     };
-
-    const queryParams = { ...defaultParams, ...(this.query ? { q: this.query } : {}) };
-    const queryString = new URLSearchParams(queryParams).toString();
+    if (this.query) {
+      params.q = this.query;
+    }
+    if (this.nextPageToken) {
+      params.pageToken = this.nextPageToken;
+    }
+    const queryString = new URLSearchParams(params).toString();
 
     const url = `https://www.googleapis.com/gmail/v1/users/me/messages?${queryString}`;
 
@@ -225,6 +240,7 @@ export class Gmail implements EmailProvider {
             }
 
             const decodedContents = atob(rawBase64);
+            logger.debug("decodedContents: ", decodedContents);
 
             const subject = decodedContents.match(/Subject: (.*)/)?.[1] || "No Subject";
 

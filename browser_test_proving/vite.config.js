@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import path from "path";
-import commonjs from "vite-plugin-commonjs";
 import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 import rollupNodePolyfills from "rollup-plugin-node-polyfills";
 
@@ -16,7 +15,6 @@ export default defineConfig({
   },
   publicDir: "public",
   plugins: [
-    commonjs(), // Handles CommonJS modules
     {
       ...rollupNodePolyfills(), // Polyfills Node.js modules
       apply: "build",
@@ -65,10 +63,19 @@ export default defineConfig({
     },
   },
   define: {
-    global: "globalThis", // Polyfill `global` for browser environments
+    global: "globalThis",
+    Buffer: "globalThis.Buffer",
+    "process.env": "{}",
+    "process.env.NODE_ENV": '"development"',
+    "process.platform": '"browser"',
+    "process.version": '""',
   },
   optimizeDeps: {
+    include: ["buffer"],
     esbuildOptions: {
+      define: {
+        global: "globalThis",
+      },
       plugins: [
         NodeGlobalsPolyfillPlugin({
           process: true,
@@ -76,5 +83,6 @@ export default defineConfig({
         }),
       ],
     },
+    exclude: ["@zk-email/sdk"], // Don't pre-bundle the SDK
   },
 });

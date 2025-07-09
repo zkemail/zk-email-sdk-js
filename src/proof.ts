@@ -43,6 +43,11 @@ export class Proof {
 
   async getPubKeyHash(): Promise<string> {
     let pubKeyHash: string;
+    
+    if (!this.props.zkFramework) {
+      this.props.zkFramework = ZkFramework.Circom;
+    }
+    
     if (this.props.zkFramework === ZkFramework.Circom) {
       pubKeyHash = (this.props.publicOutputs as string[])[0];
     } else if (this.props.zkFramework === ZkFramework.Sp1) {

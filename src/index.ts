@@ -1,5 +1,7 @@
 import { Blueprint, BlueprintProps, ListBlueprintsOptions } from "./blueprint";
+import { BlueprintGroup } from "./blueprintGroup";
 import { Proof } from "./proof";
+import { BlueprintGroupProps } from "./types/blueprintGroup";
 import { SdkOptions } from "./types/sdk";
 import { getStarredBlueprints } from "./user";
 import { logger } from "./utils/logger";
@@ -34,8 +36,7 @@ export { ZodError } from "./blueprintValidation";
 export { LoginWithGoogle, Gmail } from "./login_for_email/gmail";
 export { Outlook, LoginWithMicrosoft } from "./login_for_email/microsoft";
 
-// Exported sdk, functions that need initialization
-export default (sdkOptions?: SdkOptions) => {
+export function initZkEmailSdk(sdkOptions?: SdkOptions) {
   const baseUrl = sdkOptions?.baseUrl || "https://conductor.zk.email";
   
   // Configure logging
@@ -70,5 +71,20 @@ export default (sdkOptions?: SdkOptions) => {
     async unPackProof(packedProof: string): Promise<Proof> {
       return Proof.unPackProof(packedProof, baseUrl);
     },
+    createBlueprintGroup(props: BlueprintGroupProps): BlueprintGroup {
+      if (!sdkOptions && !sdkOptions!.auth) {
+        throw new Error("You need to specify options.auth to use createBlueprintGroup");
+      }
+      const blueprintGroup = new BlueprintGroup(props, baseUrl, sdkOptions!.auth);
+      return blueprintGroup;
+    },
+    async getBlueprintGroupById(id: string): Promise<BlueprintGroup> {
+      return BlueprintGroup.getBlueprintGroupById(id, baseUrl);
+    }
   };
-};
+}
+
+// Exported sdk, functions that need initialization
+// export default (sdkOptions?: SdkOptions) => {
+//   return initZkEmailSdk(sdkOptions);
+// };
