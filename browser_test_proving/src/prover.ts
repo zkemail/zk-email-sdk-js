@@ -10,7 +10,7 @@ export function setupProver(element: HTMLElement) {
       try {
         console.log("getting blueprint");
         // const blueprint = await sdk.getBlueprintById("008b5da5-fbda-4445-b7df-6b0c6dde4bb1");
-        const blueprint = await sdk.getBlueprintById("9c4f651d-a925-45dc-b2b5-7cd51b401d0b");
+        const blueprint = await sdk.getBlueprintById("1fc25bf2-bfce-430f-9d0e-447a02cc7864");
 
         console.log("blueprint: ", blueprint);
 
@@ -60,7 +60,7 @@ export function setupProver(element: HTMLElement) {
 
 async function getEml() {
   try {
-    const response = await fetch("/residency.eml"); // URL is relative to the root of the project
+    const response = await fetch("/amazon.eml"); // URL is relative to the root of the project
     if (!response.ok) {
       throw new Error("Network response was not ok " + response.statusText);
     }

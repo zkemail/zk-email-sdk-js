@@ -24,6 +24,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
+      "@zk-email/sdk": path.resolve(__dirname, "../src"),
       "node:buffer": "buffer",
       "node:stream": "stream-browserify",
       buffer: "buffer",

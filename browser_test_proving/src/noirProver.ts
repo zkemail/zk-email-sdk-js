@@ -18,7 +18,7 @@ export function setupNoirProver(element: HTMLElement) {
       try {
         console.log("getting blueprint");
         // const blueprint = await sdk.getBlueprintById("4c67a6fe-6202-40ff-8672-9dbe02e5cb52");
-        const blueprint = await sdk.getBlueprintById("1efb18f3-c0f7-44e5-95dd-38059cc0004a");
+        const blueprint = await sdk.getBlueprintById("1fc25bf2-bfce-430f-9d0e-447a02cc7864");
 
         console.log("blueprint: ", blueprint);
 
@@ -28,12 +28,12 @@ export function setupNoirProver(element: HTMLElement) {
 
         const eml = await getEml();
 
-        try {
-          const isValidEml = await blueprint.validateEmail(eml!);
-          console.log("isValidEml: ", isValidEml);
-        } catch (err) {
-          console.error("Email is not valid: ", err);
-        }
+        // try {
+        //   const isValidEml = await blueprint.validateEmail(eml!);
+        //   console.log("isValidEml: ", isValidEml);
+        // } catch (err) {
+        //   console.error("Email is not valid: ", err);
+        // }
 
         // console.log("putting in eml: ", eml);
         const externalInputs = {
