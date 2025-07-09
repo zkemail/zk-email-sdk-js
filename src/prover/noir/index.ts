@@ -75,6 +75,7 @@ export class NoirProver extends AbstractProver implements IProver {
       return {
         name: dr.name,
         regex_graph_json: JSON.stringify(regexGraph),
+        haystack,
         haystack_location,
         max_haystack_length: maxHaystackLength,
         max_match_length: dr.maxLength,
