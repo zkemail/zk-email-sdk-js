@@ -1,0 +1,3284 @@
+Delivered-To: zsofia.z.varga@gmail.com
+Received: by 2002:a05:7108:6784:b0:385:5725:e550 with SMTP id i4csp8789gdg;
+        Wed, 18 Sep 2024 18:45:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGVfxurw9iMSotk4cbzqqEYFd50uXgEPBRDW+A3aCto+R9srbpO0u47tuxVVMBKkJiqRO8n
+X-Received: by 2002:a05:6214:3d0b:b0:6c6:9bba:a3ad with SMTP id 6a1803df08f44-6c69bbaa3d2mr14342866d6.4.1726710319274;
+        Wed, 18 Sep 2024 18:45:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1726710319; cv=none;
+        d=google.com; s=arc-20240605;
+        b=ihpZSnKCLIVpgAg8ktsUFqPInHey56h7zanhvN16FUqHLt7bFq3FYy1ZypaeAROx0u
+         PxZRA+NUqUstLFXIzOOy89u6p2eyFXVofZDhSarJLehzzhIpchpZSAcRtvTxW9NIQ9rX
+         4mGM2eNZZWIgSbbIJogSnri37sVGy4AGxGPakbJ7XVkfPa8bATUht9MPngqzUB6q7qDk
+         UU7eOYo1zPBOkMN+6jV/tavl6qCCiTwFDppcA1S7GOxCS5DxTlNALWeyxltcDEjix/8f
+         MSDiJmNwwJbmGV3Nu8Ha2us3bhXhvLDV9NHE28Pl/PX+M13827zW0wKOFrCbrlN/XGIt
+         STBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=feedback-id:bounces-to:mime-version:subject:message-id:to:reply-to
+         :from:date:dkim-signature:dkim-signature;
+        bh=VNdFvm1WSKx24ImMn/gZSC+26bCNSNDzYCvfJC//Wl4=;
+        fh=kaT2aX8hYSdXsW+gB81RQJdMiM5+GTfqJYSU668Z7xI=;
+        b=TgKlshgkEw+TqVDj6/rbb/FETn9xuUWrgTM9fgw2Ksa1yxH3OSUmw5rfshlUjoXgy2
+         kOa+93pMoOxvR8DXfab2LfIh3bnX2aD0uAHHtA0ogRbv3umXdTSSdn/YaiEhUAEGEBkT
+         512ZJCy1n6Hk6T0B/x6vGaNUy/0xRKHx9ESVRS1U8OZNp+tWkRQZQNtIrqqi0kQpL7nz
+         A3TGlSrutyOXYMxKPqCgD1zD9YylPU9enl3jH1q0LddUfRNDbTJ7NeQyCoMOB65+CX7l
+         dGl5US3l7nSCUih89KpOJLEOuEC+JZsEKHj4q0OIoeNQ2zajYybnSSCTyGI3SHlFv+kR
+         Hu8w==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@amazon.com header.s=yg4mwqurec7fkhzutopddd3ytuaqrvuz header.b="dLUV/DY3";
+       dkim=pass header.i=@amazonses.com header.s=ug7nbtf4gccmlpwj322ax3p6ow6yfsug header.b=DKSSt4JU;
+       spf=pass (google.com: domain of 202409190145189be5069e309d44d2932172dc0310p0na-c3n8a7nlgm1xas@bounces.amazon.com designates 54.240.13.106 as permitted sender) smtp.mailfrom=202409190145189be5069e309d44d2932172dc0310p0na-C3N8A7NLGM1XAS@bounces.amazon.com;
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=amazon.com
+Return-Path: <202409190145189be5069e309d44d2932172dc0310p0na-C3N8A7NLGM1XAS@bounces.amazon.com>
+Received: from a13-106.smtp-out.amazonses.com (a13-106.smtp-out.amazonses.com. [54.240.13.106])
+        by mx.google.com with ESMTPS id 6a1803df08f44-6c75e585712si7739746d6.379.2024.09.18.18.45.19
+        for <zsofia.z.varga@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Sep 2024 18:45:19 -0700 (PDT)
+Received-SPF: pass (google.com: domain of 202409190145189be5069e309d44d2932172dc0310p0na-c3n8a7nlgm1xas@bounces.amazon.com designates 54.240.13.106 as permitted sender) client-ip=54.240.13.106;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@amazon.com header.s=yg4mwqurec7fkhzutopddd3ytuaqrvuz header.b="dLUV/DY3";
+       dkim=pass header.i=@amazonses.com header.s=ug7nbtf4gccmlpwj322ax3p6ow6yfsug header.b=DKSSt4JU;
+       spf=pass (google.com: domain of 202409190145189be5069e309d44d2932172dc0310p0na-c3n8a7nlgm1xas@bounces.amazon.com designates 54.240.13.106 as permitted sender) smtp.mailfrom=202409190145189be5069e309d44d2932172dc0310p0na-C3N8A7NLGM1XAS@bounces.amazon.com;
+       dmarc=pass (p=QUARANTINE sp=QUARANTINE dis=NONE) header.from=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=yg4mwqurec7fkhzutopddd3ytuaqrvuz; d=amazon.com; t=1726710318;
+	h=Date:From:Reply-To:To:Message-ID:Subject:MIME-Version:Content-Type;
+	bh=t4MQgKs3YS7/9McodHF1SuWasHdp4KQPZ/QZkH0yuxg=;
+	b=dLUV/DY3zIjAhpG5DY9nY9c+wiDv7rSu0JqZ546HVuTAvvQESu2QoZsVwZl8DgMn
+	iDCBbg7QG622QFUk9jaVIX5veEGKQZy5myZDuNxwNaizMZpfeW2t984cmkeHKP2W4iZ
+	tVSs5jNrKAmqbEz1K8ITa+6BJL2fnZ1yxs9mEjgo=
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
+	s=ug7nbtf4gccmlpwj322ax3p6ow6yfsug; d=amazonses.com; t=1726710318;
+	h=Date:From:Reply-To:To:Message-ID:Subject:MIME-Version:Content-Type:Feedback-ID;
+	bh=t4MQgKs3YS7/9McodHF1SuWasHdp4KQPZ/QZkH0yuxg=;
+	b=DKSSt4JUhMypAf8zmK5VTawgW4OiD//6oMT/xQ9zdlvleFo/XNTWPs8ZhFRtZe+I
+	pcwGUYzYXGuMWI8RIpMLkfO7ZRLYGYX1Y8P6Zjm5Hl96E8b5lvF2oztkCtMxrWbGJOI
+	vtuJG/Y//6Xxu9WoTdmnm2XcNp4me9i1C00GlDu0=
+Date: Thu, 19 Sep 2024 01:45:18 +0000
+From: "Amazon.com" <auto-confirm@amazon.com>
+Reply-To: no-reply@amazon.com
+To: zsofia.z.varga@gmail.com
+Message-ID: <0100019207f48677-73db0063-11dc-4611-a2a5-4135d0d7fe3b-000000@email.amazonses.com>
+Subject: Your Amazon.com order of "Anker Prime Charger, 200W..." and 6 more
+ items.
+MIME-Version: 1.0
+Content-Type: multipart/alternative; 
+	boundary="----=_Part_6144537_254204381.1726710318691"
+X-AMAZON-MAIL-RELAY-TYPE: notification
+Bounces-to: 202409190145189be5069e309d44d2932172dc0310p0na-C3N8A7NLGM1XAS@bounces.amazon.com
+X-AMAZON-METADATA: CA=C3N8A7NLGM1XAS-CU=A23DQE9XYXUK6K
+X-Original-MessageID: <urn.rtn.msg.202409190145189be5069e309d44d2932172dc0310p0na@1726710318694.>
+Feedback-ID: 440135490::1.us-east-1.ZHcGJK6s+x+i9lRHKog4RW3tECwWIf1xzTYCZyUaiec=:AmazonSES
+X-SES-Outgoing: 2024.09.19-54.240.13.106
+
+------=_Part_6144537_254204381.1726710318691
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Amazon.com Order Confirmation
+www.amazon.com/ref=3DTE_simp_tex_h
+___________________________________________________________________________=
+____________
+
+Hello Zsofia,
+
+Thank you for shopping with us.=20
+
+We=E2=80=99ll send a confirmation when your items ship.
+
+Your purchase has been divided into 2 orders.
+
+
+View or manage your orders in Your Orders:
+https://www.amazon.com/gp/css/your-orders-access/ref=3DTE_simp_on_sh_g
+
+Order 1 of 2
+Order #114-4389656-7826603
+
+=09=09=09
+    Shipment 1 of 2
+    Arriving:
+    Saturday, September 21
+
+    Ship to:
+    Zsofia
+    CHEVY CHASE, MD
+=09=09=09
+    Shipment 2 of 2
+    Arriving:
+    Friday, September 20
+
+    Ship to:
+    Zsofia
+    CHEVY CHASE, MD
+=09
+    Order Total: $68.87
+
+
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+
+
+View or manage your orders in Your Orders:
+https://www.amazon.com/gp/css/your-orders-access/ref=3DTE_simp_on_sh_g
+
+Order 2 of 2
+Order #114-5386046-4065068
+
+    Arriving:
+    Thursday, Sep 19, 10 a.m. =E2=80=93 3 p.m.
+
+    Ship to:
+    Zsofia
+    CHEVY CHASE, MD
+=09
+    Order Total: $229.99
+
+
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+We hope to see you again soon.
+
+Amazon.com
+www.amazon.com/ref=3DTE_simp_tex_ty
+___________________________________________________________________________=
+____________
+
+The payment for your invoice is processed by Amazon Payments, Inc. P.O. Box=
+ 81226 Seattle, Washington 98108-1226. If you need more information, please=
+ contact (866) 216-1075.
+
+
+Unless otherwise noted, items sold by Amazon.com are subject to sales tax i=
+n select states in accordance with the applicable laws of that state. If yo=
+ur order contains one or more items from a seller other than Amazon.com, it=
+ may be subject to state and local sales tax, depending upon the seller's b=
+usiness policies and the location of their operations. Learn more about tax=
+ and seller information at:
+https://www.amazon.com/gp/help/customer/display.html/ref=3Dhp_bc_nav?ie=3DU=
+TF8&nodeId=3D202029700
+
+This email was sent from a notification-only address that cannot accept inc=
+oming email. Please do not reply to this message.
+------=_Part_6144537_254204381.1726710318691
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html>
+<html xmlns=3D"https://www.w3.org/1999/xhtml">
+ <head>=20
+  <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8" =
+/>=20
+  <style type=3D"text/css">
+html, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+=09margin: 0;
+=09padding: 0;
+=09border: 0;
+=09outline: 0;
+=09font-weight: inherit;
+=09font-style: inherit;
+=09font-size: 100%;
+=09font-family: inherit;
+=09vertical-align: baseline;
+}
+
+@media only screen and (max-width: 480px) {
+=09body {
+=09=09width: 375px !important;
+=09}
+=09td.rio_main_td {
+=09=09width: 375px !important;
+=09}
+=09td.rio_body_td {
+=09=09width: 375px !important;
+=09}
+=09.rio_container {
+=09=09width: 375px !important;
+=09}
+}
+
+html {
+=09display: table;
+=09background-color: #FFFFFF;
+=09width: 100%;
+}
+
+body, table {
+=09background: #FFF;
+=09display: block;
+=09-webkit-text-size-adjust: 100%;
+=09-ms-text-size-adjust: 100%;
+=09margin: 0 auto;
+=09padding: 0;
+}
+
+tbody {
+=09display: block;
+}
+
+table {
+=09border-collapse: collapse;
+=09mso-table-lspace: 0pt !important;
+=09mso-table-rspace: 0pt !important;
+}
+
+.rio_container {
+=09cellspacing:0;
+=09width:525px;
+=09margin:0 auto;
+}
+
+.rio_inner_container {
+=09width: 100%;
+}
+
+td.rio_main_td {
+=09width: 525px;
+=09border: 0 !important;
+=09padding: 0 !important;
+=09border-collapse: collapse !important;
+=09margin: 0 auto;
+}
+
+td.rio_body_td {
+=09width: 525px;
+}
+
+
+tr {
+=09vertical-align:top;
+=09display: block;
+}
+
+a {
+=09color: #007185;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+=09font-style: normal;
+=09font-weight: 400;
+=09line-height: 20px;
+=09text-decoration: none;
+=09font-size: 15px;
+}
+
+.rio_link {
+=09color: #007185 !important;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+=09font-style: normal;
+=09font-weight: 400;
+=09line-height: 20px;
+=09text-decoration: none;
+=09font-size: 15px;
+}
+
+p span {
+=09display: block;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+=09font-size: 15px;
+=09color: #0F1111;
+=09font-style: normal;
+=09font-weight: 400;
+=09line-height: 20px;
+}
+
+.rio_footer {
+=09color: #565959;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+=09font-size: 13px;
+=09font-style: normal;
+=09font-weight: 400;
+=09line-height: 18px;
+=09display: block;
+=09background: #F0F2F2;
+}
+
+.rio_footer a {
+=09font-size: 13px;
+=09color: #007185 !important;
+}
+
+.rio_footer p {
+=09margin: 0 16px;
+}
+
+.rio_hz_line {
+=09height: 1px;
+=09background: #D5D9D9;
+=09padding: 0;
+}
+
+.rio_asin_img img {
+=09max-height: 115px;
+=09max-width: 115px;
+=09margin: auto;
+=09display: block;
+=09padding: 8px;
+=09mix-blend-mode: multiply;
+}
+
+.rio_asin_img a {
+=09background-color: transparent;
+}
+
+.rio_asin_img {
+=09background-image: linear-gradient(rgba(15, 17, 17, 0.03), rgba(15, 17, 1=
+7, 0.03));
+=09border-radius: 4px;
+=09display: table-cell;
+=09width: 131px;
+=09height: 131px;
+=09vertical-align: middle;
+=09text-align: center;
+=09isolation: isolate;
+}
+
+img {
+=09border: 0;
+=09height: auto;
+=09line-height: 100%;
+=09outline: none;
+=09text-decoration: none;
+=09-ms-interpolation-mode: bicubic;
+}
+
+.rio_info_alert_icon {
+=09width: 18px;
+=09height: 18px;
+}
+
+.rio_info_alert_icon img{
+=09margin-top: 1px !important;
+=09width: 18px;
+=09height: 18px;
+}
+
+.rio_info_text td {
+=09vertical-align: top;
+}
+
+.rio_info_text a {
+=09color: #007185 !important;
+}
+
+.rio_info_text b {
+=09font-weight: 400;
+}
+
+.rio_critical_info {
+=09color: #494D4D;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+=09font-size: 14px;
+=09font-style: normal;
+=09font-weight: 400;
+=09line-height: 20px;
+=09background-color: #0F8698;
+=09border: 8px #0F8698 solid;
+=09display: block;
+}
+
+.rio_critical_info_inner {
+=09display: inline-table;
+=09table-layout: fixed;
+=09padding: 12px 8px 16px 8px;
+=09background-color: #FFFFFF;
+=09border-radius: 4px;
+}
+
+.rio_btn {
+=09border-radius: 100px;
+=09text-underline-color: #FFD814;
+=09display: inline-block;
+=09mso-padding-alt: 0;
+=09vertical-align: middle;
+=09mso-line-height-rule: at-least;
+}
+
+.rio_btn span {
+=09color: #0F1111;
+=09font-size: 13px;
+=09font-weight: 400;
+=09display: table-cell;
+=09padding: 8px 16px;
+=09line-height: 18px;
+=09vertical-align: middle;
+=09text-align: center;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+}
+
+.rio_td_cta_white {
+    background-color: #FEFEFE;
+    border: 1px solid #D5D9D9;
+    padding: 6px 16px;
+}
+
+.rio_td_cta_yellow {
+    background-color: #FFD814;
+    border: 1px solid #FCD200;
+    padding: 6px 16px;
+}
+
+p span span, .rio_btn span span, .rio_footer p span {
+=09display: inline;
+}
+
+.rio_bg_yellow {
+=09background: #FFD814;
+}
+
+.rio_bg_white {
+=09background: #FFFFFF;
+}
+
+.rio_border_yellow {
+=09border: 1px solid #FCD200 !important;
+}
+
+.rio_border_nickel {
+=09border: 1px solid #D5D9D9 !important;
+}
+
+
+.rio_main_td a {
+=09color: inherit;
+=09text-decoration: none;
+=09font-size: inherit;
+=09font-family: inherit;
+=09font-weight: inherit;
+=09line-height: inherit;
+}
+
+.rio_amazon_logo {
+=09height: 58px;
+=09width: auto;
+=09max-width: 100%;
+=09display: block;
+=09border: 0;
+=09background-color: #FFFFFF;
+}
+
+.rio_lh_20 {
+=09line-height: 20px;
+}
+
+.rio_lh_18 {
+=09line-height: 18px;
+}
+
+.rio_amazon_smile {
+=09width: 86px;
+=09height: 43px;
+=09display: block;
+}
+
+.rio_18_heavy {
+=09color: #0F1111;
+=09font-size: 18px;
+=09font-weight: 700;
+=09line-height: 22px;
+}
+
+.rio_15_heavy_green {
+=09color: #067D62;
+=09font-size: 15px;
+=09font-weight: 700;
+}
+
+.rio_15_heavy_black {
+=09color: #0F1111;
+=09font-size: 15px;
+=09font-weight: 700;
+}
+
+.rio_15_black {
+=09color: #0F1111;
+=09font-size: 15px;
+=09font-weight: 400;
+}
+
+.rio_15_heavy_blue {
+=09color: #007185;
+=09font-size: 15px;
+=09font-weight: 700;
+}
+
+.rio_15_grey {
+=09color: #565959;
+=09font-size: 15px;
+}
+
+.rio_13_grey {
+=09color: #565959;
+=09font-size: 13px;
+}
+
+.rio_13_heavy_grey {
+=09color: #565959;
+=09font-size: 13px;
+=09font-weight: 700;
+}
+
+.rio_13_grey_href {
+=09color: #565959 !important;
+=09font-size: 13px;
+}
+
+.rio_15_grey_order_number {
+=09color: #0F1111;
+=09font-size: 15px;
+}
+
+.rio_summary {
+=09color: #494D4D;
+=09font-size: 14px;
+=09font-weight: 400;
+=09display: block;
+=09background: #FFF;
+=09padding: 16px 16px 16px 16px;
+}
+
+.rio_hero_headline {
+=09color: #0F1111;
+=09font-size: 22px;
+=09font-weight: 700;
+=09line-height: 28px;
+}
+
+.rio_asin_internal_text {
+=09vertical-align: middle;
+}
+
+.rio_no_deco_href {
+=09text-decoration: none;
+}
+
+.rio_micro_space {
+=09margin-top: 4px !important;
+}
+
+.rio_body {
+=09padding: 8px;
+=09background-color: #d5d9d9 !important;
+=09border-spacing: 0;
+}
+
+table {
+=09mso-table-lspace: 0pt !important;
+=09mso-table-rspace: 0pt !important;
+}
+
+.rio_card {
+=09background-color: #FFFFFF;
+=09border-radius: 4px;
+=09padding: 12px 8px 16px 8px;
+=09margin-bottom: 8px !important;
+}
+
+.rio_last_card {
+=09background-color: #FFFFFF;
+=09border-radius: 4px;
+=09padding: 12px 8px 16px 8px;
+=09margin-bottom: 0 !important;
+}
+
+.rio_total_info_card {
+=09background-color: #FFFFFF;
+=09padding: 12px 8px 16px 8px;
+=09margin-bottom: 0 !important;
+=09border-radius: 4px 4px 0 0;
+}
+
+.rio_total_card {
+=09margin-top: 0;
+=09color: #494D4D;
+=09background: #F0F2F2;
+=09padding: 12px 8px 12px 8px !important;
+=09border-radius: 0 0 4px 4px !important;
+}
+
+.rio_total_last_card {
+=09margin-bottom: 0 !important;
+}
+
+.rio_total_card td {
+=09width: 100%;
+}
+
+.rio_total_card tr {
+=09display: table-row;
+}
+
+.rio_allow_wrap {
+    white-space: normal !important;
+}
+
+.rio_no_wrap {
+=09white-space: nowrap !important;
+}
+
+.rio_text_align_right {
+=09text-align: right;
+=09white-space: nowrap !important;
+}
+
+.rio_text_align_left {
+=09text-align: left;
+=09white-space: nowrap !important;
+}
+
+.rio_order_total_metadata a {
+=09color: #007185 !important;
+}
+
+#outlook a {
+=09padding: 0;
+}
+
+#rio_container #rio_inner_container p span a[x-apple-data-detectors=3Dtrue]=
+{
+=09color: inherit !important;
+=09-webkit-text-decoration-color: inherit !important;
+=09text-decoration: inherit !important;
+}
+
+    .rio_card_v2 , .rio_card_b2b_asin_override {
+        background-color: #FFFFFF;
+        border-radius: 4px;
+        padding: 12px 8px 16px 8px;
+        margin-bottom: 0px !important;
+        margin-top: 8px !important;
+    }
+
+    .rio_total_info_card {
+        margin-top: 8px !important;
+    }
+
+    .rio_card_v2 a {
+        color: #007185 !important;
+    }
+
+    rio_card_b2b_asin_override {
+        color: #007185;
+    }
+
+    .rio_card_v2 b , .rio_card_b2b_asin_override b {
+        font-weight: 400;
+    }
+
+    .order_total_or_less_text_style {
+        display: inline !important;
+    }
+
+    .base_total_text_style {
+        display: inline !important;
+        font-weight: 700;
+    }
+
+    .rio_total_card {
+        border-radius: 0 0 4px 4px !important;
+    }
+
+    .rio_micro_space {
+        margin-top: 4px !important;
+    }
+   =20
+    .rio_15_heavy_black a {
+        color: #007185 !important;
+    }
+
+    .rio_info_text span {
+        color: #0F1111 !important;
+        font-size: 15px;
+    }
+
+    .rio_13_grey a {
+        color: #007185 !important;
+    }
+
+    .rio_inline_link_span a {
+        color: #007185 !important;
+    }
+
+    .fan_funded_metadata strong {
+        font-weight: 700 !important;
+    }
+
+    .fan_funded_metadata td {
+        padding: 0 0 0 16px;
+    }
+   =20
+    .fan_funded_metadata ol {
+        font-family: 'Amazon Ember', Arial, sans-serif;
+    }
+
+    .fan_funded_metadata li {
+        padding: 4px 0 0 0;
+    }
+
+    .rio_word_break {
+        word-break: break-word;
+    }
+
+    .rio_asin_card_img_td {
+        vertical-align: top;
+    }
+
+    .rio_asin_metadata_13_grey {
+        color: #565959;
+        font-size: 13px;
+    }
+
+    .rio_asin_metadata_13_grey a {
+        color: #565959 !important;
+    }
+
+    .rio_primeLogo {
+        vertical-align: middle;
+        width: 53px;
+        height: 17px;
+        padding: 0px 0px 0.9px 0px;
+    }
+
+    .amabotBanner .amabotImageContainer {
+        width: 44px;
+        text-align: center;
+    }
+
+    .amabotBanner .amabotImage {
+        width: 44px;
+        display: block;
+    }
+
+    .amabotBanner .amabotTextContainer {
+        vertical-align: middle
+    }
+
+</style>=20
+  <!--[if mso]>
+<noscript>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:AllowPNG/>
+            <o:PixelsPerInch>96</o:PixelsPerInch>
+        </o:OfficeDocumentSettings>
+    </xml>
+</noscript>
+<![endif]-->=20
+  <title></title>=20
+ </head>=20
+ <body style=3D"background: rgb(255, 255, 255); display: block; -webkit-tex=
+t-size-adjust: 100%; -ms-text-size-adjust: 100%; margin: 0 auto; padding: 0=
+"><img width=3D"1" height=3D"1" src=3D"https://www.amazon.com/gp/r.html?C=
+=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e30=
+9d44d2932172dc0310p0na&R=3D2LAD7AS1B3Z7B&T=3DO&U=3Dhttps%3A%2F%2Fimages-na.=
+ssl-images-amazon.com%2Fimages%2FG%2F01%2Fnav%2Ftransp.gif&H=3DX9MALGJR7YW1=
+AJPZBOGTZAT1LH4A&ref_=3Dpe_386300_440135490_opens" />=20
+  <!--[if mso | IE]>
+    <table align=3D"center" border=3D"0" cellpadding=3D"0" cellspacing=3D"0=
+" class=3D"" style=3D"width:525px;" width=3D"525" bgcolor=3D"#000000" ><tr>=
+<td style=3D"line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
+    <![endif]-->=20
+  <table class=3D"rio_container" id=3D"rio_container" style=3D"cellspacing:=
+ 0; width: 525px; margin: 0 auto; padding: 0; border: 0; outline: 0; font-w=
+eight: inherit; font-style: inherit; font-size: 100%; font-family: inherit;=
+ vertical-align: baseline; background: rgb(255, 255, 255); display: block; =
+-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; border-collapse=
+: collapse; mso-table-lspace: 0pt !important; mso-table-rspace: 0pt !import=
+ant">=20
+   <tbody style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weigh=
+t: inherit; font-style: inherit; font-size: 100%; font-family: inherit; ver=
+tical-align: baseline; display: block">
+    <tr style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight:=
+ inherit; font-style: inherit; font-size: 100%; font-family: inherit; verti=
+cal-align: baseline; display: block">=20
+     <td style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight=
+: inherit; font-style: inherit; font-size: 100%; font-family: inherit; vert=
+ical-align: baseline">=20
+      <table class=3D"rio_inner_container" id=3D"rio_inner_container" style=
+=3D"width: 100%; margin: 0; padding: 0; border: 0; outline: 0; font-weight:=
+ inherit; font-style: inherit; font-size: 100%; font-family: inherit; verti=
+cal-align: baseline; background: rgb(255, 255, 255); display: block; -webki=
+t-text-size-adjust: 100%; -ms-text-size-adjust: 100%; border-collapse: coll=
+apse; mso-table-lspace: 0pt !important; mso-table-rspace: 0pt !important">=
+=20
+       <tbody style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-w=
+eight: inherit; font-style: inherit; font-size: 100%; font-family: inherit;=
+ vertical-align: baseline; display: block">
+        <tr style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-wei=
+ght: inherit; font-style: inherit; font-size: 100%; font-family: inherit; v=
+ertical-align: baseline; display: block">=20
+         <td style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-we=
+ight: inherit; font-style: inherit; font-size: 100%; font-family: inherit; =
+vertical-align: baseline">=20
+          <table style=3D"margin: 0; padding: 0; border: 0; outline: 0; fon=
+t-weight: inherit; font-style: inherit; font-size: 100%; font-family: inher=
+it; vertical-align: baseline; background: rgb(255, 255, 255); display: bloc=
+k; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; border-colla=
+pse: collapse; mso-table-lspace: 0pt !important; mso-table-rspace: 0pt !imp=
+ortant">=20
+           <tbody style=3D"margin: 0; padding: 0; border: 0; outline: 0; fo=
+nt-weight: inherit; font-style: inherit; font-size: 100%; font-family: inhe=
+rit; vertical-align: baseline; display: block">
+            <tr style=3D"margin: 0; padding: 0; border: 0; outline: 0; font=
+-weight: inherit; font-style: inherit; font-size: 100%; font-family: inheri=
+t; vertical-align: baseline; display: block">=20
+             <td class=3D"rio_main_td" style=3D"width: 525px; border: 0 !im=
+portant; padding: 0 !important; border-collapse: collapse !important; margi=
+n: 0 auto; outline: 0; font-weight: inherit; font-style: inherit; font-size=
+: 100%; font-family: inherit; vertical-align: baseline">=20
+              <!--[if mso]>
+    <table class=3D"rio_header" cellpadding=3D"0"><tr><td>
+    <table class=3D"rio_header"  width=3D"541">
+    <![endif]-->=20
+              <!--[if !mso]>
+    <!-->=20
+              <table class=3D"rio_header" style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline; background: rgb(255,=
+ 255, 255); display: block; -webkit-text-size-adjust: 100%; -ms-text-size-a=
+djust: 100%; border-collapse: collapse; mso-table-lspace: 0pt !important; m=
+so-table-rspace: 0pt !important">=20
+               <!--<![endif]-->=20
+               <tbody style=3D"margin: 0; padding: 0; border: 0; outline: 0=
+; font-weight: inherit; font-style: inherit; font-size: 100%; font-family: =
+inherit; vertical-align: baseline; display: block">
+                <tr style=3D"height: 0px; margin: 0; padding: 0; border: 0;=
+ outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; fo=
+nt-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                <tr style=3D"margin: 0; padding: 0; border: 0; outline: 0; =
+font-weight: inherit; font-style: inherit; font-size: 100%; font-family: in=
+herit; vertical-align: baseline; display: block">=20
+                 <td style=3D"margin: 0; padding: 0; border: 0; outline: 0;=
+ font-weight: inherit; font-style: inherit; font-size: 100%; font-family: i=
+nherit; vertical-align: baseline"> <a href=3D"https://www.amazon.com/gp/r.h=
+tml?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be50=
+69e309d44d2932172dc0310p0na&R=3D2DU9E0RJ199VQ&T=3DC&U=3Dhttps%3A%2F%2Fwww.a=
+mazon.com%2Fref%3Dpe_386300_440135490_TE_simp_&H=3D10E3KPZI1LZH9V6XJ0NAQYPX=
+AHOA&ref_=3Dpe_386300_440135490_TE_simp_" title=3D"Visit Amazon.com" style=
+=3D"color: inherit; text-decoration: none; font-size: inherit; font-family:=
+ inherit; font-weight: inherit; line-height: inherit; margin: 0; padding: 0=
+; border: 0; outline: 0; font-style: inherit; vertical-align: baseline"> <i=
+mg class=3D"rio_amazon_logo" alt=3D"Amazon.com" src=3D"https://m.media-amaz=
+on.com/images/G/01/outbound/OutboundTemplates/Amazon_logo_US._BG255,255,255=
+_.png" height=3D"58" style=3D"height: 58px; width: auto; max-width: 100%; d=
+isplay: block; border: 0; background-color: rgb(255, 255, 255); margin: 0; =
+padding: 0; outline: 0; font-weight: inherit; font-style: inherit; font-siz=
+e: 100%; font-family: inherit; vertical-align: baseline; line-height: 100%;=
+ text-decoration: none; -ms-interpolation-mode: bicubic" /> </a> </td>=20
+                </tr>=20
+               </tbody>
+              </table>=20
+              <!--[if mso]>
+    </td></tr></table>
+    <![endif]-->=20
+              <!--[if mso]>
+    <table class=3D"rio_body" cellpadding=3D"8">
+    <![endif]-->=20
+              <table class=3D"rio_body" style=3D"padding: 8px; background-c=
+olor: rgb(213, 217, 217) !important; border-spacing: 0; margin: 0; border: =
+0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; =
+font-family: inherit; vertical-align: baseline; background: rgb(255, 255, 2=
+55); display: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: =
+100%; border-collapse: collapse; mso-table-lspace: 0pt !important; mso-tabl=
+e-rspace: 0pt !important">=20
+               <tbody style=3D"margin: 0; padding: 0; border: 0; outline: 0=
+; font-weight: inherit; font-style: inherit; font-size: 100%; font-family: =
+inherit; vertical-align: baseline; display: block">
+                <tr style=3D"margin: 0; padding: 0; border: 0; outline: 0; =
+font-weight: inherit; font-style: inherit; font-size: 100%; font-family: in=
+herit; vertical-align: baseline; display: block">=20
+                 <td class=3D"rio_body_td" style=3D"width: 525px; margin: 0=
+; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inhe=
+rit; font-size: 100%; font-family: inherit; vertical-align: baseline">=20
+                  <!--[if mso]>
+    <table class=3D"rio_last_card" cellpadding=3D"8"><tr><td>
+    <table class=3D"rio_last_card"  width=3D"509">
+    <![endif]-->=20
+                  <!--[if !mso]>
+    <!-->=20
+                  <table class=3D"rio_last_card" style=3D"background-color:=
+ rgb(255, 255, 255); border-radius: 4px; padding: 12px 8px 16px 8px; margin=
+-bottom: 0 !important; margin: 0; border: 0; outline: 0; font-weight: inher=
+it; font-style: inherit; font-size: 100%; font-family: inherit; vertical-al=
+ign: baseline; background: rgb(255, 255, 255); display: block; -webkit-text=
+-size-adjust: 100%; -ms-text-size-adjust: 100%; border-collapse: collapse; =
+mso-table-lspace: 0pt !important; mso-table-rspace: 0pt !important">=20
+                   <!--<![endif]-->=20
+                   <tbody style=3D"margin: 0; padding: 0; border: 0; outlin=
+e: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fami=
+ly: inherit; vertical-align: baseline; display: block">
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"> <span class=3D"rio_=
+hero_headline" style=3D"color: rgb(15, 17, 17); font-size: 22px; font-weigh=
+t: 700; line-height: 28px; display: block; font-family: &quot;Amazon Ember&=
+quot;, Arial, sans-serif; font-style: normal; margin: 0; padding: 0; border=
+: 0; outline: 0; vertical-align: baseline"> Hello Zsofia, </span> </p> </td=
+>=20
+                    </tr>=20
+                    <tr style=3D"height: 4px; margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"> <span style=3D"disp=
+lay: block; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-=
+size: 15px; color: rgb(15, 17, 17); font-style: normal; font-weight: 400; l=
+ine-height: 20px; margin: 0; padding: 0; border: 0; outline: 0; vertical-al=
+ign: baseline"> Thank you for shopping with us. We=E2=80=99ll send a confir=
+mation when your items ship. </span> </p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"> <span style=3D"disp=
+lay: block; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-=
+size: 15px; color: rgb(15, 17, 17); font-style: normal; font-weight: 400; l=
+ine-height: 20px; margin: 0; padding: 0; border: 0; outline: 0; vertical-al=
+ign: baseline"> Your purchase has been divided into <b>2</b> orders. </span=
+> </p> </td>=20
+                    </tr>=20
+                   </tbody>
+                  </table>=20
+                  <!--[if mso]>
+    </td></tr></table>
+    <![endif]-->=20
+                  <!--[if mso]>
+<table cellpadding=3D"0" cellspacing=3D"0"><tr><td style=3D"background-colo=
+r: transparent;" colspan=3D"1" height=3D"8"></td></tr></table>
+<![endif]-->=20
+                  <!--[if mso]>
+    <table class=3D"rio_card_v2" cellpadding=3D"8"><tr><td>
+    <table class=3D"rio_card_v2"  width=3D"509">
+    <![endif]-->=20
+                  <!--[if !mso]>
+    <!-->=20
+                  <table class=3D"rio_card_v2" style=3D"background-color: r=
+gb(255, 255, 255); border-radius: 4px; padding: 12px 8px 16px 8px; margin-b=
+ottom: 0px !important; margin-top: 8px !important; margin: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; background: rgb(255, 255, 255); =
+display: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;=
+ border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rsp=
+ace: 0pt !important">=20
+                   <!--<![endif]-->=20
+                   <tbody style=3D"margin: 0; padding: 0; border: 0; outlin=
+e: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fami=
+ly: inherit; vertical-align: baseline; display: block">
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><span class=3D"rio_1=
+8_heavy" style=3D"color: rgb(15, 17, 17); font-size: 18px; font-weight: 700=
+; line-height: 22px; display: block; font-family: &quot;Amazon Ember&quot;,=
+ Arial, sans-serif; font-style: normal; margin: 0; padding: 0; border: 0; o=
+utline: 0; vertical-align: baseline">Order Confirmation</span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 12px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><span class=3D"rio_1=
+5_grey" style=3D"color: rgb(86, 89, 89); font-size: 15px; display: block; f=
+ont-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: normal=
+; font-weight: 400; line-height: 20px; margin: 0; padding: 0; border: 0; ou=
+tline: 0; vertical-align: baseline">Arriving:</span></p> <p style=3D"margin=
+: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: i=
+nherit; font-size: 100%; font-family: inherit; vertical-align: baseline"><s=
+pan class=3D"rio_15_heavy_black" style=3D"color: rgb(15, 17, 17); font-size=
+: 15px; font-weight: 700; display: block; font-family: &quot;Amazon Ember&q=
+uot;, Arial, sans-serif; font-style: normal; line-height: 20px; margin: 0; =
+padding: 0; border: 0; outline: 0; vertical-align: baseline">Saturday, Sept=
+ember 21</span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"> <span class=3D"rio_=
+15_grey" style=3D"color: rgb(86, 89, 89); font-size: 15px; display: block; =
+font-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: norma=
+l; font-weight: 400; line-height: 20px; margin: 0; padding: 0; border: 0; o=
+utline: 0; vertical-align: baseline"> Ship to: </span> </p> <p style=3D"mar=
+gin: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style=
+: inherit; font-size: 100%; font-family: inherit; vertical-align: baseline"=
+><span class=3D"rio_15_heavy_black" style=3D"color: rgb(15, 17, 17); font-s=
+ize: 15px; font-weight: 700; display: block; font-family: &quot;Amazon Embe=
+r&quot;, Arial, sans-serif; font-style: normal; line-height: 20px; margin: =
+0; padding: 0; border: 0; outline: 0; vertical-align: baseline">Zsofia</spa=
+n></p> <p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weigh=
+t: inherit; font-style: inherit; font-size: 100%; font-family: inherit; ver=
+tical-align: baseline"><span class=3D"rio_15_heavy_black" style=3D"color: r=
+gb(15, 17, 17); font-size: 15px; font-weight: 700; display: block; font-fam=
+ily: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: normal; line-=
+height: 20px; margin: 0; padding: 0; border: 0; outline: 0; vertical-align:=
+ baseline">CHEVY CHASE, MD</span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><span class=3D"rio_1=
+5_grey" style=3D"color: rgb(86, 89, 89); font-size: 15px; display: block; f=
+ont-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: normal=
+; font-weight: 400; line-height: 20px; margin: 0; padding: 0; border: 0; ou=
+tline: 0; vertical-align: baseline">Order # </span></p> <p style=3D"margin:=
+ 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: in=
+herit; font-size: 100%; font-family: inherit; vertical-align: baseline"><sp=
+an class=3D"rio_15_heavy_black" style=3D"color: rgb(15, 17, 17); font-size:=
+ 15px; font-weight: 700; display: block; font-family: &quot;Amazon Ember&qu=
+ot;, Arial, sans-serif; font-style: normal; line-height: 20px; margin: 0; p=
+adding: 0; border: 0; outline: 0; vertical-align: baseline"><a href=3D"http=
+s://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rt=
+n:msg:202409190145189be5069e309d44d2932172dc0310p0na&R=3D22ZJXTO4GK2OD&T=3D=
+C&U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fgp%2Fcss%2Forder-details%3ForderId%3D1=
+14-4389656-7826603%26ref_%3Dpe_386300_440135490_TE_simp_od&H=3DVNAZ0N4AZ8XR=
+TLEUAHMID8FO488A&ref_=3Dpe_386300_440135490_TE_simp_od" class=3D"rio_link" =
+style=3D"color: rgb(0, 113, 133) !important; text-decoration: none; font-si=
+ze: inherit; font-family: inherit; font-weight: inherit; line-height: inher=
+it; font-style: normal; margin: 0; padding: 0; border: 0; outline: 0; verti=
+cal-align: baseline"> 114-4389656-7826603</a></span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline">=20
+                      <table style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; background: rgb(255, 255, 255); d=
+isplay: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; =
+border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rspa=
+ce: 0pt !important">=20
+                       <tbody style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; display: block">
+                        <tr style=3D"margin: 0; padding: 0; border: 0; outl=
+ine: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fa=
+mily: inherit; vertical-align: baseline; display: block">=20
+                         <!--[if mso]>
+<td class=3D"rio_td_cta_yellow">
+<!-->=20
+                         <td style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline">=20
+                          <!--[endif]----> <a class=3D"rio_btn rio_bg_yello=
+w rio_border_yellow" href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9H=
+F37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172=
+dc0310p0na&R=3D2Q5SROG77VECI&T=3DC&U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fgp%2F=
+css%2Forder-details%3ForderId%3D114-4389656-7826603%26ref_%3Dpe_386300_4401=
+35490_TE_simp_od&H=3DOWYBOXCEZNBIDQNZ8DA7AU0CTWCA&ref_=3Dpe_386300_44013549=
+0_TE_simp_od" target=3D"_blank" rel=3D"noopener" style=3D"color: rgb(0, 113=
+, 133) !important; text-decoration: none; font-size: inherit; font-family: =
+inherit; font-weight: inherit; line-height: inherit; border-radius: 100px; =
+text-underline-color: rgb(255, 216, 20); display: inline-block; mso-padding=
+-alt: 0; vertical-align: middle; mso-line-height-rule: at-least; background=
+: rgb(255, 216, 20); border: 1px solid rgb(252, 210, 0) !important; margin:=
+ 0; padding: 0; outline: 0; font-style: inherit"> <span style=3D"color: rgb=
+(15, 17, 17); font-size: 13px; font-weight: 400; display: table-cell; paddi=
+ng: 8px 16px; line-height: 18px; vertical-align: middle; text-align: center=
+; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif; margin: 0; bord=
+er: 0; outline: 0; font-style: inherit"> View or manage order </span> </a> =
+</td>=20
+                        </tr>=20
+                       </tbody>
+                      </table> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> </td>
+                    </tr>
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline">=20
+                      <table style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; background: rgb(255, 255, 255); d=
+isplay: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; =
+border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rspa=
+ce: 0pt !important">=20
+                       <tbody style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; display: block">
+                        <tr class=3D"rio_asin_card" style=3D"margin: 0; pad=
+ding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inherit; =
+font-size: 100%; font-family: inherit; vertical-align: baseline; display: b=
+lock">=20
+                         <td class=3D"rio_asin_img" style=3D"background-ima=
+ge: linear-gradient(rgba(15,17,17,0.03),rgba(15,17,17,0.03)); border-radius=
+: 4px; display: table-cell; width: 131px; height: 131px; vertical-align: mi=
+ddle; text-align: center; isolation: isolate; margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit"> <a href=3D"https://www.amazon.com/gp/r.html?C=3D1G=
+DZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d=
+2932172dc0310p0na&R=3D4MXW894XXFIW&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2F=
+dp%2FB0D84YX465%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DNT3HTG8O=
+OAKPUVVVFGBAXOFAJI4A&ref_=3Dpe_386300_440135490_TE_simp_item_image" title=
+=3D"Spigen Tempered Glas..." style=3D"background-color: transparent; color:=
+ rgb(0, 113, 133) !important; text-decoration: none; font-size: inherit; fo=
+nt-family: inherit; font-weight: inherit; line-height: inherit; margin: 0; =
+padding: 0; border: 0; outline: 0; font-style: inherit; vertical-align: bas=
+eline"> <img src=3D"https://m.media-amazon.com/images/I/41CPDzPajzL._SY115_=
+SX115_.jpg" alt=3D"Spigen Tempered Glas..." style=3D"max-height: 115px; max=
+-width: 115px; margin: auto; display: block; padding: 8px; mix-blend-mode: =
+multiply; border: 0; outline: 0; font-weight: inherit; font-style: inherit;=
+ font-size: 100%; font-family: inherit; vertical-align: baseline; height: a=
+uto; line-height: 100%; text-decoration: none; -ms-interpolation-mode: bicu=
+bic" /> </a> </td>=20
+                         <td style=3D"width: 8px; margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline"></td>=20
+                         <td class=3D"rio_asin_internal_text" style=3D"vert=
+ical-align: middle; margin: 0; padding: 0; border: 0; outline: 0; font-weig=
+ht: inherit; font-style: inherit; font-size: 100%; font-family: inherit"> <=
+p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight: inher=
+it; font-style: inherit; font-size: 100%; font-family: inherit; vertical-al=
+ign: baseline"> <span style=3D"display: block; font-family: &quot;Amazon Em=
+ber&quot;, Arial, sans-serif; font-size: 15px; color: rgb(15, 17, 17); font=
+-style: normal; font-weight: 400; line-height: 20px; margin: 0; padding: 0;=
+ border: 0; outline: 0; vertical-align: baseline"> <a class=3D"rio_black_hr=
+ef rio_15_black" href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K=
+&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172dc03=
+10p0na&R=3D8CTX6S3QNB4D&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2Fdp%2FB0D84Y=
+X465%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DOFAQSVOOE18RI5PM2K5=
+QOAYTYCYA&ref_=3Dpe_386300_440135490_TE_simp_item_image" style=3D"color: rg=
+b(0, 113, 133) !important; text-decoration: none; font-size: inherit; font-=
+family: inherit; font-weight: inherit; line-height: inherit; margin: 0; pad=
+ding: 0; border: 0; outline: 0; font-style: inherit; vertical-align: baseli=
+ne"> <span style=3D"display: inline; font-family: &quot;Amazon Ember&quot;,=
+ Arial, sans-serif; font-size: 15px; color: rgb(15, 17, 17); font-style: no=
+rmal; font-weight: 400; line-height: 20px; margin: 0; padding: 0; border: 0=
+; outline: 0; vertical-align: baseline"> Spigen Tempered Glass Scree... </s=
+pan> </a> </span> </p> <p class=3D"rio_micro_space" style=3D"margin-top: 4p=
+x !important; margin: 0; padding: 0; border: 0; outline: 0; font-weight: in=
+herit; font-style: inherit; font-size: 100%; font-family: inherit; vertical=
+-align: baseline"> <span class=3D"rio_13_grey" style=3D"color: rgb(86, 89, =
+89); font-size: 13px; display: block; font-family: &quot;Amazon Ember&quot;=
+, Arial, sans-serif; font-style: normal; font-weight: 400; line-height: 20p=
+x; margin: 0; padding: 0; border: 0; outline: 0; vertical-align: baseline">=
+ Qty : 1 </span> </p> </td>=20
+                        </tr>=20
+                       </tbody>
+                      </table> </td>=20
+                    </tr>  =20
+                    <tr style=3D"height: 12px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                   </tbody>
+                  </table>=20
+                  <!--[if mso]>
+    </td></tr></table>
+    <![endif]-->=20
+                  <!--[if mso]>
+<table cellpadding=3D"0" cellspacing=3D"0"><tr><td style=3D"background-colo=
+r: transparent;" colspan=3D"1" height=3D"8"></td></tr></table>
+<![endif]-->=20
+                  <!--[if mso]>
+    <table class=3D"rio_total_info_card" cellpadding=3D"8"><tr><td>
+    <table class=3D"rio_total_info_card" width=3D"509">
+    <![endif]-->=20
+                  <!--[if !mso]>
+    <!-->=20
+                  <table class=3D"rio_total_info_card" style=3D"background-=
+color: rgb(255, 255, 255); padding: 12px 8px 16px 8px; margin-bottom: 0 !im=
+portant; border-radius: 4px 4px 0 0; margin-top: 8px !important; margin: 0;=
+ border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-siz=
+e: 100%; font-family: inherit; vertical-align: baseline; background: rgb(25=
+5, 255, 255); display: block; -webkit-text-size-adjust: 100%; -ms-text-size=
+-adjust: 100%; border-collapse: collapse; mso-table-lspace: 0pt !important;=
+ mso-table-rspace: 0pt !important">=20
+                   <!--<![endif]-->=20
+                   <tbody style=3D"margin: 0; padding: 0; border: 0; outlin=
+e: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fami=
+ly: inherit; vertical-align: baseline; display: block">
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><span class=3D"rio_1=
+5_grey" style=3D"color: rgb(86, 89, 89); font-size: 15px; display: block; f=
+ont-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: normal=
+; font-weight: 400; line-height: 20px; margin: 0; padding: 0; border: 0; ou=
+tline: 0; vertical-align: baseline">Arriving:</span></p> <p style=3D"margin=
+: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: i=
+nherit; font-size: 100%; font-family: inherit; vertical-align: baseline"><s=
+pan class=3D"rio_15_heavy_black" style=3D"color: rgb(15, 17, 17); font-size=
+: 15px; font-weight: 700; display: block; font-family: &quot;Amazon Ember&q=
+uot;, Arial, sans-serif; font-style: normal; line-height: 20px; margin: 0; =
+padding: 0; border: 0; outline: 0; vertical-align: baseline">Friday, Septem=
+ber 20</span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"> <span class=3D"rio_=
+15_grey" style=3D"color: rgb(86, 89, 89); font-size: 15px; display: block; =
+font-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: norma=
+l; font-weight: 400; line-height: 20px; margin: 0; padding: 0; border: 0; o=
+utline: 0; vertical-align: baseline"> Ship to: </span> </p> <p style=3D"mar=
+gin: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style=
+: inherit; font-size: 100%; font-family: inherit; vertical-align: baseline"=
+><span class=3D"rio_15_heavy_black" style=3D"color: rgb(15, 17, 17); font-s=
+ize: 15px; font-weight: 700; display: block; font-family: &quot;Amazon Embe=
+r&quot;, Arial, sans-serif; font-style: normal; line-height: 20px; margin: =
+0; padding: 0; border: 0; outline: 0; vertical-align: baseline">Zsofia</spa=
+n></p> <p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weigh=
+t: inherit; font-style: inherit; font-size: 100%; font-family: inherit; ver=
+tical-align: baseline"><span class=3D"rio_15_heavy_black" style=3D"color: r=
+gb(15, 17, 17); font-size: 15px; font-weight: 700; display: block; font-fam=
+ily: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: normal; line-=
+height: 20px; margin: 0; padding: 0; border: 0; outline: 0; vertical-align:=
+ baseline">CHEVY CHASE, MD</span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><span class=3D"rio_1=
+5_grey" style=3D"color: rgb(86, 89, 89); font-size: 15px; display: block; f=
+ont-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: normal=
+; font-weight: 400; line-height: 20px; margin: 0; padding: 0; border: 0; ou=
+tline: 0; vertical-align: baseline">Order # </span></p> <p style=3D"margin:=
+ 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: in=
+herit; font-size: 100%; font-family: inherit; vertical-align: baseline"><sp=
+an class=3D"rio_15_heavy_black" style=3D"color: rgb(15, 17, 17); font-size:=
+ 15px; font-weight: 700; display: block; font-family: &quot;Amazon Ember&qu=
+ot;, Arial, sans-serif; font-style: normal; line-height: 20px; margin: 0; p=
+adding: 0; border: 0; outline: 0; vertical-align: baseline"><a href=3D"http=
+s://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rt=
+n:msg:202409190145189be5069e309d44d2932172dc0310p0na&R=3DIXKWE19IIJHB&T=3DC=
+&U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fgp%2Fcss%2Forder-details%3ForderId%3D11=
+4-4389656-7826603%26ref_%3Dpe_386300_440135490_TE_simp_od&H=3DL9IA1HJSZAERL=
+FMAMX41I3KXFA8A&ref_=3Dpe_386300_440135490_TE_simp_od" class=3D"rio_link" s=
+tyle=3D"color: rgb(0, 113, 133) !important; text-decoration: none; font-siz=
+e: inherit; font-family: inherit; font-weight: inherit; line-height: inheri=
+t; font-style: normal; margin: 0; padding: 0; border: 0; outline: 0; vertic=
+al-align: baseline"> 114-4389656-7826603</a></span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline">=20
+                      <table style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; background: rgb(255, 255, 255); d=
+isplay: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; =
+border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rspa=
+ce: 0pt !important">=20
+                       <tbody style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; display: block">
+                        <tr style=3D"margin: 0; padding: 0; border: 0; outl=
+ine: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fa=
+mily: inherit; vertical-align: baseline; display: block">=20
+                         <!--[if mso]>
+<td class=3D"rio_td_cta_yellow">
+<!-->=20
+                         <td style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline">=20
+                          <!--[endif]----> <a class=3D"rio_btn rio_bg_yello=
+w rio_border_yellow" href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9H=
+F37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172=
+dc0310p0na&R=3DHYJ2REZCFT7U&T=3DC&U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fgp%2Fc=
+ss%2Forder-details%3ForderId%3D114-4389656-7826603%26ref_%3Dpe_386300_44013=
+5490_TE_simp_od&H=3DFHGSHIYYCVY5VLCAZKN9HUDCJBGA&ref_=3Dpe_386300_440135490=
+_TE_simp_od" target=3D"_blank" rel=3D"noopener" style=3D"color: inherit; te=
+xt-decoration: none; font-size: inherit; font-family: inherit; font-weight:=
+ inherit; line-height: inherit; border-radius: 100px; text-underline-color:=
+ rgb(255, 216, 20); display: inline-block; mso-padding-alt: 0; vertical-ali=
+gn: middle; mso-line-height-rule: at-least; background: rgb(255, 216, 20); =
+border: 1px solid rgb(252, 210, 0) !important; margin: 0; padding: 0; outli=
+ne: 0; font-style: inherit"> <span style=3D"color: rgb(15, 17, 17); font-si=
+ze: 13px; font-weight: 400; display: table-cell; padding: 8px 16px; line-he=
+ight: 18px; vertical-align: middle; text-align: center; font-family: &quot;=
+Amazon Ember&quot;, Arial, sans-serif; margin: 0; border: 0; outline: 0; fo=
+nt-style: inherit"> View or manage order </span> </a> </td>=20
+                        </tr>=20
+                       </tbody>
+                      </table> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> </td>
+                    </tr>
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline">=20
+                      <table style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; background: rgb(255, 255, 255); d=
+isplay: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; =
+border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rspa=
+ce: 0pt !important">=20
+                       <tbody style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; display: block">
+                        <tr class=3D"rio_asin_card" style=3D"margin: 0; pad=
+ding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inherit; =
+font-size: 100%; font-family: inherit; vertical-align: baseline; display: b=
+lock">=20
+                         <td class=3D"rio_asin_img" style=3D"background-ima=
+ge: linear-gradient(rgba(15,17,17,0.03),rgba(15,17,17,0.03)); border-radius=
+: 4px; display: table-cell; width: 131px; height: 131px; vertical-align: mi=
+ddle; text-align: center; isolation: isolate; margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit"> <a href=3D"https://www.amazon.com/gp/r.html?C=3D1G=
+DZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d=
+2932172dc0310p0na&R=3DDGWD2P8UXGXI&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2F=
+dp%2FB0CNYRNDR4%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DIWYIGODK=
+SN0IESBGXWNZJHRIH6CA&ref_=3Dpe_386300_440135490_TE_simp_item_image" title=
+=3D"JJC Upgrade Hand Gri..." style=3D"background-color: transparent; color:=
+ inherit; text-decoration: none; font-size: inherit; font-family: inherit; =
+font-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: =
+0; outline: 0; font-style: inherit; vertical-align: baseline"> <img src=3D"=
+https://m.media-amazon.com/images/I/41BxHa+ySUL._SY115_SX115_.jpg" alt=3D"J=
+JC Upgrade Hand Gri..." style=3D"max-height: 115px; max-width: 115px; margi=
+n: auto; display: block; padding: 8px; mix-blend-mode: multiply; border: 0;=
+ outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; fo=
+nt-family: inherit; vertical-align: baseline; height: auto; line-height: 10=
+0%; text-decoration: none; -ms-interpolation-mode: bicubic" /> </a> </td>=
+=20
+                         <td style=3D"width: 8px; margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline"></td>=20
+                         <td class=3D"rio_asin_internal_text" style=3D"vert=
+ical-align: middle; margin: 0; padding: 0; border: 0; outline: 0; font-weig=
+ht: inherit; font-style: inherit; font-size: 100%; font-family: inherit"> <=
+p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight: inher=
+it; font-style: inherit; font-size: 100%; font-family: inherit; vertical-al=
+ign: baseline"> <span style=3D"display: block; font-family: &quot;Amazon Em=
+ber&quot;, Arial, sans-serif; font-size: 15px; color: rgb(15, 17, 17); font=
+-style: normal; font-weight: 400; line-height: 20px; margin: 0; padding: 0;=
+ border: 0; outline: 0; vertical-align: baseline"> <a class=3D"rio_black_hr=
+ef rio_15_black" href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K=
+&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172dc03=
+10p0na&R=3D1EAEJ56W5AR91&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2Fdp%2FB0CNY=
+RNDR4%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DTVFYAK6J7PVBSOSW19=
+AMHF13H00A&ref_=3Dpe_386300_440135490_TE_simp_item_image" style=3D"color: i=
+nherit; text-decoration: none; font-size: inherit; font-family: inherit; fo=
+nt-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: 0;=
+ outline: 0; font-style: inherit; vertical-align: baseline"> <span style=3D=
+"display: inline; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif;=
+ font-size: 15px; color: rgb(15, 17, 17); font-style: normal; font-weight: =
+400; line-height: 20px; margin: 0; padding: 0; border: 0; outline: 0; verti=
+cal-align: baseline"> JJC Upgrade Hand Grip Brack... </span> </a> </span> <=
+/p> <p class=3D"rio_micro_space" style=3D"margin-top: 4px !important; margi=
+n: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: =
+inherit; font-size: 100%; font-family: inherit; vertical-align: baseline"> =
+<span class=3D"rio_13_grey" style=3D"color: rgb(86, 89, 89); font-size: 13p=
+x; display: block; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif=
+; font-style: normal; font-weight: 400; line-height: 20px; margin: 0; paddi=
+ng: 0; border: 0; outline: 0; vertical-align: baseline"> Qty : 1 </span> </=
+p> </td>=20
+                        </tr>=20
+                       </tbody>
+                      </table> </td>=20
+                    </tr>  =20
+                    <tr style=3D"height: 12px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> </td>
+                    </tr>
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline">=20
+                      <table style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; background: rgb(255, 255, 255); d=
+isplay: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; =
+border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rspa=
+ce: 0pt !important">=20
+                       <tbody style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; display: block">
+                        <tr class=3D"rio_asin_card" style=3D"margin: 0; pad=
+ding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inherit; =
+font-size: 100%; font-family: inherit; vertical-align: baseline; display: b=
+lock">=20
+                         <td class=3D"rio_asin_img" style=3D"background-ima=
+ge: linear-gradient(rgba(15,17,17,0.03),rgba(15,17,17,0.03)); border-radius=
+: 4px; display: table-cell; width: 131px; height: 131px; vertical-align: mi=
+ddle; text-align: center; isolation: isolate; margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit"> <a href=3D"https://www.amazon.com/gp/r.html?C=3D1G=
+DZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d=
+2932172dc0310p0na&R=3D2KP9EF4K1PNQF&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2=
+Fdp%2FB0CR688FS6%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DGXO3FWD=
+9BZ5EGNAYWIUWPUOJO8OA&ref_=3Dpe_386300_440135490_TE_simp_item_image" title=
+=3D"A7CII A7CR Thumb Gri..." style=3D"background-color: transparent; color:=
+ inherit; text-decoration: none; font-size: inherit; font-family: inherit; =
+font-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: =
+0; outline: 0; font-style: inherit; vertical-align: baseline"> <img src=3D"=
+https://m.media-amazon.com/images/I/31N2aKXzIPL._SY115_SX115_.jpg" alt=3D"A=
+7CII A7CR Thumb Gri..." style=3D"max-height: 115px; max-width: 115px; margi=
+n: auto; display: block; padding: 8px; mix-blend-mode: multiply; border: 0;=
+ outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; fo=
+nt-family: inherit; vertical-align: baseline; height: auto; line-height: 10=
+0%; text-decoration: none; -ms-interpolation-mode: bicubic" /> </a> </td>=
+=20
+                         <td style=3D"width: 8px; margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline"></td>=20
+                         <td class=3D"rio_asin_internal_text" style=3D"vert=
+ical-align: middle; margin: 0; padding: 0; border: 0; outline: 0; font-weig=
+ht: inherit; font-style: inherit; font-size: 100%; font-family: inherit"> <=
+p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight: inher=
+it; font-style: inherit; font-size: 100%; font-family: inherit; vertical-al=
+ign: baseline"> <span style=3D"display: block; font-family: &quot;Amazon Em=
+ber&quot;, Arial, sans-serif; font-size: 15px; color: rgb(15, 17, 17); font=
+-style: normal; font-weight: 400; line-height: 20px; margin: 0; padding: 0;=
+ border: 0; outline: 0; vertical-align: baseline"> <a class=3D"rio_black_hr=
+ef rio_15_black" href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K=
+&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172dc03=
+10p0na&R=3D2DPIBQOP0YSEU&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2Fdp%2FB0CR6=
+88FS6%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3D45XXRYRCCP7QJKUWUN=
+MHBD1GARCA&ref_=3Dpe_386300_440135490_TE_simp_item_image" style=3D"color: i=
+nherit; text-decoration: none; font-size: inherit; font-family: inherit; fo=
+nt-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: 0;=
+ outline: 0; font-style: inherit; vertical-align: baseline"> <span style=3D=
+"display: inline; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif;=
+ font-size: 15px; color: rgb(15, 17, 17); font-style: normal; font-weight: =
+400; line-height: 20px; margin: 0; padding: 0; border: 0; outline: 0; verti=
+cal-align: baseline"> A7CII A7CR Thumb Grip, Meta... </span> </a> </span> <=
+/p> <p class=3D"rio_micro_space" style=3D"margin-top: 4px !important; margi=
+n: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: =
+inherit; font-size: 100%; font-family: inherit; vertical-align: baseline"> =
+<span class=3D"rio_13_grey" style=3D"color: rgb(86, 89, 89); font-size: 13p=
+x; display: block; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif=
+; font-style: normal; font-weight: 400; line-height: 20px; margin: 0; paddi=
+ng: 0; border: 0; outline: 0; vertical-align: baseline"> Qty : 1 </span> </=
+p> </td>=20
+                        </tr>=20
+                       </tbody>
+                      </table> </td>=20
+                    </tr>  =20
+                    <tr style=3D"height: 12px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                   </tbody>
+                  </table>=20
+                  <!--[if mso]></td></tr></table><![endif]-->=20
+                  <!--[if mso]>
+    <table class=3D"rio_total_card rio_total_last_card" cellpadding=3D"8"><=
+tr><td>
+    <table class=3D"rio_total_card rio_total_last_card" width=3D"509">
+    <![endif]-->=20
+                  <!--[if !mso]>
+    <!-->=20
+                  <table class=3D"rio_total_card rio_total_last_card" style=
+=3D"margin-top: 0; color: rgb(73, 77, 77); background: rgb(240, 242, 242); =
+padding: 12px 8px 12px 8px !important; border-radius: 0 0 4px 4px !importan=
+t; margin-bottom: 0 !important; margin: 0; border: 0; outline: 0; font-weig=
+ht: inherit; font-style: inherit; font-size: 100%; font-family: inherit; ve=
+rtical-align: baseline; display: block; -webkit-text-size-adjust: 100%; -ms=
+-text-size-adjust: 100%; border-collapse: collapse; mso-table-lspace: 0pt !=
+important; mso-table-rspace: 0pt !important">=20
+                   <!--<![endif]-->=20
+                   <tbody style=3D"margin: 0; padding: 0; border: 0; outlin=
+e: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fami=
+ly: inherit; vertical-align: baseline; display: block">
+                    <tr style=3D"display: table-row; margin: 0; padding: 0;=
+ border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-siz=
+e: 100%; font-family: inherit; vertical-align: baseline">=20
+                     <td style=3D"width: 100%; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline"> <p style=3D"margin: 0; =
+padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inheri=
+t; font-size: 100%; font-family: inherit; vertical-align: baseline"> <span =
+class=3D"rio_15_grey rio_lh_20" style=3D"line-height: 20px; color: rgb(86, =
+89, 89); font-size: 15px; display: block; font-family: &quot;Amazon Ember&q=
+uot;, Arial, sans-serif; font-style: normal; font-weight: 400; margin: 0; p=
+adding: 0; border: 0; outline: 0; vertical-align: baseline"> Order Total: <=
+/span> </p> </td>=20
+                     <td class=3D"rio_no_wrap             rio_text_align_ri=
+ght
+" style=3D"width: 100%; white-space: nowrap !important; text-align: right; =
+margin: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-st=
+yle: inherit; font-size: 100%; font-family: inherit; vertical-align: baseli=
+ne"> <p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight:=
+ inherit; font-style: inherit; font-size: 100%; font-family: inherit; verti=
+cal-align: baseline"> <span class=3D"rio_15_heavy_black rio_lh_20" style=3D=
+"line-height: 20px; color: rgb(15, 17, 17); font-size: 15px; font-weight: 7=
+00; display: block; font-family: &quot;Amazon Ember&quot;, Arial, sans-seri=
+f; font-style: normal; margin: 0; padding: 0; border: 0; outline: 0; vertic=
+al-align: baseline"> $68.87 </span> </p> </td>=20
+                    </tr>=20
+                   </tbody>
+                  </table>=20
+                  <!--[if mso]></td></tr></table><![endif]-->=20
+                  <!--[if mso]>
+<table cellpadding=3D"0" cellspacing=3D"0"><tr><td style=3D"background-colo=
+r: transparent;" colspan=3D"1" height=3D"8"></td></tr></table>
+<![endif]-->=20
+                  <!--[if mso]>
+    <table class=3D"rio_total_info_card" cellpadding=3D"8"><tr><td>
+    <table class=3D"rio_total_info_card" width=3D"509">
+    <![endif]-->=20
+                  <!--[if !mso]>
+    <!-->=20
+                  <table class=3D"rio_total_info_card" style=3D"background-=
+color: rgb(255, 255, 255); padding: 12px 8px 16px 8px; margin-bottom: 0 !im=
+portant; border-radius: 4px 4px 0 0; margin-top: 8px !important; margin: 0;=
+ border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-siz=
+e: 100%; font-family: inherit; vertical-align: baseline; background: rgb(25=
+5, 255, 255); display: block; -webkit-text-size-adjust: 100%; -ms-text-size=
+-adjust: 100%; border-collapse: collapse; mso-table-lspace: 0pt !important;=
+ mso-table-rspace: 0pt !important">=20
+                   <!--<![endif]-->=20
+                   <tbody style=3D"margin: 0; padding: 0; border: 0; outlin=
+e: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fami=
+ly: inherit; vertical-align: baseline; display: block">
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><span class=3D"rio_1=
+8_heavy" style=3D"color: rgb(15, 17, 17); font-size: 18px; font-weight: 700=
+; line-height: 22px; display: block; font-family: &quot;Amazon Ember&quot;,=
+ Arial, sans-serif; font-style: normal; margin: 0; padding: 0; border: 0; o=
+utline: 0; vertical-align: baseline">Order Confirmation</span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 12px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><span class=3D"rio_1=
+5_grey" style=3D"color: rgb(86, 89, 89); font-size: 15px; display: block; f=
+ont-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: normal=
+; font-weight: 400; line-height: 20px; margin: 0; padding: 0; border: 0; ou=
+tline: 0; vertical-align: baseline">Arriving:</span></p> <p style=3D"margin=
+: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: i=
+nherit; font-size: 100%; font-family: inherit; vertical-align: baseline"><s=
+pan class=3D"rio_15_heavy_black" style=3D"color: rgb(15, 17, 17); font-size=
+: 15px; font-weight: 700; display: block; font-family: &quot;Amazon Ember&q=
+uot;, Arial, sans-serif; font-style: normal; line-height: 20px; margin: 0; =
+padding: 0; border: 0; outline: 0; vertical-align: baseline">Thursday, Sep =
+19, 10 a.m. =E2=80=93 3 p.m.</span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"> <span class=3D"rio_=
+15_grey" style=3D"color: rgb(86, 89, 89); font-size: 15px; display: block; =
+font-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: norma=
+l; font-weight: 400; line-height: 20px; margin: 0; padding: 0; border: 0; o=
+utline: 0; vertical-align: baseline"> Ship to: </span> </p> <p style=3D"mar=
+gin: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style=
+: inherit; font-size: 100%; font-family: inherit; vertical-align: baseline"=
+><span class=3D"rio_15_heavy_black" style=3D"color: rgb(15, 17, 17); font-s=
+ize: 15px; font-weight: 700; display: block; font-family: &quot;Amazon Embe=
+r&quot;, Arial, sans-serif; font-style: normal; line-height: 20px; margin: =
+0; padding: 0; border: 0; outline: 0; vertical-align: baseline">Zsofia</spa=
+n></p> <p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weigh=
+t: inherit; font-style: inherit; font-size: 100%; font-family: inherit; ver=
+tical-align: baseline"><span class=3D"rio_15_heavy_black" style=3D"color: r=
+gb(15, 17, 17); font-size: 15px; font-weight: 700; display: block; font-fam=
+ily: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: normal; line-=
+height: 20px; margin: 0; padding: 0; border: 0; outline: 0; vertical-align:=
+ baseline">CHEVY CHASE, MD</span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> <p style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><span class=3D"rio_1=
+5_grey" style=3D"color: rgb(86, 89, 89); font-size: 15px; display: block; f=
+ont-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-style: normal=
+; font-weight: 400; line-height: 20px; margin: 0; padding: 0; border: 0; ou=
+tline: 0; vertical-align: baseline">Order # </span></p> <p style=3D"margin:=
+ 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: in=
+herit; font-size: 100%; font-family: inherit; vertical-align: baseline"><sp=
+an class=3D"rio_15_heavy_black" style=3D"color: rgb(15, 17, 17); font-size:=
+ 15px; font-weight: 700; display: block; font-family: &quot;Amazon Ember&qu=
+ot;, Arial, sans-serif; font-style: normal; line-height: 20px; margin: 0; p=
+adding: 0; border: 0; outline: 0; vertical-align: baseline"><a href=3D"http=
+s://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rt=
+n:msg:202409190145189be5069e309d44d2932172dc0310p0na&R=3DJLEELFTC0UU6&T=3DC=
+&U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fgp%2Fcss%2Forder-details%3ForderId%3D11=
+4-5386046-4065068%26ref_%3Dpe_386300_440135490_TE_simp_od&H=3DJBCH27YGA135C=
+PADSMP65KEP7XIA&ref_=3Dpe_386300_440135490_TE_simp_od" class=3D"rio_link" s=
+tyle=3D"color: rgb(0, 113, 133) !important; text-decoration: none; font-siz=
+e: inherit; font-family: inherit; font-weight: inherit; line-height: inheri=
+t; font-style: normal; margin: 0; padding: 0; border: 0; outline: 0; vertic=
+al-align: baseline"> 114-5386046-4065068</a></span></p> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline">=20
+                      <table style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; background: rgb(255, 255, 255); d=
+isplay: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; =
+border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rspa=
+ce: 0pt !important">=20
+                       <tbody style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; display: block">
+                        <tr style=3D"margin: 0; padding: 0; border: 0; outl=
+ine: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fa=
+mily: inherit; vertical-align: baseline; display: block">=20
+                         <!--[if mso]>
+<td class=3D"rio_td_cta_yellow">
+<!-->=20
+                         <td style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline">=20
+                          <!--[endif]----> <a class=3D"rio_btn rio_bg_yello=
+w rio_border_yellow" href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9H=
+F37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172=
+dc0310p0na&R=3DMWVCOE5QHA72&T=3DC&U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fgp%2Fc=
+ss%2Forder-details%3ForderId%3D114-5386046-4065068%26ref_%3Dpe_386300_44013=
+5490_TE_simp_od&H=3D6ORK7IXEAM2PFJGKL4SUCZE175AA&ref_=3Dpe_386300_440135490=
+_TE_simp_od" target=3D"_blank" rel=3D"noopener" style=3D"color: inherit; te=
+xt-decoration: none; font-size: inherit; font-family: inherit; font-weight:=
+ inherit; line-height: inherit; border-radius: 100px; text-underline-color:=
+ rgb(255, 216, 20); display: inline-block; mso-padding-alt: 0; vertical-ali=
+gn: middle; mso-line-height-rule: at-least; background: rgb(255, 216, 20); =
+border: 1px solid rgb(252, 210, 0) !important; margin: 0; padding: 0; outli=
+ne: 0; font-style: inherit"> <span style=3D"color: rgb(15, 17, 17); font-si=
+ze: 13px; font-weight: 400; display: table-cell; padding: 8px 16px; line-he=
+ight: 18px; vertical-align: middle; text-align: center; font-family: &quot;=
+Amazon Ember&quot;, Arial, sans-serif; margin: 0; border: 0; outline: 0; fo=
+nt-style: inherit"> View or manage order </span> </a> </td>=20
+                        </tr>=20
+                       </tbody>
+                      </table> </td>=20
+                    </tr>=20
+                    <tr style=3D"height: 20px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> </td>
+                    </tr>
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline">=20
+                      <table style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; background: rgb(255, 255, 255); d=
+isplay: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; =
+border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rspa=
+ce: 0pt !important">=20
+                       <tbody style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; display: block">
+                        <tr class=3D"rio_asin_card" style=3D"margin: 0; pad=
+ding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inherit; =
+font-size: 100%; font-family: inherit; vertical-align: baseline; display: b=
+lock">=20
+                         <td class=3D"rio_asin_img" style=3D"background-ima=
+ge: linear-gradient(rgba(15,17,17,0.03),rgba(15,17,17,0.03)); border-radius=
+: 4px; display: table-cell; width: 131px; height: 131px; vertical-align: mi=
+ddle; text-align: center; isolation: isolate; margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit"> <a href=3D"https://www.amazon.com/gp/r.html?C=3D1G=
+DZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d=
+2932172dc0310p0na&R=3D3BOR7PZK6S7KV&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2=
+Fdp%2FB0CT2NQ7WG%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DFVDBAAA=
+BGVVRD9M4VXAJ5AYAEKMA&ref_=3Dpe_386300_440135490_TE_simp_item_image" title=
+=3D"Anker Prime Charger,..." style=3D"background-color: transparent; color:=
+ inherit; text-decoration: none; font-size: inherit; font-family: inherit; =
+font-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: =
+0; outline: 0; font-style: inherit; vertical-align: baseline"> <img src=3D"=
+https://m.media-amazon.com/images/I/31gsmdLvgSL._SY115_SX115_.jpg" alt=3D"A=
+nker Prime Charger,..." style=3D"max-height: 115px; max-width: 115px; margi=
+n: auto; display: block; padding: 8px; mix-blend-mode: multiply; border: 0;=
+ outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; fo=
+nt-family: inherit; vertical-align: baseline; height: auto; line-height: 10=
+0%; text-decoration: none; -ms-interpolation-mode: bicubic" /> </a> </td>=
+=20
+                         <td style=3D"width: 8px; margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline"></td>=20
+                         <td class=3D"rio_asin_internal_text" style=3D"vert=
+ical-align: middle; margin: 0; padding: 0; border: 0; outline: 0; font-weig=
+ht: inherit; font-style: inherit; font-size: 100%; font-family: inherit"> <=
+p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight: inher=
+it; font-style: inherit; font-size: 100%; font-family: inherit; vertical-al=
+ign: baseline"> <span style=3D"display: block; font-family: &quot;Amazon Em=
+ber&quot;, Arial, sans-serif; font-size: 15px; color: rgb(15, 17, 17); font=
+-style: normal; font-weight: 400; line-height: 20px; margin: 0; padding: 0;=
+ border: 0; outline: 0; vertical-align: baseline"> <a class=3D"rio_black_hr=
+ef rio_15_black" href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K=
+&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172dc03=
+10p0na&R=3D291956YTILUB8&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2Fdp%2FB0CT2=
+NQ7WG%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DLGUQ0GP5IAXQLKWN5U=
+KPVDSYZWAA&ref_=3Dpe_386300_440135490_TE_simp_item_image" style=3D"color: i=
+nherit; text-decoration: none; font-size: inherit; font-family: inherit; fo=
+nt-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: 0;=
+ outline: 0; font-style: inherit; vertical-align: baseline"> <span style=3D=
+"display: inline; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif;=
+ font-size: 15px; color: rgb(15, 17, 17); font-style: normal; font-weight: =
+400; line-height: 20px; margin: 0; padding: 0; border: 0; outline: 0; verti=
+cal-align: baseline"> Anker Prime Charger, 200W 6... </span> </a> </span> <=
+/p> <p class=3D"rio_micro_space" style=3D"margin-top: 4px !important; margi=
+n: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: =
+inherit; font-size: 100%; font-family: inherit; vertical-align: baseline"> =
+<span class=3D"rio_13_grey" style=3D"color: rgb(86, 89, 89); font-size: 13p=
+x; display: block; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif=
+; font-style: normal; font-weight: 400; line-height: 20px; margin: 0; paddi=
+ng: 0; border: 0; outline: 0; vertical-align: baseline"> Qty : 1 </span> </=
+p> </td>=20
+                        </tr>=20
+                       </tbody>
+                      </table> </td>=20
+                    </tr>  =20
+                    <tr style=3D"height: 12px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> </td>
+                    </tr>
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline">=20
+                      <table style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; background: rgb(255, 255, 255); d=
+isplay: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; =
+border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rspa=
+ce: 0pt !important">=20
+                       <tbody style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; display: block">
+                        <tr class=3D"rio_asin_card" style=3D"margin: 0; pad=
+ding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inherit; =
+font-size: 100%; font-family: inherit; vertical-align: baseline; display: b=
+lock">=20
+                         <td class=3D"rio_asin_img" style=3D"background-ima=
+ge: linear-gradient(rgba(15,17,17,0.03),rgba(15,17,17,0.03)); border-radius=
+: 4px; display: table-cell; width: 131px; height: 131px; vertical-align: mi=
+ddle; text-align: center; isolation: isolate; margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit"> <a href=3D"https://www.amazon.com/gp/r.html?C=3D1G=
+DZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d=
+2932172dc0310p0na&R=3D1GNVVRT4XVOU3&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2=
+Fdp%2FB099284SRR%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3D0IALIP2=
+IFJTBISQOOBA09TJDOU4A&ref_=3Dpe_386300_440135490_TE_simp_item_image" title=
+=3D"Anker 621 Magnetic P..." style=3D"background-color: transparent; color:=
+ inherit; text-decoration: none; font-size: inherit; font-family: inherit; =
+font-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: =
+0; outline: 0; font-style: inherit; vertical-align: baseline"> <img src=3D"=
+https://m.media-amazon.com/images/I/21DT8vQ1e1L._SY115_SX115_.jpg" alt=3D"A=
+nker 621 Magnetic P..." style=3D"max-height: 115px; max-width: 115px; margi=
+n: auto; display: block; padding: 8px; mix-blend-mode: multiply; border: 0;=
+ outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; fo=
+nt-family: inherit; vertical-align: baseline; height: auto; line-height: 10=
+0%; text-decoration: none; -ms-interpolation-mode: bicubic" /> </a> </td>=
+=20
+                         <td style=3D"width: 8px; margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline"></td>=20
+                         <td class=3D"rio_asin_internal_text" style=3D"vert=
+ical-align: middle; margin: 0; padding: 0; border: 0; outline: 0; font-weig=
+ht: inherit; font-style: inherit; font-size: 100%; font-family: inherit"> <=
+p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight: inher=
+it; font-style: inherit; font-size: 100%; font-family: inherit; vertical-al=
+ign: baseline"> <span style=3D"display: block; font-family: &quot;Amazon Em=
+ber&quot;, Arial, sans-serif; font-size: 15px; color: rgb(15, 17, 17); font=
+-style: normal; font-weight: 400; line-height: 20px; margin: 0; padding: 0;=
+ border: 0; outline: 0; vertical-align: baseline"> <a class=3D"rio_black_hr=
+ef rio_15_black" href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K=
+&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172dc03=
+10p0na&R=3D13CZ0N8LBT87B&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2Fdp%2FB0992=
+84SRR%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DPFGXIFQWWUADBUT2UZ=
+CUDB9E7JGA&ref_=3Dpe_386300_440135490_TE_simp_item_image" style=3D"color: i=
+nherit; text-decoration: none; font-size: inherit; font-family: inherit; fo=
+nt-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: 0;=
+ outline: 0; font-style: inherit; vertical-align: baseline"> <span style=3D=
+"display: inline; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif;=
+ font-size: 15px; color: rgb(15, 17, 17); font-style: normal; font-weight: =
+400; line-height: 20px; margin: 0; padding: 0; border: 0; outline: 0; verti=
+cal-align: baseline"> Anker 621 Magnetic Portable... </span> </a> </span> <=
+/p> <p class=3D"rio_micro_space" style=3D"margin-top: 4px !important; margi=
+n: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: =
+inherit; font-size: 100%; font-family: inherit; vertical-align: baseline"> =
+<span class=3D"rio_13_grey" style=3D"color: rgb(86, 89, 89); font-size: 13p=
+x; display: block; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif=
+; font-style: normal; font-weight: 400; line-height: 20px; margin: 0; paddi=
+ng: 0; border: 0; outline: 0; vertical-align: baseline"> Qty : 1 </span> </=
+p> </td>=20
+                        </tr>=20
+                       </tbody>
+                      </table> </td>=20
+                    </tr>  =20
+                    <tr style=3D"height: 12px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> </td>
+                    </tr>
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline">=20
+                      <table style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; background: rgb(255, 255, 255); d=
+isplay: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; =
+border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rspa=
+ce: 0pt !important">=20
+                       <tbody style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; display: block">
+                        <tr class=3D"rio_asin_card" style=3D"margin: 0; pad=
+ding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inherit; =
+font-size: 100%; font-family: inherit; vertical-align: baseline; display: b=
+lock">=20
+                         <td class=3D"rio_asin_img" style=3D"background-ima=
+ge: linear-gradient(rgba(15,17,17,0.03),rgba(15,17,17,0.03)); border-radius=
+: 4px; display: table-cell; width: 131px; height: 131px; vertical-align: mi=
+ddle; text-align: center; isolation: isolate; margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit"> <a href=3D"https://www.amazon.com/gp/r.html?C=3D1G=
+DZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d=
+2932172dc0310p0na&R=3D3LO5CW3ATZFN3&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2=
+Fdp%2FB0D54JZTHY%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DSY7HX6R=
+U1LRAEMYC2EHTV6UV4WQA&ref_=3Dpe_386300_440135490_TE_simp_item_image" title=
+=3D"Apple AirTag 4 Pack
+" style=3D"background-color: transparent; color: inherit; text-decoration: =
+none; font-size: inherit; font-family: inherit; font-weight: inherit; line-=
+height: inherit; margin: 0; padding: 0; border: 0; outline: 0; font-style: =
+inherit; vertical-align: baseline"> <img src=3D"https://m.media-amazon.com/=
+images/I/31dl1k9kRpL._SY115_SX115_.jpg" alt=3D"Apple AirTag 4 Pack
+" style=3D"max-height: 115px; max-width: 115px; margin: auto; display: bloc=
+k; padding: 8px; mix-blend-mode: multiply; border: 0; outline: 0; font-weig=
+ht: inherit; font-style: inherit; font-size: 100%; font-family: inherit; ve=
+rtical-align: baseline; height: auto; line-height: 100%; text-decoration: n=
+one; -ms-interpolation-mode: bicubic" /> </a> </td>=20
+                         <td style=3D"width: 8px; margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline"></td>=20
+                         <td class=3D"rio_asin_internal_text" style=3D"vert=
+ical-align: middle; margin: 0; padding: 0; border: 0; outline: 0; font-weig=
+ht: inherit; font-style: inherit; font-size: 100%; font-family: inherit"> <=
+p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight: inher=
+it; font-style: inherit; font-size: 100%; font-family: inherit; vertical-al=
+ign: baseline"> <span style=3D"display: block; font-family: &quot;Amazon Em=
+ber&quot;, Arial, sans-serif; font-size: 15px; color: rgb(15, 17, 17); font=
+-style: normal; font-weight: 400; line-height: 20px; margin: 0; padding: 0;=
+ border: 0; outline: 0; vertical-align: baseline"> <a class=3D"rio_black_hr=
+ef rio_15_black" href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K=
+&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172dc03=
+10p0na&R=3D1U0OUUL72YTUG&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2Fdp%2FB0D54=
+JZTHY%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DBNUJRLKBS3Z9KLFABF=
+ABTTDPGAIA&ref_=3Dpe_386300_440135490_TE_simp_item_image" style=3D"color: i=
+nherit; text-decoration: none; font-size: inherit; font-family: inherit; fo=
+nt-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: 0;=
+ outline: 0; font-style: inherit; vertical-align: baseline"> <span style=3D=
+"display: inline; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif;=
+ font-size: 15px; color: rgb(15, 17, 17); font-style: normal; font-weight: =
+400; line-height: 20px; margin: 0; padding: 0; border: 0; outline: 0; verti=
+cal-align: baseline"> Apple AirTag 4 Pack </span> </a> </span> </p> <p clas=
+s=3D"rio_micro_space" style=3D"margin-top: 4px !important; margin: 0; paddi=
+ng: 0; border: 0; outline: 0; font-weight: inherit; font-style: inherit; fo=
+nt-size: 100%; font-family: inherit; vertical-align: baseline"> <span class=
+=3D"rio_13_grey" style=3D"color: rgb(86, 89, 89); font-size: 13px; display:=
+ block; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-styl=
+e: normal; font-weight: 400; line-height: 20px; margin: 0; padding: 0; bord=
+er: 0; outline: 0; vertical-align: baseline"> Qty : 1 </span> </p> </td>=20
+                        </tr>=20
+                       </tbody>
+                      </table> </td>=20
+                    </tr>  =20
+                    <tr style=3D"height: 12px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline"> </td>
+                    </tr>
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td style=3D"margin: 0; padding: 0; border: 0; outline=
+: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-famil=
+y: inherit; vertical-align: baseline">=20
+                      <table style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; background: rgb(255, 255, 255); d=
+isplay: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; =
+border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rspa=
+ce: 0pt !important">=20
+                       <tbody style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; display: block">
+                        <tr class=3D"rio_asin_card" style=3D"margin: 0; pad=
+ding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inherit; =
+font-size: 100%; font-family: inherit; vertical-align: baseline; display: b=
+lock">=20
+                         <td class=3D"rio_asin_img" style=3D"background-ima=
+ge: linear-gradient(rgba(15,17,17,0.03),rgba(15,17,17,0.03)); border-radius=
+: 4px; display: table-cell; width: 131px; height: 131px; vertical-align: mi=
+ddle; text-align: center; isolation: isolate; margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit"> <a href=3D"https://www.amazon.com/gp/r.html?C=3D1G=
+DZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d=
+2932172dc0310p0na&R=3D2XN5CM3HAFLJA&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2=
+Fdp%2FB0C9RX4MLV%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DNWBXDR8=
+5YD1G0EFC0MZC6HYLRS0A&ref_=3Dpe_386300_440135490_TE_simp_item_image" title=
+=3D"Spigen Tempered Glas..." style=3D"background-color: transparent; color:=
+ inherit; text-decoration: none; font-size: inherit; font-family: inherit; =
+font-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: =
+0; outline: 0; font-style: inherit; vertical-align: baseline"> <img src=3D"=
+https://m.media-amazon.com/images/I/41Yo-VgX9dL._SY115_SX115_.jpg" alt=3D"S=
+pigen Tempered Glas..." style=3D"max-height: 115px; max-width: 115px; margi=
+n: auto; display: block; padding: 8px; mix-blend-mode: multiply; border: 0;=
+ outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; fo=
+nt-family: inherit; vertical-align: baseline; height: auto; line-height: 10=
+0%; text-decoration: none; -ms-interpolation-mode: bicubic" /> </a> </td>=
+=20
+                         <td style=3D"width: 8px; margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline"></td>=20
+                         <td class=3D"rio_asin_internal_text" style=3D"vert=
+ical-align: middle; margin: 0; padding: 0; border: 0; outline: 0; font-weig=
+ht: inherit; font-style: inherit; font-size: 100%; font-family: inherit"> <=
+p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight: inher=
+it; font-style: inherit; font-size: 100%; font-family: inherit; vertical-al=
+ign: baseline"> <span style=3D"display: block; font-family: &quot;Amazon Em=
+ber&quot;, Arial, sans-serif; font-size: 15px; color: rgb(15, 17, 17); font=
+-style: normal; font-weight: 400; line-height: 20px; margin: 0; padding: 0;=
+ border: 0; outline: 0; vertical-align: baseline"> <a class=3D"rio_black_hr=
+ef rio_15_black" href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K=
+&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172dc03=
+10p0na&R=3D39O70VPWQ7U7Y&T=3DC&U=3Dhttp%3A%2F%2Fwww.amazon.com%2Fdp%2FB0C9R=
+X4MLV%2Fref%3Dpe_386300_440135490_TE_simp_item_image&H=3DPUG1VNR4I7AARWHKQO=
+OHWVWYN5OA&ref_=3Dpe_386300_440135490_TE_simp_item_image" style=3D"color: i=
+nherit; text-decoration: none; font-size: inherit; font-family: inherit; fo=
+nt-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: 0;=
+ outline: 0; font-style: inherit; vertical-align: baseline"> <span style=3D=
+"display: inline; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif;=
+ font-size: 15px; color: rgb(15, 17, 17); font-style: normal; font-weight: =
+400; line-height: 20px; margin: 0; padding: 0; border: 0; outline: 0; verti=
+cal-align: baseline"> Spigen Tempered Glass Scree... </span> </a> </span> <=
+/p> <p class=3D"rio_micro_space" style=3D"margin-top: 4px !important; margi=
+n: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: =
+inherit; font-size: 100%; font-family: inherit; vertical-align: baseline"> =
+<span class=3D"rio_13_grey" style=3D"color: rgb(86, 89, 89); font-size: 13p=
+x; display: block; font-family: &quot;Amazon Ember&quot;, Arial, sans-serif=
+; font-style: normal; font-weight: 400; line-height: 20px; margin: 0; paddi=
+ng: 0; border: 0; outline: 0; vertical-align: baseline"> Qty : 1 </span> </=
+p> </td>=20
+                        </tr>=20
+                       </tbody>
+                      </table> </td>=20
+                    </tr>  =20
+                    <tr style=3D"height: 12px; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                   </tbody>
+                  </table>=20
+                  <!--[if mso]></td></tr></table><![endif]-->=20
+                  <!--[if mso]>
+    <table class=3D"rio_total_card rio_total_last_card" cellpadding=3D"8"><=
+tr><td>
+    <table class=3D"rio_total_card rio_total_last_card" width=3D"509">
+    <![endif]-->=20
+                  <!--[if !mso]>
+    <!-->=20
+                  <table class=3D"rio_total_card rio_total_last_card" style=
+=3D"margin-top: 0; color: rgb(73, 77, 77); background: rgb(240, 242, 242); =
+padding: 12px 8px 12px 8px !important; border-radius: 0 0 4px 4px !importan=
+t; margin-bottom: 0 !important; margin: 0; border: 0; outline: 0; font-weig=
+ht: inherit; font-style: inherit; font-size: 100%; font-family: inherit; ve=
+rtical-align: baseline; display: block; -webkit-text-size-adjust: 100%; -ms=
+-text-size-adjust: 100%; border-collapse: collapse; mso-table-lspace: 0pt !=
+important; mso-table-rspace: 0pt !important">=20
+                   <!--<![endif]-->=20
+                   <tbody style=3D"margin: 0; padding: 0; border: 0; outlin=
+e: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fami=
+ly: inherit; vertical-align: baseline; display: block">
+                    <tr style=3D"display: table-row; margin: 0; padding: 0;=
+ border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-siz=
+e: 100%; font-family: inherit; vertical-align: baseline">=20
+                     <td style=3D"width: 100%; margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline"> <p style=3D"margin: 0; =
+padding: 0; border: 0; outline: 0; font-weight: inherit; font-style: inheri=
+t; font-size: 100%; font-family: inherit; vertical-align: baseline"> <span =
+class=3D"rio_15_grey rio_lh_20" style=3D"line-height: 20px; color: rgb(86, =
+89, 89); font-size: 15px; display: block; font-family: &quot;Amazon Ember&q=
+uot;, Arial, sans-serif; font-style: normal; font-weight: 400; margin: 0; p=
+adding: 0; border: 0; outline: 0; vertical-align: baseline"> Order Total: <=
+/span> </p> </td>=20
+                     <td class=3D"rio_no_wrap             rio_text_align_ri=
+ght
+" style=3D"width: 100%; white-space: nowrap !important; text-align: right; =
+margin: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-st=
+yle: inherit; font-size: 100%; font-family: inherit; vertical-align: baseli=
+ne"> <p style=3D"margin: 0; padding: 0; border: 0; outline: 0; font-weight:=
+ inherit; font-style: inherit; font-size: 100%; font-family: inherit; verti=
+cal-align: baseline"> <span class=3D"rio_15_heavy_black rio_lh_20" style=3D=
+"line-height: 20px; color: rgb(15, 17, 17); font-size: 15px; font-weight: 7=
+00; display: block; font-family: &quot;Amazon Ember&quot;, Arial, sans-seri=
+f; font-style: normal; margin: 0; padding: 0; border: 0; outline: 0; vertic=
+al-align: baseline"> $229.99 </span> </p> </td>=20
+                    </tr>=20
+                   </tbody>
+                  </table>=20
+                  <!--[if mso]></td></tr></table><![endif]-->=20
+                  <!--[if mso]>
+<table cellpadding=3D"0" cellspacing=3D"0"><tr><td style=3D"background-colo=
+r: transparent;" colspan=3D"1" height=3D"8"></td></tr></table>
+<![endif]-->=20
+                  <!--[if mso]>
+    <table class=3D"rio_card_v2" cellpadding=3D"8"><tr><td>
+    <table class=3D"rio_card_v2"  width=3D"509">
+    <![endif]-->=20
+                  <!--[if !mso]>
+    <!-->=20
+                  <table class=3D"rio_card_v2" style=3D"background-color: r=
+gb(255, 255, 255); border-radius: 4px; padding: 12px 8px 16px 8px; margin-b=
+ottom: 0px !important; margin-top: 8px !important; margin: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline; background: rgb(255, 255, 255); =
+display: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;=
+ border-collapse: collapse; mso-table-lspace: 0pt !important; mso-table-rsp=
+ace: 0pt !important">=20
+                   <!--<![endif]-->=20
+                   <tbody style=3D"margin: 0; padding: 0; border: 0; outlin=
+e: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fami=
+ly: inherit; vertical-align: baseline; display: block">
+                    <tr style=3D"margin: 0; padding: 0; border: 0; outline:=
+ 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family=
+: inherit; vertical-align: baseline; display: block">=20
+                     <td id=3D"marketingContent" class=3D"rio_word_break" s=
+tyle=3D"word-break: break-word; margin: 0; padding: 0; border: 0; outline: =
+0; font-weight: inherit; font-style: inherit; font-size: 100%; font-family:=
+ inherit; vertical-align: baseline">=20
+                      <!--rbd-->=20
+                      <div class=3D"celwidget pd_rd_w-0vT5u content-id-amzn=
+1.sym.d817935f-09d1-4270-a0d9-aa68549d5244 pf_rd_p-d817935f-09d1-4270-a0d9-=
+aa68549d5244 pf_rd_r-M6V8J3C95ZQJ3AV3VSN5 pd_rd_wg-WzYWH pd_rd_r-b9f3a6de-9=
+968-4a44-8252-f40e905b9011 c-f" cel_widget_id=3D"p13n-asin-list-plain_email=
+-order-confirmation_0" data-csa-op-log-render=3D"" data-csa-c-content-id=3D=
+"amzn1.sym.d817935f-09d1-4270-a0d9-aa68549d5244" data-csa-c-slot-id=3D"emai=
+l-order-confirmation-1" data-csa-c-type=3D"widget" data-csa-c-painter=3D"p1=
+3n-asin-list-plain-cards" style=3D"margin: 0; padding: 0; border: 0; outlin=
+e: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-fami=
+ly: inherit; vertical-align: baseline">
+                       <script>if(window.mix_csa){window.mix_csa('[cel_widg=
+et_id=3D"p13n-asin-list-plain_email-order-confirmation_0"]', '#CardInstance=
+vWBi29JdlA3mEQ_pLYxjNA')('mark', 'bb')}</script>=20
+                       <script>if(window.uet){window.uet('bb','p13n-asin-li=
+st-plain_email-order-confirmation_0',{wb: 1})}</script>=20
+                       <style>[class*=3Dcards-widget-qs-widget-override] [c=
+lass*=3Dqs-widget-table],[class*=3Dcards-widget-qs-widget-override] [id^=3D=
+qs-widget-button-],[class*=3Dcards-widget-qs-widget-override][class*=3Dqs-w=
+idget-container],[id^=3Dqs-widget-atc-button-]{width:100%}._cDEzb_buttonPad=
+ding_yNxb4{padding:0 8px 8px}
+._cDEzb_welcome_2Dav7{background:-webkit-linear-gradient(#01a4b5,#008296,#3=
+83e3e);background:linear-gradient(#01a4b5,#008296,#383e3e);color:#fff;paddi=
+ng:40px;text-align:center}._cDEzb_welcome_2Dav7 h1{font-size:4em}._cDEzb_we=
+lcome_2Dav7 h2{font-size:2.5em}._cDEzb_example_286SK{padding:40px}</style>=
+=20
+                       <!--CardsClient-->
+                       <table style=3D"width: 100%; margin: 0; padding: 0; =
+border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size=
+: 100%; font-family: inherit; vertical-align: baseline; background: rgb(255=
+, 255, 255); display: block; -webkit-text-size-adjust: 100%; -ms-text-size-=
+adjust: 100%; border-collapse: collapse; mso-table-lspace: 0pt !important; =
+mso-table-rspace: 0pt !important" id=3D"CardInstancevWBi29JdlA3mEQ_pLYxjNA"=
+ data-card-metrics-id=3D"p13n-asin-list-plain_email-order-confirmation_0">
+                        <tbody style=3D"margin: 0; padding: 0; border: 0; o=
+utline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font=
+-family: inherit; vertical-align: baseline; display: block">
+                         <tr style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; display: block">
+                          <td style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline">
+                           <table width=3D"100%" bgcolor=3D"#FFFFFF" style=
+=3D"vertical-align: central; background: white; margin: 0; padding: 0; bord=
+er: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 10=
+0%; font-family: inherit; display: block; -webkit-text-size-adjust: 100%; -=
+ms-text-size-adjust: 100%; border-collapse: collapse; mso-table-lspace: 0pt=
+ !important; mso-table-rspace: 0pt !important">
+                            <tbody style=3D"margin: 0; padding: 0; border: =
+0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; =
+font-family: inherit; vertical-align: baseline; display: block">
+                             <tr style=3D"margin: 0; padding: 0; border: 0;=
+ outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; fo=
+nt-family: inherit; vertical-align: baseline; display: block">
+                              <td style=3D"text-align: left; font-family: &=
+quot;Amazon Ember&quot;, Arial, sans-serif; font-size: 18px; font-weight: 7=
+00; color: rgb(15, 17, 17); line-height: 22px; padding: 12px 8px; margin: 0=
+; border: 0; outline: 0; font-style: inherit; vertical-align: baseline">Cus=
+tomers Who Bought Items in Your Order Also Bought</td>
+                             </tr>
+                            </tbody>
+                           </table></td>
+                         </tr>
+                         <tr style=3D"margin: 0; padding: 0; border: 0; out=
+line: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-f=
+amily: inherit; vertical-align: baseline; display: block">
+                          <td style=3D"margin: 0; padding: 0; border: 0; ou=
+tline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; font-=
+family: inherit; vertical-align: baseline">
+                           <table width=3D"100%" cellspacing=3D"0" cellpadd=
+ing=3D"0" border=3D"0" style=3D"vertical-align: central; background: white;=
+ margin: 0; padding: 0; border: 0; outline: 0; font-weight: inherit; font-s=
+tyle: inherit; font-size: 100%; font-family: inherit; display: block; -webk=
+it-text-size-adjust: 100%; -ms-text-size-adjust: 100%; border-collapse: col=
+lapse; mso-table-lspace: 0pt !important; mso-table-rspace: 0pt !important">
+                            <tbody style=3D"margin: 0; padding: 0; border: =
+0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; =
+font-family: inherit; vertical-align: baseline; display: block">
+                             <tr style=3D"margin: 0; padding: 0; border: 0;=
+ outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; fo=
+nt-family: inherit; vertical-align: baseline; display: block">
+                              <td width=3D"48%" bgcolor=3D"#ffffff" style=
+=3D"vertical-align: middle; margin: 0; padding: 0; border: 0; outline: 0; f=
+ont-weight: inherit; font-style: inherit; font-size: 100%; font-family: inh=
+erit">
+                               <table style=3D"margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; background: rgb(255, 255=
+, 255); display: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjus=
+t: 100%; border-collapse: collapse; mso-table-lspace: 0pt !important; mso-t=
+able-rspace: 0pt !important">
+                                <tbody style=3D"margin: 0; padding: 0; bord=
+er: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 10=
+0%; font-family: inherit; vertical-align: baseline; display: block">
+                                 <tr style=3D"margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit; vertical-align: baseline; display: block">
+                                  <td align=3D"center" style=3D"min-width: =
+80px; padding: 12px 4px 8px 4px; vertical-align: middle; margin: 0; border:=
+ 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%;=
+ font-family: inherit"><a href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZ=
+ONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d29=
+32172dc0310p0na&R=3D2FUKYKJVP4JE4&T=3DC&U=3Dhttps%3A%2F%2Fwww.amazon.com%2F=
+Anker-Compatible-Wireless-Charging-Certified%2Fdp%2FB0D2XPHFSL%2Fref%3Dpe_3=
+86300_440135490_crm_crc_typ_gr_reranked_piee_d_sccl_1%2F139-0803456-5961652=
+%2F%3F_encoding%3DUTF8%26pd_rd_i%3DB0D2XPHFSL%26psc%3D1%26pd_rd_w%3D0vT5u%2=
+6content-id%3Damzn1.sym.d817935f-09d1-4270-a0d9-aa68549d5244%26pf_rd_p%3Dd8=
+17935f-09d1-4270-a0d9-aa68549d5244%26pf_rd_r%3DM6V8J3C95ZQJ3AV3VSN5%26pd_rd=
+_wg%3DWzYWH%26pd_rd_r%3Db9f3a6de-9968-4a44-8252-f40e905b9011%26ref_%3Dcrm_c=
+rc_typ_gr_reranked_piee&H=3DGNVLB90PY0S2CSYVJOCJYRZAYPQA&ref_=3Dpe_386300_4=
+40135490_crm_crc_typ_gr_reranked_piee_d_sccl_1" style=3D"color: rgb(0, 113,=
+ 133) !important; text-decoration: none; font-size: inherit; font-family: i=
+nherit; font-weight: inherit; line-height: inherit; margin: 0; padding: 0; =
+border: 0; outline: 0; font-style: inherit; vertical-align: baseline"><img =
+style=3D"margin: 0 8px 0 8px; padding: 0; border: 0; outline: 0; font-weigh=
+t: inherit; font-style: inherit; font-size: 100%; font-family: inherit; ver=
+tical-align: baseline; height: auto; line-height: 100%; text-decoration: no=
+ne; -ms-interpolation-mode: bicubic" src=3D"https://m.media-amazon.com/imag=
+es/I/617+E4Cnj-L._AC_SX80_SY80_SS80_.jpg" alt=3D"Anker MagSafe Compatible M=
+agGo Charger Stand, iPhone 16 Wireless Charger, 2-in-1 Charging Station, Qi=
+2 Certified 15W Wireless" width=3D"80" height=3D"80" /></a></td>
+                                  <td style=3D"padding: 12px 4px 8px 4px; m=
+in-width: 80px; margin: 4px; vertical-align: middle; border: 0; outline: 0;=
+ font-weight: inherit; font-style: inherit; font-size: 100%; font-family: i=
+nherit">
+                                   <table style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline; background: rgb(255,=
+ 255, 255); display: block; -webkit-text-size-adjust: 100%; -ms-text-size-a=
+djust: 100%; border-collapse: collapse; mso-table-lspace: 0pt !important; m=
+so-table-rspace: 0pt !important">
+                                    <tbody style=3D"margin: 0; padding: 0; =
+border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size=
+: 100%; font-family: inherit; vertical-align: baseline; display: block">
+                                     <tr style=3D"margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline; display: block">
+                                      <td style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><a href=3D"https://w=
+ww.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg=
+:202409190145189be5069e309d44d2932172dc0310p0na&R=3D54U10A9952K9&T=3DC&U=3D=
+https%3A%2F%2Fwww.amazon.com%2FAnker-Compatible-Wireless-Charging-Certified=
+%2Fdp%2FB0D2XPHFSL%2Fref%3Dpe_386300_440135490_crm_crc_typ_gr_reranked_piee=
+_d_sccl_1%2F139-0803456-5961652%2F%3F_encoding%3DUTF8%26pd_rd_i%3DB0D2XPHFS=
+L%26psc%3D1%26pd_rd_w%3D0vT5u%26content-id%3Damzn1.sym.d817935f-09d1-4270-a=
+0d9-aa68549d5244%26pf_rd_p%3Dd817935f-09d1-4270-a0d9-aa68549d5244%26pf_rd_r=
+%3DM6V8J3C95ZQJ3AV3VSN5%26pd_rd_wg%3DWzYWH%26pd_rd_r%3Db9f3a6de-9968-4a44-8=
+252-f40e905b9011%26ref_%3Dcrm_crc_typ_gr_reranked_piee&H=3DNMQBLW41ZW6J6WFP=
+MCQHSQFNHTGA&ref_=3Dpe_386300_440135490_crm_crc_typ_gr_reranked_piee_d_sccl=
+_1" style=3D"font-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font=
+-size: 15px; text-decoration: none; color: rgb(0, 113, 133) !important; lin=
+e-height: 20px; font-weight: inherit; margin: 0; padding: 0; border: 0; out=
+line: 0; font-style: inherit; vertical-align: baseline">Anker MagSafe Compa=
+tible MagGo...</a></td>
+                                     </tr>
+                                     <tr style=3D"margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline; display: block">
+                                      <td style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><a href=3D"https://w=
+ww.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg=
+:202409190145189be5069e309d44d2932172dc0310p0na&R=3D3T901VA6IAIMV&T=3DC&U=
+=3Dhttps%3A%2F%2Fwww.amazon.com%2FAnker-Compatible-Wireless-Charging-Certif=
+ied%2Fdp%2FB0D2XPHFSL%2Fref%3Dpe_386300_440135490_crm_crc_typ_gr_reranked_p=
+iee_d_sccl_1%2F139-0803456-5961652%2F%3F_encoding%3DUTF8%26pd_rd_i%3DB0D2XP=
+HFSL%26psc%3D1%26pd_rd_w%3D0vT5u%26content-id%3Damzn1.sym.d817935f-09d1-427=
+0-a0d9-aa68549d5244%26pf_rd_p%3Dd817935f-09d1-4270-a0d9-aa68549d5244%26pf_r=
+d_r%3DM6V8J3C95ZQJ3AV3VSN5%26pd_rd_wg%3DWzYWH%26pd_rd_r%3Db9f3a6de-9968-4a4=
+4-8252-f40e905b9011%26ref_%3Dcrm_crc_typ_gr_reranked_piee&H=3D9AVTPYTAPYQAQ=
+AK92VZN14ETYVOA&ref_=3Dpe_386300_440135490_crm_crc_typ_gr_reranked_piee_d_s=
+ccl_1" style=3D"text-decoration: none; color: rgb(0, 113, 133) !important; =
+font-size: inherit; font-family: inherit; font-weight: inherit; line-height=
+: inherit; margin: 0; padding: 0; border: 0; outline: 0; font-style: inheri=
+t; vertical-align: baseline"><span style=3D"font-family: &quot;Amazon Ember=
+&quot;, Arial, sans-serif; font-size: 15px; text-decoration: none; color: r=
+gb(86, 89, 89); line-height: 20px; margin: 0; padding: 0; border: 0; outlin=
+e: 0; font-weight: inherit; font-style: inherit; vertical-align: baseline">=
+$39.99</span><span style=3D"vertical-align: -3px; margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit"><img style=3D"margin: 0px 4px; padding: 0; bord=
+er: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 10=
+0%; font-family: inherit; vertical-align: baseline; height: auto; line-heig=
+ht: 100%; text-decoration: none; -ms-interpolation-mode: bicubic" src=3D"ht=
+tps://m.media-amazon.com/images/G/01/StreamDEX/prime_badge_small.png" borde=
+r=3D"0" alt=3D"Prime shipping available" /></span></a></td>
+                                     </tr>
+                                    </tbody>
+                                   </table></td>
+                                 </tr>
+                                </tbody>
+                               </table></td>
+                              <td width=3D"48%" bgcolor=3D"#ffffff" style=
+=3D"vertical-align: middle; margin: 0; padding: 0; border: 0; outline: 0; f=
+ont-weight: inherit; font-style: inherit; font-size: 100%; font-family: inh=
+erit">
+                               <table style=3D"margin: 0; padding: 0; borde=
+r: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100=
+%; font-family: inherit; vertical-align: baseline; background: rgb(255, 255=
+, 255); display: block; -webkit-text-size-adjust: 100%; -ms-text-size-adjus=
+t: 100%; border-collapse: collapse; mso-table-lspace: 0pt !important; mso-t=
+able-rspace: 0pt !important">
+                                <tbody style=3D"margin: 0; padding: 0; bord=
+er: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 10=
+0%; font-family: inherit; vertical-align: baseline; display: block">
+                                 <tr style=3D"margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit; vertical-align: baseline; display: block">
+                                  <td align=3D"center" style=3D"min-width: =
+80px; padding: 12px 4px 8px 4px; vertical-align: middle; margin: 0; border:=
+ 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%;=
+ font-family: inherit"><a href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZ=
+ONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d29=
+32172dc0310p0na&R=3D77R6K3I807MI&T=3DC&U=3Dhttps%3A%2F%2Fwww.amazon.com%2FA=
+nker-Flexible-Multi-Color-Braided-Charging%2Fdp%2FB0CZ41XXS3%2Fref%3Dpe_386=
+300_440135490_crm_crc_typ_gr_reranked_piee_d_sccl_2%2F139-0803456-5961652%2=
+F%3F_encoding%3DUTF8%26pd_rd_i%3DB0CZ41XXS3%26psc%3D1%26pd_rd_w%3D0vT5u%26c=
+ontent-id%3Damzn1.sym.d817935f-09d1-4270-a0d9-aa68549d5244%26pf_rd_p%3Dd817=
+935f-09d1-4270-a0d9-aa68549d5244%26pf_rd_r%3DM6V8J3C95ZQJ3AV3VSN5%26pd_rd_w=
+g%3DWzYWH%26pd_rd_r%3Db9f3a6de-9968-4a44-8252-f40e905b9011%26ref_%3Dcrm_crc=
+_typ_gr_reranked_piee&H=3DT61A4GBFVIIA5LJNCYEVNWFR6A0A&ref_=3Dpe_386300_440=
+135490_crm_crc_typ_gr_reranked_piee_d_sccl_2" style=3D"color: rgb(0, 113, 1=
+33) !important; text-decoration: none; font-size: inherit; font-family: inh=
+erit; font-weight: inherit; line-height: inherit; margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-style: inherit; vertical-align: baseline"><img st=
+yle=3D"margin: 0 8px 0 8px; padding: 0; border: 0; outline: 0; font-weight:=
+ inherit; font-style: inherit; font-size: 100%; font-family: inherit; verti=
+cal-align: baseline; height: auto; line-height: 100%; text-decoration: none=
+; -ms-interpolation-mode: bicubic" src=3D"https://m.media-amazon.com/images=
+/I/71ETgVVGT2L._AC_SX80_SY80_SS80_.jpg" alt=3D"Anker Nano USB C Cable, 240W=
+ 6 ft Flexible Multi-Color Braided Cord, Fast Charging Type C Charger for i=
+Phone 16/16 Pro/16 Plu" width=3D"80" height=3D"80" /></a></td>
+                                  <td style=3D"padding: 12px 4px 8px 4px; m=
+in-width: 80px; margin: 4px; vertical-align: middle; border: 0; outline: 0;=
+ font-weight: inherit; font-style: inherit; font-size: 100%; font-family: i=
+nherit">
+                                   <table style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline; background: rgb(255,=
+ 255, 255); display: block; -webkit-text-size-adjust: 100%; -ms-text-size-a=
+djust: 100%; border-collapse: collapse; mso-table-lspace: 0pt !important; m=
+so-table-rspace: 0pt !important">
+                                    <tbody style=3D"margin: 0; padding: 0; =
+border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size=
+: 100%; font-family: inherit; vertical-align: baseline; display: block">
+                                     <tr style=3D"margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline; display: block">
+                                      <td style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><a href=3D"https://w=
+ww.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg=
+:202409190145189be5069e309d44d2932172dc0310p0na&R=3DK92RPCHC7I8R&T=3DC&U=3D=
+https%3A%2F%2Fwww.amazon.com%2FAnker-Flexible-Multi-Color-Braided-Charging%=
+2Fdp%2FB0CZ41XXS3%2Fref%3Dpe_386300_440135490_crm_crc_typ_gr_reranked_piee_=
+d_sccl_2%2F139-0803456-5961652%2F%3F_encoding%3DUTF8%26pd_rd_i%3DB0CZ41XXS3=
+%26psc%3D1%26pd_rd_w%3D0vT5u%26content-id%3Damzn1.sym.d817935f-09d1-4270-a0=
+d9-aa68549d5244%26pf_rd_p%3Dd817935f-09d1-4270-a0d9-aa68549d5244%26pf_rd_r%=
+3DM6V8J3C95ZQJ3AV3VSN5%26pd_rd_wg%3DWzYWH%26pd_rd_r%3Db9f3a6de-9968-4a44-82=
+52-f40e905b9011%26ref_%3Dcrm_crc_typ_gr_reranked_piee&H=3DEBTDYFPKYLFRB8LM2=
+IUWR27ANFYA&ref_=3Dpe_386300_440135490_crm_crc_typ_gr_reranked_piee_d_sccl_=
+2" style=3D"font-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-=
+size: 15px; text-decoration: none; color: rgb(0, 113, 133) !important; line=
+-height: 20px; font-weight: inherit; margin: 0; padding: 0; border: 0; outl=
+ine: 0; font-style: inherit; vertical-align: baseline">Anker Nano USB C Cab=
+le, 240W 6 ft...</a></td>
+                                     </tr>
+                                     <tr style=3D"margin: 0; padding: 0; bo=
+rder: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: =
+100%; font-family: inherit; vertical-align: baseline; display: block">
+                                      <td style=3D"margin: 0; padding: 0; b=
+order: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size:=
+ 100%; font-family: inherit; vertical-align: baseline"><a href=3D"https://w=
+ww.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg=
+:202409190145189be5069e309d44d2932172dc0310p0na&R=3DARZS9OQ58YVP&T=3DC&U=3D=
+https%3A%2F%2Fwww.amazon.com%2FAnker-Flexible-Multi-Color-Braided-Charging%=
+2Fdp%2FB0CZ41XXS3%2Fref%3Dpe_386300_440135490_crm_crc_typ_gr_reranked_piee_=
+d_sccl_2%2F139-0803456-5961652%2F%3F_encoding%3DUTF8%26pd_rd_i%3DB0CZ41XXS3=
+%26psc%3D1%26pd_rd_w%3D0vT5u%26content-id%3Damzn1.sym.d817935f-09d1-4270-a0=
+d9-aa68549d5244%26pf_rd_p%3Dd817935f-09d1-4270-a0d9-aa68549d5244%26pf_rd_r%=
+3DM6V8J3C95ZQJ3AV3VSN5%26pd_rd_wg%3DWzYWH%26pd_rd_r%3Db9f3a6de-9968-4a44-82=
+52-f40e905b9011%26ref_%3Dcrm_crc_typ_gr_reranked_piee&H=3DX8KWSV46PHBBMAXGU=
+BC5GN0DRUCA&ref_=3Dpe_386300_440135490_crm_crc_typ_gr_reranked_piee_d_sccl_=
+2" style=3D"text-decoration: none; color: rgb(0, 113, 133) !important; font=
+-size: inherit; font-family: inherit; font-weight: inherit; line-height: in=
+herit; margin: 0; padding: 0; border: 0; outline: 0; font-style: inherit; v=
+ertical-align: baseline"><span style=3D"font-family: &quot;Amazon Ember&quo=
+t;, Arial, sans-serif; font-size: 15px; text-decoration: none; color: rgb(8=
+6, 89, 89); line-height: 20px; margin: 0; padding: 0; border: 0; outline: 0=
+; font-weight: inherit; font-style: inherit; vertical-align: baseline">$21.=
+99</span><span style=3D"vertical-align: -3px; margin: 0; padding: 0; border=
+: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%=
+; font-family: inherit"><img style=3D"margin: 0px 4px; padding: 0; border: =
+0; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; =
+font-family: inherit; vertical-align: baseline; height: auto; line-height: =
+100%; text-decoration: none; -ms-interpolation-mode: bicubic" src=3D"https:=
+//m.media-amazon.com/images/G/01/StreamDEX/prime_badge_small.png" border=3D=
+"0" alt=3D"Prime shipping available" /></span></a></td>
+                                     </tr>
+                                    </tbody>
+                                   </table></td>
+                                 </tr>
+                                </tbody>
+                               </table></td>
+                             </tr>
+                            </tbody>
+                           </table></td>
+                         </tr>
+                        </tbody>
+                       </table>
+                       <script>if(window.mix_csa){window.mix_csa('[cel_widg=
+et_id=3D"p13n-asin-list-plain_email-order-confirmation_0"]', '#CardInstance=
+vWBi29JdlA3mEQ_pLYxjNA')('mark', 'be')}</script>=20
+                       <script>if(window.uet){window.uet('be','p13n-asin-li=
+st-plain_email-order-confirmation_0',{wb: 1})}</script>=20
+                       <script>if(window.mixTimeout){window.mixTimeout('p13=
+n-asin-list-plain', 'CardInstancevWBi29JdlA3mEQ_pLYxjNA', 90000)};
+P.when('mix:@amzn/mix.client-runtime', 'mix:p13n-asin-list-plain__d2OGA22z'=
+).execute(function (runtime, cardModule) {runtime.registerCardFactory('Card=
+InstancevWBi29JdlA3mEQ_pLYxjNA', cardModule).then(function(){if(window.mix_=
+csa){window.mix_csa('[cel_widget_id=3D"p13n-asin-list-plain_email-order-con=
+firmation_0"]', '#CardInstancevWBi29JdlA3mEQ_pLYxjNA')('mark', 'functional'=
+)}if(window.uex){window.uex('ld','p13n-asin-list-plain_email-order-confirma=
+tion_0',{wb: 1})}});});
+</script>=20
+                       <script>P.load.js('https://images-na.ssl-images-amaz=
+on.com/images/I/01flEqCNmTL.js?xcp');
+</script>=20
+                      </div> </td>=20
+                    </tr>=20
+                   </tbody>
+                  </table>=20
+                  <!--[if mso]>
+    </td></tr></table>
+    <![endif]--> </td>=20
+                </tr>=20
+               </tbody>
+              </table>=20
+              <!--[if mso]>
+    </table>
+    <![endif]-->=20
+              <!--[if mso]>
+    <table class=3D"rio_footer" cellpadding=3D"0"><tr><td>
+    <table class=3D"rio_footer"  width=3D"541">
+    <![endif]-->=20
+              <!--[if !mso]>
+    <!-->=20
+              <table class=3D"rio_footer" style=3D"color: rgb(86, 89, 89); =
+font-family: &quot;Amazon Ember&quot;, Arial, sans-serif; font-size: 13px; =
+font-style: normal; font-weight: 400; line-height: 18px; display: block; ba=
+ckground: rgb(240, 242, 242); margin: 0; padding: 0; border: 0; outline: 0;=
+ vertical-align: baseline; -webkit-text-size-adjust: 100%; -ms-text-size-ad=
+just: 100%; border-collapse: collapse; mso-table-lspace: 0pt !important; ms=
+o-table-rspace: 0pt !important">=20
+               <!--<![endif]-->=20
+               <tbody style=3D"margin: 0; padding: 0; border: 0; outline: 0=
+; font-weight: inherit; font-style: inherit; font-size: 100%; font-family: =
+inherit; vertical-align: baseline; display: block">
+                <tr style=3D"height: 32px; margin: 0; padding: 0; border: 0=
+; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; f=
+ont-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                <tr style=3D"margin: 0; padding: 0; border: 0; outline: 0; =
+font-weight: inherit; font-style: inherit; font-size: 100%; font-family: in=
+herit; vertical-align: baseline; display: block">=20
+                 <td style=3D"margin: 0; padding: 0; border: 0; outline: 0;=
+ font-weight: inherit; font-style: inherit; font-size: 100%; font-family: i=
+nherit; vertical-align: baseline"> <p style=3D"margin: 0 16px; padding: 0; =
+border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size=
+: 100%; font-family: inherit; vertical-align: baseline">The payment for you=
+r invoice is processed by Amazon Payments, Inc. P.O. Box 81226 Seattle, Was=
+hington 98108-1226. If you need more information, please contact (866) 216-=
+1075</p> </td>=20
+                </tr>=20
+                <tr style=3D"height: 20px; margin: 0; padding: 0; border: 0=
+; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; f=
+ont-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                <tr style=3D"margin: 0; padding: 0; border: 0; outline: 0; =
+font-weight: inherit; font-style: inherit; font-size: 100%; font-family: in=
+herit; vertical-align: baseline; display: block">=20
+                 <td style=3D"margin: 0; padding: 0; border: 0; outline: 0;=
+ font-weight: inherit; font-style: inherit; font-size: 100%; font-family: i=
+nherit; vertical-align: baseline"> <p style=3D"margin: 0 16px; padding: 0; =
+border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size=
+: 100%; font-family: inherit; vertical-align: baseline">By placing your ord=
+er, you agree to Amazon.com=E2=80=99s <a href=3D"https://www.amazon.com/gp/=
+r.html?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189b=
+e5069e309d44d2932172dc0310p0na&R=3D1FQUOHGCZSJ4M&T=3DC&U=3Dhttps%3A%2F%2Fww=
+w.amazon.com%2Fgp%2Fhelp%2Fcustomer%2Fdisplay.html%2Fref%3Dpe_386300_440135=
+490_TE_simp_p%3Fie%3DUTF8%26nodeId%3D468496&H=3DLGJFWHYYGYYI0PW7T1HJPBFUT9S=
+A&ref_=3Dpe_386300_440135490_TE_simp_p" style=3D"font-size: 13px; color: rg=
+b(0, 113, 133) !important; text-decoration: none; font-family: inherit; fon=
+t-weight: inherit; line-height: inherit; margin: 0; padding: 0; border: 0; =
+outline: 0; font-style: inherit; vertical-align: baseline">Privacy Notice</=
+a> and <a href=3D"https://www.amazon.com/gp/r.html?C=3D1GDZONJ9HF37K&K=3D3Q=
+5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d44d2932172dc0310p0na&=
+R=3D1X9VH34OQFKY6&T=3DC&U=3Dhttps%3A%2F%2Fwww.amazon.com%2Fgp%2Fhelp%2Fcust=
+omer%2Fdisplay.html%2Fref%3Dpe_386300_440135490_TE_simp_p%3Fie%3DUTF8%26nod=
+eId%3D508088&H=3DAHWJPZ0O5NRBXDESME4JQGQXGDQA&ref_=3Dpe_386300_440135490_TE=
+_simp_p" style=3D"font-size: 13px; color: rgb(0, 113, 133) !important; text=
+-decoration: none; font-family: inherit; font-weight: inherit; line-height:=
+ inherit; margin: 0; padding: 0; border: 0; outline: 0; font-style: inherit=
+; vertical-align: baseline"> Conditions of Use</a>. Unless otherwise noted,=
+ items sold by Amazon.com are subject to sales tax in select states in acco=
+rdance with the applicable laws of that state. If your order contains one o=
+r more items from a seller other than Amazon.com, it may be subject to stat=
+e and local sales tax, depending upon the seller's business policies and th=
+e location of their operations. Learn more about <a href=3D"https://www.ama=
+zon.com/gp/r.html?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:20240=
+9190145189be5069e309d44d2932172dc0310p0na&R=3D1HTFYN382NQ6V&T=3DC&U=3Dhttps=
+%3A%2F%2Fwww.amazon.com%2Fgp%2Fhelp%2Fcustomer%2Fdisplay.html%2Fref%3Dpe_38=
+6300_440135490_hp_bc_nav%3Fie%3DUTF8%26nodeId%3D202029700&H=3DZJMP5QYWJMXMZ=
+DMZPMPJF5K1VOEA&ref_=3Dpe_386300_440135490_hp_bc_nav" style=3D"font-size: 1=
+3px; color: rgb(0, 113, 133) !important; text-decoration: none; font-family=
+: inherit; font-weight: inherit; line-height: inherit; margin: 0; padding: =
+0; border: 0; outline: 0; font-style: inherit; vertical-align: baseline">ta=
+x and seller information</a>.</p> </td>=20
+                </tr>=20
+                <tr style=3D"height: 20px; margin: 0; padding: 0; border: 0=
+; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; f=
+ont-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                <tr style=3D"margin: 0; padding: 0; border: 0; outline: 0; =
+font-weight: inherit; font-style: inherit; font-size: 100%; font-family: in=
+herit; vertical-align: baseline; display: block">=20
+                 <td style=3D"margin: 0; padding: 0; border: 0; outline: 0;=
+ font-weight: inherit; font-style: inherit; font-size: 100%; font-family: i=
+nherit; vertical-align: baseline"> <p style=3D"margin: 0 16px; padding: 0; =
+border: 0; outline: 0; font-weight: inherit; font-style: inherit; font-size=
+: 100%; font-family: inherit; vertical-align: baseline">This email was sent=
+ from a notification-only address that cannot accept incoming email. Please=
+ do not reply to this message.</p> </td>=20
+                </tr>=20
+                <tr style=3D"height: 20px; margin: 0; padding: 0; border: 0=
+; outline: 0; font-weight: inherit; font-style: inherit; font-size: 100%; f=
+ont-family: inherit; vertical-align: baseline; display: block"></tr>=20
+                <tr style=3D"margin: 0; padding: 0; border: 0; outline: 0; =
+font-weight: inherit; font-style: inherit; font-size: 100%; font-family: in=
+herit; vertical-align: baseline; display: block">=20
+                 <td style=3D"margin: 0; padding: 0; border: 0; outline: 0;=
+ font-weight: inherit; font-style: inherit; font-size: 100%; font-family: i=
+nherit; vertical-align: baseline"> <a href=3D"https://www.amazon.com/gp/r.h=
+tml?C=3D1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be50=
+69e309d44d2932172dc0310p0na&R=3D3DTXMLL5GARSU&T=3DC&U=3Dhttps%3A%2F%2Fwww.a=
+mazon.com%3Fie%3DUTF8%26ref_%3Dpe_386300_440135490_scr_home&H=3DOMC8XGTIACZ=
+VZLDXP7ENMKVORWAA&ref_=3Dpe_386300_440135490_scr_home" title=3D"Amazon.com"=
+ style=3D"font-size: 13px; color: rgb(0, 113, 133) !important; text-decorat=
+ion: none; font-family: inherit; font-weight: inherit; line-height: inherit=
+; margin: 0; padding: 0; border: 0; outline: 0; font-style: inherit; vertic=
+al-align: baseline"> <img class=3D"rio_amazon_smile" alt=3D"Amazon.com" src=
+=3D"https://m.media-amazon.com/images/G/01/outbound/OutboundTemplates/Smile=
+_Logo_Light._BG240,242,242_.png" height=3D"43" style=3D"width: 86px; height=
+: 43px; display: block; margin: 0; padding: 0; border: 0; outline: 0; font-=
+weight: inherit; font-style: inherit; font-size: 100%; font-family: inherit=
+; vertical-align: baseline; line-height: 100%; text-decoration: none; -ms-i=
+nterpolation-mode: bicubic" /> </a> </td>=20
+                </tr>=20
+               </tbody>
+              </table>=20
+              <!--[if mso]>
+    </td></tr></table>
+    <![endif]--> </td>=20
+            </tr>=20
+           </tbody>
+          </table> </td>=20
+        </tr>=20
+       </tbody>
+      </table> </td>=20
+    </tr>=20
+   </tbody>
+  </table>=20
+  <!--[if mso | IE]></td></tr></table><![endif]-->=20
+  <style type=3D"text/css">
+html, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+=09margin: 0;
+=09padding: 0;
+=09border: 0;
+=09outline: 0;
+=09font-weight: inherit;
+=09font-style: inherit;
+=09font-size: 100%;
+=09font-family: inherit;
+=09vertical-align: baseline;
+}
+
+@media only screen and (max-width: 480px) {
+=09body {
+=09=09width: 375px !important;
+=09}
+=09td.rio_main_td {
+=09=09width: 375px !important;
+=09}
+=09td.rio_body_td {
+=09=09width: 375px !important;
+=09}
+=09.rio_container {
+=09=09width: 375px !important;
+=09}
+}
+
+html {
+=09display: table;
+=09background-color: #FFFFFF;
+=09width: 100%;
+}
+
+body, table {
+=09background: #FFF;
+=09display: block;
+=09-webkit-text-size-adjust: 100%;
+=09-ms-text-size-adjust: 100%;
+=09margin: 0 auto;
+=09padding: 0;
+}
+
+tbody {
+=09display: block;
+}
+
+table {
+=09border-collapse: collapse;
+=09mso-table-lspace: 0pt !important;
+=09mso-table-rspace: 0pt !important;
+}
+
+.rio_container {
+=09cellspacing:0;
+=09width:525px;
+=09margin:0 auto;
+}
+
+.rio_inner_container {
+=09width: 100%;
+}
+
+td.rio_main_td {
+=09width: 525px;
+=09border: 0 !important;
+=09padding: 0 !important;
+=09border-collapse: collapse !important;
+=09margin: 0 auto;
+}
+
+td.rio_body_td {
+=09width: 525px;
+}
+
+
+tr {
+=09vertical-align:top;
+=09display: block;
+}
+
+a {
+=09color: #007185;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+=09font-style: normal;
+=09font-weight: 400;
+=09line-height: 20px;
+=09text-decoration: none;
+=09font-size: 15px;
+}
+
+.rio_link {
+=09color: #007185 !important;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+=09font-style: normal;
+=09font-weight: 400;
+=09line-height: 20px;
+=09text-decoration: none;
+=09font-size: 15px;
+}
+
+p span {
+=09display: block;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+=09font-size: 15px;
+=09color: #0F1111;
+=09font-style: normal;
+=09font-weight: 400;
+=09line-height: 20px;
+}
+
+.rio_footer {
+=09color: #565959;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+=09font-size: 13px;
+=09font-style: normal;
+=09font-weight: 400;
+=09line-height: 18px;
+=09display: block;
+=09background: #F0F2F2;
+}
+
+.rio_footer a {
+=09font-size: 13px;
+=09color: #007185 !important;
+}
+
+.rio_footer p {
+=09margin: 0 16px;
+}
+
+.rio_hz_line {
+=09height: 1px;
+=09background: #D5D9D9;
+=09padding: 0;
+}
+
+.rio_asin_img img {
+=09max-height: 115px;
+=09max-width: 115px;
+=09margin: auto;
+=09display: block;
+=09padding: 8px;
+=09mix-blend-mode: multiply;
+}
+
+.rio_asin_img a {
+=09background-color: transparent;
+}
+
+.rio_asin_img {
+=09background-image: linear-gradient(rgba(15, 17, 17, 0.03), rgba(15, 17, 1=
+7, 0.03));
+=09border-radius: 4px;
+=09display: table-cell;
+=09width: 131px;
+=09height: 131px;
+=09vertical-align: middle;
+=09text-align: center;
+=09isolation: isolate;
+}
+
+img {
+=09border: 0;
+=09height: auto;
+=09line-height: 100%;
+=09outline: none;
+=09text-decoration: none;
+=09-ms-interpolation-mode: bicubic;
+}
+
+.rio_info_alert_icon {
+=09width: 18px;
+=09height: 18px;
+}
+
+.rio_info_alert_icon img{
+=09margin-top: 1px !important;
+=09width: 18px;
+=09height: 18px;
+}
+
+.rio_info_text td {
+=09vertical-align: top;
+}
+
+.rio_info_text a {
+=09color: #007185 !important;
+}
+
+.rio_info_text b {
+=09font-weight: 400;
+}
+
+.rio_critical_info {
+=09color: #494D4D;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+=09font-size: 14px;
+=09font-style: normal;
+=09font-weight: 400;
+=09line-height: 20px;
+=09background-color: #0F8698;
+=09border: 8px #0F8698 solid;
+=09display: block;
+}
+
+.rio_critical_info_inner {
+=09display: inline-table;
+=09table-layout: fixed;
+=09padding: 12px 8px 16px 8px;
+=09background-color: #FFFFFF;
+=09border-radius: 4px;
+}
+
+.rio_btn {
+=09border-radius: 100px;
+=09text-underline-color: #FFD814;
+=09display: inline-block;
+=09mso-padding-alt: 0;
+=09vertical-align: middle;
+=09mso-line-height-rule: at-least;
+}
+
+.rio_btn span {
+=09color: #0F1111;
+=09font-size: 13px;
+=09font-weight: 400;
+=09display: table-cell;
+=09padding: 8px 16px;
+=09line-height: 18px;
+=09vertical-align: middle;
+=09text-align: center;
+=09font-family: "Amazon Ember", Arial, sans-serif;
+}
+
+.rio_td_cta_white {
+    background-color: #FEFEFE;
+    border: 1px solid #D5D9D9;
+    padding: 6px 16px;
+}
+
+.rio_td_cta_yellow {
+    background-color: #FFD814;
+    border: 1px solid #FCD200;
+    padding: 6px 16px;
+}
+
+p span span, .rio_btn span span, .rio_footer p span {
+=09display: inline;
+}
+
+.rio_bg_yellow {
+=09background: #FFD814;
+}
+
+.rio_bg_white {
+=09background: #FFFFFF;
+}
+
+.rio_border_yellow {
+=09border: 1px solid #FCD200 !important;
+}
+
+.rio_border_nickel {
+=09border: 1px solid #D5D9D9 !important;
+}
+
+
+.rio_main_td a {
+=09color: inherit;
+=09text-decoration: none;
+=09font-size: inherit;
+=09font-family: inherit;
+=09font-weight: inherit;
+=09line-height: inherit;
+}
+
+.rio_amazon_logo {
+=09height: 58px;
+=09width: auto;
+=09max-width: 100%;
+=09display: block;
+=09border: 0;
+=09background-color: #FFFFFF;
+}
+
+.rio_lh_20 {
+=09line-height: 20px;
+}
+
+.rio_lh_18 {
+=09line-height: 18px;
+}
+
+.rio_amazon_smile {
+=09width: 86px;
+=09height: 43px;
+=09display: block;
+}
+
+.rio_18_heavy {
+=09color: #0F1111;
+=09font-size: 18px;
+=09font-weight: 700;
+=09line-height: 22px;
+}
+
+.rio_15_heavy_green {
+=09color: #067D62;
+=09font-size: 15px;
+=09font-weight: 700;
+}
+
+.rio_15_heavy_black {
+=09color: #0F1111;
+=09font-size: 15px;
+=09font-weight: 700;
+}
+
+.rio_15_black {
+=09color: #0F1111;
+=09font-size: 15px;
+=09font-weight: 400;
+}
+
+.rio_15_heavy_blue {
+=09color: #007185;
+=09font-size: 15px;
+=09font-weight: 700;
+}
+
+.rio_15_grey {
+=09color: #565959;
+=09font-size: 15px;
+}
+
+.rio_13_grey {
+=09color: #565959;
+=09font-size: 13px;
+}
+
+.rio_13_heavy_grey {
+=09color: #565959;
+=09font-size: 13px;
+=09font-weight: 700;
+}
+
+.rio_13_grey_href {
+=09color: #565959 !important;
+=09font-size: 13px;
+}
+
+.rio_15_grey_order_number {
+=09color: #0F1111;
+=09font-size: 15px;
+}
+
+.rio_summary {
+=09color: #494D4D;
+=09font-size: 14px;
+=09font-weight: 400;
+=09display: block;
+=09background: #FFF;
+=09padding: 16px 16px 16px 16px;
+}
+
+.rio_hero_headline {
+=09color: #0F1111;
+=09font-size: 22px;
+=09font-weight: 700;
+=09line-height: 28px;
+}
+
+.rio_asin_internal_text {
+=09vertical-align: middle;
+}
+
+.rio_no_deco_href {
+=09text-decoration: none;
+}
+
+.rio_micro_space {
+=09margin-top: 4px !important;
+}
+
+.rio_body {
+=09padding: 8px;
+=09background-color: #d5d9d9 !important;
+=09border-spacing: 0;
+}
+
+table {
+=09mso-table-lspace: 0pt !important;
+=09mso-table-rspace: 0pt !important;
+}
+
+.rio_card {
+=09background-color: #FFFFFF;
+=09border-radius: 4px;
+=09padding: 12px 8px 16px 8px;
+=09margin-bottom: 8px !important;
+}
+
+.rio_last_card {
+=09background-color: #FFFFFF;
+=09border-radius: 4px;
+=09padding: 12px 8px 16px 8px;
+=09margin-bottom: 0 !important;
+}
+
+.rio_total_info_card {
+=09background-color: #FFFFFF;
+=09padding: 12px 8px 16px 8px;
+=09margin-bottom: 0 !important;
+=09border-radius: 4px 4px 0 0;
+}
+
+.rio_total_card {
+=09margin-top: 0;
+=09color: #494D4D;
+=09background: #F0F2F2;
+=09padding: 12px 8px 12px 8px !important;
+=09border-radius: 0 0 4px 4px !important;
+}
+
+.rio_total_last_card {
+=09margin-bottom: 0 !important;
+}
+
+.rio_total_card td {
+=09width: 100%;
+}
+
+.rio_total_card tr {
+=09display: table-row;
+}
+
+.rio_allow_wrap {
+    white-space: normal !important;
+}
+
+.rio_no_wrap {
+=09white-space: nowrap !important;
+}
+
+.rio_text_align_right {
+=09text-align: right;
+=09white-space: nowrap !important;
+}
+
+.rio_text_align_left {
+=09text-align: left;
+=09white-space: nowrap !important;
+}
+
+.rio_order_total_metadata a {
+=09color: #007185 !important;
+}
+
+#outlook a {
+=09padding: 0;
+}
+
+#rio_container #rio_inner_container p span a[x-apple-data-detectors=3Dtrue]=
+{
+=09color: inherit !important;
+=09-webkit-text-decoration-color: inherit !important;
+=09text-decoration: inherit !important;
+}
+
+    .rio_card_v2 , .rio_card_b2b_asin_override {
+        background-color: #FFFFFF;
+        border-radius: 4px;
+        padding: 12px 8px 16px 8px;
+        margin-bottom: 0px !important;
+        margin-top: 8px !important;
+    }
+
+    .rio_total_info_card {
+        margin-top: 8px !important;
+    }
+
+    .rio_card_v2 a {
+        color: #007185 !important;
+    }
+
+    rio_card_b2b_asin_override {
+        color: #007185;
+    }
+
+    .rio_card_v2 b , .rio_card_b2b_asin_override b {
+        font-weight: 400;
+    }
+
+    .order_total_or_less_text_style {
+        display: inline !important;
+    }
+
+    .base_total_text_style {
+        display: inline !important;
+        font-weight: 700;
+    }
+
+    .rio_total_card {
+        border-radius: 0 0 4px 4px !important;
+    }
+
+    .rio_micro_space {
+        margin-top: 4px !important;
+    }
+   =20
+    .rio_15_heavy_black a {
+        color: #007185 !important;
+    }
+
+    .rio_info_text span {
+        color: #0F1111 !important;
+        font-size: 15px;
+    }
+
+    .rio_13_grey a {
+        color: #007185 !important;
+    }
+
+    .rio_inline_link_span a {
+        color: #007185 !important;
+    }
+
+    .fan_funded_metadata strong {
+        font-weight: 700 !important;
+    }
+
+    .fan_funded_metadata td {
+        padding: 0 0 0 16px;
+    }
+   =20
+    .fan_funded_metadata ol {
+        font-family: 'Amazon Ember', Arial, sans-serif;
+    }
+
+    .fan_funded_metadata li {
+        padding: 4px 0 0 0;
+    }
+
+    .rio_word_break {
+        word-break: break-word;
+    }
+
+    .rio_asin_card_img_td {
+        vertical-align: top;
+    }
+
+    .rio_asin_metadata_13_grey {
+        color: #565959;
+        font-size: 13px;
+    }
+
+    .rio_asin_metadata_13_grey a {
+        color: #565959 !important;
+    }
+
+    .rio_primeLogo {
+        vertical-align: middle;
+        width: 53px;
+        height: 17px;
+        padding: 0px 0px 0.9px 0px;
+    }
+
+    .amabotBanner .amabotImageContainer {
+        width: 44px;
+        text-align: center;
+    }
+
+    .amabotBanner .amabotImage {
+        width: 44px;
+        display: block;
+    }
+
+    .amabotBanner .amabotTextContainer {
+        vertical-align: middle
+    }
+
+</style>=20
+  <!--[if mso]>
+<noscript>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:AllowPNG/>
+            <o:PixelsPerInch>96</o:PixelsPerInch>
+        </o:OfficeDocumentSettings>
+    </xml>
+</noscript>
+<![endif]--> =20
+ <img width=3D"1" height=3D"1" src=3D"https://www.amazon.com/gp/r.html?C=3D=
+1GDZONJ9HF37K&K=3D3Q5NGOBQM4MTL&M=3Durn:rtn:msg:202409190145189be5069e309d4=
+4d2932172dc0310p0na&R=3D1G02ZH51MQHTF&T=3DE&U=3Dhttps%3A%2F%2Fimages-na.ssl=
+-images-amazon.com%2Fimages%2FG%2F01%2Fnav%2Ftransp.gif&H=3DWOEX0PLGLIIK928=
+VZCBFLJPHIYGA&ref_=3Dpe_386300_440135490_open" /></body>
+</html>
+------=_Part_6144537_254204381.1726710318691--

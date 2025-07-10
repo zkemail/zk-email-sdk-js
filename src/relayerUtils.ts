@@ -130,6 +130,7 @@ export async function testBlueprint(
   }
 
   const header = parsedEmail.canonicalizedHeader;
+  console.log("header: ", header);
 
   console.log("checkInputLengths");
   await checkInputLengths(header, body, blueprint);

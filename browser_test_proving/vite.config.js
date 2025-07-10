@@ -10,6 +10,13 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+    },
+    fs: {
+      allow: ['..']
+    }
   },
   preview: {
     port: 3000,
@@ -21,6 +28,17 @@ export default defineConfig({
       ...rollupNodePolyfills(), // Polyfills Node.js modules
       apply: "build",
     },
+    {
+      name: 'wasm-mime',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url?.endsWith('.wasm')) {
+            res.setHeader('Content-Type', 'application/wasm');
+          }
+          next();
+        });
+      }
+    }
   ],
   resolve: {
     alias: {
@@ -77,5 +95,7 @@ export default defineConfig({
         }),
       ],
     },
+    exclude: ['@noir-lang/noir_js', '@aztec/bb.js'],
   },
+  assetsInclude: ['**/*.wasm'],
 });

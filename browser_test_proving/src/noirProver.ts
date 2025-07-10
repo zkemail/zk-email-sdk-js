@@ -1,5 +1,6 @@
 import zkeSdk, { GenerateProofOptions } from "../../src";
-import { initNoirWasm } from "@zk-email/sdk/initNoirWasm";
+// import { initNoirWasm } from "@zk-email/sdk/initNoirWasm";
+import { initNoirWasm } from "../../src/initNoirWasm";
 
 export function setupNoirProver(element: HTMLElement) {
   const sdk = zkeSdk({
@@ -18,28 +19,27 @@ export function setupNoirProver(element: HTMLElement) {
       try {
         console.log("getting blueprint");
         // const blueprint = await sdk.getBlueprintById("4c67a6fe-6202-40ff-8672-9dbe02e5cb52");
-        const blueprint = await sdk.getBlueprintById("1fc25bf2-bfce-430f-9d0e-447a02cc7864");
+        const blueprint = await sdk.getBlueprintById("31e8b732-9bef-40f4-9224-5440b8b2ae5b");
 
         console.log("blueprint: ", blueprint);
 
-        const prover = blueprint.createProver({ isLocal: true });
+        const prover = blueprint.createProver();
         console.log("prover");
         console.log("typeof prover", typeof prover);
 
         const eml = await getEml();
 
-        // try {
-        //   const isValidEml = await blueprint.validateEmail(eml!);
-        //   console.log("isValidEml: ", isValidEml);
-        // } catch (err) {
-        //   console.error("Email is not valid: ", err);
-        // }
+        try {
+          const isValidEml = await blueprint.validateEmail(eml!);
+          console.log("isValidEml: ", isValidEml);
+        } catch (err) {
+          console.error("Email is not valid: ", err);
+        }
 
         // console.log("putting in eml: ", eml);
         const externalInputs = {
-          name: "name",
-          value: "master",
-          maxLength: 32,
+          name: "owner",
+          value: "me",
         };
         const noirWasm = await initNoirWasm();
         const options: GenerateProofOptions = { noirWasm };
@@ -67,7 +67,7 @@ export function setupNoirProver(element: HTMLElement) {
 
 async function getEml() {
   try {
-    const response = await fetch("/amazon.eml"); // URL is relative to the root of the project
+    const response = await fetch("/amazonjp.eml"); // URL is relative to the root of the project
     if (!response.ok) {
       throw new Error("Network response was not ok " + response.statusText);
     }

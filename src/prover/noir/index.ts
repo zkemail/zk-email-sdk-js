@@ -119,7 +119,9 @@ export class NoirProver extends AbstractProver implements IProver {
 
     const compiledProgram = circuit as any;
 
+    console.log("new noir");
     const noir = new Noir(compiledProgram);
+    console.log("got new noir");
     // TODO: we can use threads here, although not defining threads is the same speed
     // const backend = new UltraHonkBackend(circuit.bytecode, threads ? { threads } : {});
     const backend = new UltraHonkBackend(compiledProgram.bytecode);
@@ -138,6 +140,7 @@ export class NoirProver extends AbstractProver implements IProver {
     // delete circuitInputsObject.dkim_header_sequence;
 
     logger.time("witness");
+    console.log("getting noir");
     const { witness } = await noir.execute(circuitInputsObject);
     logger.timeEnd("witness");
 
