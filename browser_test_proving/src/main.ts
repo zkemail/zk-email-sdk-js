@@ -2,7 +2,7 @@ import "./style.css";
 import { setupProver } from "./prover.ts";
 import { setupLoginWithGoogle } from "./loginWithGoogle.ts";
 import { setupLoginWithMicrosoft } from "./loginWithMicrosoft.ts";
-import { setupNoirProver } from "./noirProver.ts";
+// import { setupNoirProver } from "./noirProver.ts";
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
   <div>
@@ -33,4 +33,4 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
 setupProver(document.querySelector<HTMLElement>("#prover")!);
 setupLoginWithGoogle(document.querySelector<HTMLElement>("#lwg")!);
 setupLoginWithMicrosoft(document.querySelector<HTMLElement>("#lwm")!);
-setupNoirProver(document.querySelector<HTMLElement>("#noir-prover")!);
+// setupNoirProver(document.querySelector<HTMLElement>("#noir-prover")!);

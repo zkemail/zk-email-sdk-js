@@ -94,6 +94,7 @@ export interface OutlookEmailResponse {
   subject: string;
   receivedDateTime: string;
   internetMessageId: string;
+  internetMessageHeaders: { name: string; value: string }[];
   body: {
     content: string;
     contentType: string;
@@ -309,38 +310,77 @@ export class Outlook implements EmailProvider {
       `Date: ${email.receivedDateTime}`,
       `Subject: ${email.subject || "No Subject"}`,
       "MIME-Version: 1.0",
+      `From: ${email.internetMessageHeaders?.find((header) => header.name === "From")?.value}`,
       `Content-Type: ${email.body.contentType}; charset=UTF-8`,
+      `DKIM-Signature: ${email.internetMessageHeaders?.find((header) => header.name === "DKIM-Signature")?.value}`,
       "",
     ].join("\r\n");
 
     return headers + "\r\n" + email.body.content;
   }
 
+  private createRawValidEmail(email: RawOutlookEmailResponse): string {
+    console.log("email: ", email);
+    const dkimHeaderLine =
+      "DKIM-Signature: " +
+      email.internetMessageHeaders?.find((header) => header.name === "DKIM-Signature")?.value;
+
+    // Split the decodedContents into headers and body
+    // The first occurrence of "\r\n\r\n" separates headers from body.
+    const parts = email.body.content.split("\r\n\r\n", 2); // Split at most twice
+    const headersPart = parts[0];
+    const bodyPart = parts[1] || ""; // In case there's no body, though unlikely for an email
+
+    // Insert the DKIM-Signature line into the headers.
+    // Find the Content-Type header and insert after it.
+    const headerLines = headersPart.split("\r\n");
+    let newHeaderLines = [];
+    let inserted = false;
+
+    for (const line of headerLines) {
+      newHeaderLines.push(line);
+      if (line.toLowerCase().startsWith("content-type:")) {
+        newHeaderLines.push(dkimHeaderLine);
+        inserted = true;
+      }
+    }
+
+    // If for some reason Content-Type wasn't found, insert it before the last blank line.
+    // This fallback should rarely be hit with valid email data.
+    if (!inserted) {
+      console.warn(
+        "Content-Type header not found. Inserting DKIM-Signature before the body separator."
+      );
+      // Reconstruct without the newHeaderLines logic, just append before body
+      const fullEmlContent = headersPart + "\r\n" + dkimHeaderLine + "\r\n\r\n" + bodyPart;
+      return fullEmlContent;
+    } else {
+      const fullEmlContent = newHeaderLines.join("\r\n") + "\r\n\r\n" + bodyPart;
+      return fullEmlContent;
+    }
+  }
+
   // Get a specific email by ID in its raw format
-  async fetchEmailRawById(accessToken: string, emailId: string): Promise<RawOutlookEmailResponse> {
-    const url = `https://graph.microsoft.com/v1.0/me/messages/${emailId}?$select=id,subject,receivedDateTime,internetMessageId,body`;
+  async fetchEmailRawById(emailId: string): Promise<RawOutlookEmailResponse> {
+    const accessToken = await this.loginWithMicrosoft.getAccessToken();
+
+    const url = `https://graph.microsoft.com/v1.0/me/messages/${emailId}/$value`;
 
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
       },
     });
 
     if (response.ok) {
-      const email: OutlookEmailResponse = await response.json();
-
-      // Convert to raw format
-      let rawContent = email.body.content;
-      if (email.body.contentType === "html") {
-        rawContent = this.constructRawEmail(email);
-      }
+      const rawEmail = await response.text();
+      const subject = rawEmail.match(/Subject: (.*)/)?.[1] || "No Subject";
 
       return {
-        emailMessageId: email.id,
-        subject: email.subject || "No Subject",
-        internalDate: email.receivedDateTime,
-        decodedContents: rawContent,
+        decodedContents: rawEmail,
+        emailMessageId: emailId,
+        subject,
+        internalDate: rawEmail.match(/Date: (.*)/)?.[1] || new Date().toISOString(),
       };
     } else {
       logger.error(`Failed to fetch email with ID: ${emailId}`, response);
