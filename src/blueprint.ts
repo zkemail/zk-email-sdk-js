@@ -903,7 +903,7 @@ export class Blueprint {
   }
   
   async getCircomRegexGraphsDownloadLink(): Promise<string> {
-    if (this.props.clientStatus !== Status.Done || this.props.serverStatus !== Status.Done) {
+    if (this.props.clientStatus !== Status.Done && this.props.serverStatus !== Status.Done) {
       throw new Error("The circuits are not compiled yet, nothing to download.");
     }
 
@@ -947,7 +947,7 @@ export class Blueprint {
   }
   
   async getCircomRegexGraphs(): Promise<any> {
-    if (this.props.clientZkFramework !== ZkFramework.Circom || this.props.serverZkFramework !== ZkFramework.Circom) {
+    if (this.props.clientZkFramework !== ZkFramework.Circom && this.props.serverZkFramework !== ZkFramework.Circom) {
       throw new Error("Only a circom blueprint has a circom circuit");
     }
 
