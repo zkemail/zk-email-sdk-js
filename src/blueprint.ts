@@ -875,6 +875,28 @@ export class Blueprint {
 
     return response.url;
   }
+  
+  async getCircomCircuitJsonDownloadLink(): Promise<string> {
+    if (this.props.clientStatus !== Status.Done || this.props.serverStatus !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(
+        `${this.baseUrl}/blueprint/circom-circuit-json/${this.props.id}`
+      );
+    } catch (err) {
+      console.error(
+        "Failed calling GET on /blueprint/circom-circuit/:id in getCircomCircuitDownloadLink: ",
+        err
+      );
+      throw err;
+    }
+
+    return response.url;
+  }
+  
 
   async getNoirRegexGraphsDownloadLink(): Promise<string> {
     if (this.props.clientStatus !== Status.Done) {
@@ -900,6 +922,27 @@ export class Blueprint {
 
     return response.url;
   }
+  
+  async getCircomRegexGraphsDownloadLink(): Promise<string> {
+    if (this.props.clientStatus !== Status.Done || this.props.serverStatus !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
+
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(
+        `${this.baseUrl}/blueprint/circom-regex-graphs/${this.props.id}`
+      );
+    } catch (err) {
+      console.error(
+        "Failed calling GET on /blueprint/circom-regex-graphs/:id in getCircomCircuitDownloadLink: ",
+        err
+      );
+      throw err;
+    }
+
+    return response.url;
+  }
 
   async getNoirCircuit(): Promise<any> {
     if (this.props.clientZkFramework !== ZkFramework.Noir) {
@@ -911,6 +954,17 @@ export class Blueprint {
     const circuit = await downloadJsonFromUrl<any>(circuitUrl);
     return circuit;
   }
+  
+  async getCircomCircuit(): Promise<any> {
+    if (this.props.clientZkFramework !== ZkFramework.Circom || this.props.serverZkFramework !== ZkFramework.Circom ) {
+      throw new Error("Only a circom blueprint has a circom circuit");
+    }
+
+    const circuitUrl = await this.getCircomCircuitJsonDownloadLink();
+    // TODO: type circuit
+    const circuit = await downloadJsonFromUrl<any>(circuitUrl);
+    return circuit;
+  }
 
   async getNoirRegexGraphs(): Promise<any> {
     if (this.props.clientZkFramework !== ZkFramework.Noir) {
@@ -918,6 +972,18 @@ export class Blueprint {
     }
 
     const url = await this.getNoirRegexGraphsDownloadLink();
+    const data = await downloadAndUnzipFile(url);
+    logger.debug("data: ", data);
+
+    return data;
+  }
+  
+  async getCircomRegexGraphs(): Promise<any> {
+    if (this.props.clientZkFramework !== ZkFramework.Circom || this.props.serverZkFramework !== ZkFramework.Circom) {
+      throw new Error("Only a circom blueprint has a circom circuit");
+    }
+
+    const url = await this.getCircomRegexGraphsDownloadLink();
     const data = await downloadAndUnzipFile(url);
     logger.debug("data: ", data);
 
