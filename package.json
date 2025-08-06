@@ -1,6 +1,6 @@
 {
   "name": "@zk-email/sdk",
-  "version": "1.4.2-3",
+  "version": "1.4.2-6",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/zk-email-sdk.es.js",
@@ -26,7 +26,7 @@
     "build-old": "bunx tsup src/index.ts src/localProverWorker.ts --format esm,cjs --dts",
     "build": "vite build",
     "build-prove-worker": "bun x vite build --config vite.config.worker.ts && bun scripts/escape_str_chars.js",
-    "publish": "bun run build && npm publish --access public",
+    "publish:new": "bun run build && npm publish --access public",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist",
@@ -42,9 +42,9 @@
   "license": "MIT",
   "devDependencies": {
     "@aztec/bb.js": "0.82.2",
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@noir-lang/noir_js": "1.0.0-beta.6",
     "@noir-lang/noirc_abi": "1.0.0-beta.6",
-    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@rollup/plugin-inject": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
