@@ -68,7 +68,20 @@ self.onmessage = async function (event) {
       await downloadFromUrl(url, `${circuitName}.zkey${suffix}`, true);
     })
   );
+
+  self.postMessage({ type: "progress", message: "Downloading the wasm file" });
+  await downloadFromUrl(wasmUrl, `${circuitName}.wasm` ,false);
   self.postMessage({ type: "message", message: "Download complete" });
+
+  // Concatenate chunks back together
+  self.postMessage({ type: "progress", message: "Preparing circuit files" });
+  const zkeyChunks = [];
+  for (const { suffix } of chunkedZkeyUrls) {
+    const chunk = await localforage.getItem(`${circuitName}.zkey${suffix}`);
+    if (chunk) {
+      zkeyChunks.push(new Uint8Array(chunk));
+    }
+  }
 
   let concatenatedZkey;
   if (zkeyChunks.length > 0) {
@@ -90,12 +103,21 @@ self.onmessage = async function (event) {
     throw new Error("ZKey file not found - no chunks were downloaded successfully");
   }
 
+  let wasmFile = await localforage.getItem(`${circuitName}.wasm`);
+  if (wasmFile instanceof ArrayBuffer) {
+    wasmFile = new Uint8Array(wasmFile);
+  }
+  if (!wasmFile) {
+    throw new Error("WASM file not found - download may have failed");
+  }
+  
   try {
     self.postMessage({ type: "progress", message: "Proving" });
+    
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(
       JSON.parse(inputs),
-      wasmUrl,
-      `${circuitName}.zkey`
+      wasmFile,
+      circuitfile
     );
 
     await localforage.clear();
