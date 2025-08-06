@@ -70,6 +70,26 @@ self.onmessage = async function (event) {
   );
   self.postMessage({ type: "message", message: "Download complete" });
 
+  let concatenatedZkey;
+  if (zkeyChunks.length > 0) {
+    const totalLength = zkeyChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+    concatenatedZkey = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of zkeyChunks) {
+      concatenatedZkey.set(chunk, offset);
+      offset += chunk.length;
+    }
+    await localforage.setItem(`${circuitName}.zkey`, concatenatedZkey);
+  }
+
+  let circuitfile = await localforage.getItem(`${circuitName}.zkey`);
+  if (circuitfile instanceof ArrayBuffer) {
+    circuitfile = new Uint8Array(circuitfile);
+  }
+  if (!circuitfile) {
+    throw new Error("ZKey file not found - no chunks were downloaded successfully");
+  }
+
   try {
     self.postMessage({ type: "progress", message: "Proving" });
     const { proof, publicSignals } = await snarkjs.groth16.fullProve(
