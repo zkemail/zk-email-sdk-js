@@ -47,7 +47,8 @@ export async function post<T>(url: string, data?: object | null, auth?: Auth): P
       if (response.status === 401) {
         auth!.onTokenExpired();
       }
-      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
+      const errorMessage = typeof body === 'object' ? JSON.stringify(body) : String(body);
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorMessage}`);
     }
 
     return body;
@@ -179,7 +180,8 @@ export async function del<T>(url: string, data?: object | null, auth?: Auth): Pr
       if (response.status === 401) {
         auth!.onTokenExpired();
       }
-      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
+      const errorMessage = typeof body === 'object' ? JSON.stringify(body) : String(body);
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorMessage}`);
     }
 
     return body;
