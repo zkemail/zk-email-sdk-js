@@ -1,4 +1,6 @@
 import { Blueprint, BlueprintProps, ListBlueprintsOptions } from "./blueprint";
+import { BlueprintCollection } from "./blueprintCollection";
+import { BlueprintCollectionProps, ListBlueprintCollectionsOptions } from "./types/blueprintCollection";
 import { Proof } from "./proof";
 import { SdkOptions } from "./types/sdk";
 import { getStarredBlueprints } from "./user";
@@ -7,6 +9,7 @@ import { logger } from "./utils/logger";
 // Export Types
 export * from "./types/blueprint";
 export { Blueprint } from "./blueprint";
+export { BlueprintCollection } from "./blueprintCollection";
 export * from "./types/proof";
 export { Proof } from "./proof";
 export * from "./types/prover";
@@ -57,6 +60,23 @@ export default (sdkOptions?: SdkOptions) => {
     },
     async listBlueprints(options?: ListBlueprintsOptions): Promise<Blueprint[]> {
       return Blueprint.listBlueprints(baseUrl, options, sdkOptions?.auth);
+    },
+    // Blueprint Collection methods
+    createBlueprintCollection(props: BlueprintCollectionProps) {
+      if (!sdkOptions && !sdkOptions!.auth) {
+        throw new Error("You need to specify options.auth to use createBlueprintCollection");
+      }
+      const collection = new BlueprintCollection(props, baseUrl, sdkOptions!.auth);
+      return collection;
+    },
+    async getBlueprintCollection(slug: string): Promise<BlueprintCollection> {
+      return BlueprintCollection.getBlueprintCollectionBySlug(slug, baseUrl, sdkOptions?.auth);
+    },
+    async getBlueprintCollectionById(id: string): Promise<BlueprintCollection> {
+      return BlueprintCollection.getBlueprintCollectionById(id, baseUrl, sdkOptions?.auth);
+    },
+    async listBlueprintCollections(options?: ListBlueprintCollectionsOptions): Promise<BlueprintCollection[]> {
+      return BlueprintCollection.listBlueprintCollections(baseUrl, options, sdkOptions?.auth);
     },
     async getProof(id: string): Promise<Proof> {
       return Proof.getProofById(id, baseUrl);
