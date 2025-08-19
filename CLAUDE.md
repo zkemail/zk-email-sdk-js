@@ -17,8 +17,24 @@ This is the **ZK Email SDK**, a TypeScript library that enables creating zero-kn
 ### Testing
 Tests are currently not working due to api changes, please don't use for now.
 
-### Publishing
-Do not publish yourself
+### Publishing & Versioning
+
+#### Changelog Management
+When making changes:
+1. Add entries to `[Unreleased]` section in CHANGELOG.md
+2. Use categories: Added, Changed, Deprecated, Removed, Fixed, Security
+3. Mark breaking changes with `**BREAKING**` and provide migration examples
+
+#### Version Bumping
+Follow semantic versioning:
+- MAJOR (2.0.0): Breaking changes (e.g., export pattern changes)
+- MINOR (1.X.0): New features, backwards compatible
+- PATCH (1.0.X): Bug fixes
+
+#### Publishing Process
+Do not publish yourself. For reference:
+- **Nightly**: Version with suffix (e.g., 1.4.0-18), keep changes in `[Unreleased]`
+- **Production**: Update version, move `[Unreleased]` to `[X.X.X] - YYYY-MM-DD`, create new `[Unreleased]`
 
 ### Core Classes
 - **`Blueprint`** (`src/types/Blueprint.ts`) - Manages regex patterns and circuit compilation

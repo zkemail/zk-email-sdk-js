@@ -48,16 +48,38 @@ To generate the `localProverWorkerString.ts` file which is passed into the worke
 
 `bun run build-prove-worker`.
 
+## Changelog Management
+
+When making changes to the SDK:
+
+1. **For ongoing development**: Add your changes to the `[Unreleased]` section in `CHANGELOG.md`
+2. **Categories to use**:
+   - `Added` for new features
+   - `Changed` for changes in existing functionality
+   - `Deprecated` for soon-to-be removed features
+   - `Removed` for now removed features
+   - `Fixed` for any bug fixes
+   - `Security` for vulnerability fixes
+
+3. **Breaking changes**: Mark with `**BREAKING**` and provide migration examples
+
 ## Publish to npm
 
 ### Publish nightly for testing
 
-Bump the version in `package.json`, use a trailing version number, starting with `-1`, e.g. `0.0.86-6`.
-
-Run `bun run publish-nightly`.
+1. Bump the version in `package.json`, use a trailing version number, starting with `-1`, e.g. `0.0.86-6`
+2. Keep changes in the `[Unreleased]` section of CHANGELOG.md
+3. Run `bun run publish-nightly`
 
 ### Publish new production version
 
-Bump the version in `package.json`, using this format: `0.0.86`.
+1. Bump the version in `package.json`, using semantic versioning:
+   - MAJOR version (X.0.0) for breaking changes
+   - MINOR version (0.X.0) for new features
+   - PATCH version (0.0.X) for bug fixes
 
-Run `bun run publish`.
+2. Update `CHANGELOG.md`:
+   - Change `[Unreleased]` to `[X.X.X] - YYYY-MM-DD` with the new version and date
+   - Add a new empty `[Unreleased]` section at the top
+
+3. Run `bun run publish`

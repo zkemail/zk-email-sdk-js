@@ -1,0 +1,35 @@
+# Changelog
+
+All notable changes to the ZK Email SDK will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [2.0.0] - 2025-01-19
+
+### Changed
+- **BREAKING**: Changed from default export to named export `initZkEmailSdk`
+  - Before: `import zkEmailSdk from '@zk-email/sdk'`
+  - After: `import { initZkEmailSdk } from '@zk-email/sdk'`
+- Improved dual package support for both ESM and CommonJS
+- Set Circom as the default ZK framework
+
+### Added
+- Support for custom Google OAuth client ID configuration
+- Buffer polyfill for better browser compatibility
+- Enhanced browser testing setup
+
+### Fixed
+- Removed duplicate HTML closing tags in browser test files
+- Cleaned up redundant dependencies in browser test package.json
+
+## [1.3.0-3] - Previous Release
+
+### Added
+- Initial SDK implementation with Blueprint system
+- Support for Gmail and Outlook OAuth flows
+- Local and remote proof generation
+- Web Worker for browser-based proving
+- SP1, Circom, and Noir prover implementations
