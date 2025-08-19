@@ -36,6 +36,45 @@ Do not publish yourself. For reference:
 - **Nightly**: Version with suffix (e.g., 1.4.0-18), keep changes in `[Unreleased]`
 - **Production**: Update version, move `[Unreleased]` to `[X.X.X] - YYYY-MM-DD`, create new `[Unreleased]`
 
+### Automated Release Commands
+
+When the user asks to "release", "publish", or "create a new version", follow these steps:
+
+1. **Analyze Changes**: Check CHANGELOG.md `[Unreleased]` section to determine version type:
+   - Breaking changes → Major
+   - New features → Minor
+   - Bug fixes → Patch
+
+2. **Pre-release Checks**:
+   ```bash
+   git status  # Must be clean
+   git branch  # Should be on main
+   grep "\[Unreleased\]" CHANGELOG.md  # Must have content
+   ```
+
+3. **Execute Release**:
+   ```bash
+   # Use the release script
+   ./scripts/release.sh [patch|minor|major]
+   ```
+   
+   Or manually:
+   - Update package.json version
+   - Update CHANGELOG.md (move Unreleased to versioned section)
+   - Commit with "chore: release vX.X.X"
+   - Tag with vX.X.X
+   - Run `bun run publish`
+   - Push commits and tags
+   - Create GitHub release
+
+4. **Inform User**: Report the new version number and provide npm/GitHub links
+
+Example user prompts that trigger this:
+- "Release a new version"
+- "Can you publish this to npm?"
+- "Do a patch release"
+- "Release version 2.1.0"
+
 ### Core Classes
 - **`Blueprint`** (`src/types/Blueprint.ts`) - Manages regex patterns and circuit compilation
 - **`Prover`** (`src/prover/`) - Abstract base with SP1 and Circom implementation, NoirProver implementation seperate. User for proof generation.
