@@ -34,7 +34,12 @@
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist",
-    "publish-nightly": "bun run build && npm publish --access public --tag nightly"
+    "publish-nightly": "bun run build && npm publish --access public --tag nightly",
+    "release:patch": "npm version patch && bun run release",
+    "release:minor": "npm version minor && bun run release",
+    "release:major": "npm version major && bun run release",
+    "release": "bun run publish && git push && git push --tags && gh release create v$npm_package_version --generate-notes",
+    "changelog": "echo 'Please update CHANGELOG.md manually before releasing'"
   },
   "keywords": [
     "zk",
