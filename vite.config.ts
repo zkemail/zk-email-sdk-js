@@ -21,11 +21,15 @@ export default defineConfig({
       formats: ["es", "cjs"],
       // The output file name base
       fileName: (format, entryName) => {
-        return `zk-email-sdk.${entryName}.${format}.js`;
+        const extension = format === 'es' ? 'mjs' : 'cjs';
+        return `zk-email-sdk.${entryName}.${extension}`;
       },
     },
     // If you don't want certain deps bundled, put them in external: [...]
     rollupOptions: {
+      output: {
+        exports: "named",
+      },
       plugins: [
         // So we get declaration files
         typescript({

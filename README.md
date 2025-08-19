@@ -21,19 +21,19 @@ The SDK includes comprehensive logging capabilities that are **silent by default
 ### Basic Usage
 
 ```ts
-import zkeSdk from "@zk-email/sdk";
+import { initZkEmailSdk } from "@zk-email/sdk";
 
 // Silent by default (no logs)
-const sdk = zkSdk();
+const sdk = initZkEmailSdk();
 
 // Enable error-level logging only
-const sdk = zkSdk({ logging: { enabled: true } });
+const sdk = initZkEmailSdk({ logging: { enabled: true } });
 
 // Enable all logs including debug information
-const sdk = zkSdk({ logging: { level: 'debug', enabled: true } });
+const sdk = initZkEmailSdk({ logging: { level: 'debug', enabled: true } });
 
 // Completely disable all logging
-const sdk = zkSdk({ logging: { enabled: false } });
+const sdk = initZkEmailSdk({ logging: { enabled: false } });
 ```
 
 ### Log Levels
@@ -59,16 +59,16 @@ The SDK supports the following log levels in order of verbosity:
 
 ```ts
 // Show only errors (recommended for production)
-const sdk = zkSdk({ logging: { enabled: true } });
+const sdk = initZkEmailSdk({ logging: { enabled: true } });
 
 // Show errors and warnings
-const sdk = zkSdk({ logging: { level: 'warn', enabled: true } });
+const sdk = initZkEmailSdk({ logging: { level: 'warn', enabled: true } });
 
 // Show all logs for debugging
-const sdk = zkSdk({ logging: { level: 'debug', enabled: true } });
+const sdk = initZkEmailSdk({ logging: { level: 'debug', enabled: true } });
 
 // Completely silent
-const sdk = zkSdk({ logging: { enabled: false } });
+const sdk = initZkEmailSdk({ logging: { enabled: false } });
 ```
 
 ## Create a blueprint
@@ -81,8 +81,8 @@ we will provide the documentation for this shortly.
 Initialize the SDK:
 
 ```ts
-import zkeSdk from "@zk-email/sdk";
-const sdk = zkSdk();
+import { initZkEmailSdk } from "@zk-email/sdk";
+const sdk = initZkEmailSdk();
 ```
 
 Next, obtain the slug of the blueprint you want to create a proof for from our [registry](https://registry.zk.email).
@@ -163,10 +163,10 @@ You can use the sdks' `Gmail` utility class to fetch users emails according to t
 **NOTE:** This will only work if you approved your domain with us.
 
 ```ts
-import zkeSdk, { Gmail } from "@zk-email/sdk";
+import { initZkEmailSdk, Gmail } from "@zk-email/sdk";
 
 const gmail = new Gmail();
-const sdk = zkeSdk();
+const sdk = initZkEmailSdk();
 
 // optional - manually start Login with Google flow and authorize before fetching emails
 await gmail.authorize();

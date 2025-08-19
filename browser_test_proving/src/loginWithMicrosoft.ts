@@ -1,8 +1,8 @@
-import zkeSdk, { FetchEmailOptions, Outlook } from "../../src/index";
+import { initZkEmailSdk, FetchEmailOptions, Outlook } from "../../src/index";
 // import zkeSdk, { FetchEmailOptoins, Gmail } from "../../src/index";
 
 export function setupLoginWithMicrosoft(element: HTMLElement) {
-  const sdk = zkeSdk();
+  const sdk = initZkEmailSdk();
   const outlook = new Outlook();
 
   const loginButton = element.querySelector("button");

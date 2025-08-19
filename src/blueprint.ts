@@ -141,8 +141,8 @@ export class Blueprint {
       senderDomain: response.sender_domain,
       enableHeaderMasking: response.enable_header_masking,
       enableBodyMasking: response.enable_body_masking,
-      clientZkFramework: (response.client_zk_framework as ZkFramework) || ZkFramework.None,
-      serverZkFramework: (response.server_zk_framework as ZkFramework) || ZkFramework.None,
+      clientZkFramework: (response.client_zk_framework as ZkFramework) || ZkFramework.Circom,
+      serverZkFramework: (response.server_zk_framework as ZkFramework) || ZkFramework.Circom,
       isPublic: response.is_public,
       createdAt: new Date(response.created_at.seconds * 1000),
       updatedAt: new Date(response.updated_at.seconds * 1000),
@@ -792,7 +792,7 @@ export class Blueprint {
         this.auth
       );
     } catch (err) {
-      logger.error("Failed calling DELETE on /blueprint/${id} in cancelCompilation: ", err);
+      logger.error("Failed calling DELETE on /blueprint/${id} in delete: ", err);
       throw err;
     }
   }
@@ -953,11 +953,12 @@ export class Blueprint {
       this.props.serverStatus === Status.Done &&
       this.props.serverZkFramework === ZkFramework.Circom;
 
-    if (!hasValidClientCircuit && !hasValidServerCircuit) {
-      throw new Error(
-        "At least one circuit (client or server) must be compiled with Circom to download."
-      );
-    }
+    // TODO: add back
+    // if (!hasValidClientCircuit && !hasValidServerCircuit) {
+    //   throw new Error(
+    //     "At least one circuit (client or server) must be compiled with Circom to download."
+    //   );
+    // }
 
     let response: { url: string };
     try {
