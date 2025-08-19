@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2025-01-19
+
+### Fixed
+- Updated README documentation to reflect the new named export pattern (`initZkEmailSdk`)
+- Corrected all usage examples and import statements in documentation
+
 ## [2.0.0] - 2025-01-19
 
 ### Changed
