@@ -134,7 +134,8 @@ export abstract class AbstractProver implements IProver {
         eml,
         this.blueprint.props.decomposedRegexes,
         externalInputsWithMaxLength,
-        params
+        params,
+        this.blueprint
       );
 
       logger.debug("got proof inputs: ", inputs);

@@ -75,10 +75,17 @@ export class NoirProver extends AbstractProver implements IProver {
       return {
         name: dr.name,
         regex_graph_json: JSON.stringify(regexGraph),
-        haystack,
         haystack_location,
         max_haystack_length: maxHaystackLength,
-        max_match_length: dr.maxLength,
+        max_match_length: dr.maxMatchLength || dr.maxLength,
+        parts: dr.parts.map((p) => ({
+          // @ts-ignore
+          is_public: p.isPublic || !!p.is_public,
+          // @ts-ignore
+          regex_def: p.regexDef || !!p.regex_def,
+          // @ts-ignore
+          ...(p.isPublic && { maxLength:  p.maxLength || !!p.max_length }),         
+        })),
         proving_framework: "noir",
       };
     });
@@ -92,9 +99,9 @@ export class NoirProver extends AbstractProver implements IProver {
       proverEthAddress: "0x0000000000000000000000000000000000000000",
     };
 
-    logger.debug("generating inputs regexInputs: ", regexInputs);
-    logger.debug("generating inputs externalInputs: ", externalInputs);
-    logger.debug("generating inputs noirParams: ", noirParams);
+    logger.info("generating inputs regexInputs: ", regexInputs);
+    logger.info("generating inputs externalInputs: ", externalInputs);
+    logger.info("generating inputs noirParams: ", noirParams);
 
     const externalInputsWithMaxLength = addMaxLengthToExternalInputs(
       externalInputs,
@@ -217,19 +224,25 @@ export function parseNoirPublicOutputs(
   decomposedRegexes.forEach((decomposedRegex) => {
     const partOutputs: string[] = [];
 
-    const { maxLength } = decomposedRegex;
+    const { maxMatchLength } = decomposedRegex;
     decomposedRegex.parts.forEach((part) => {
       if (decomposedRegex.isHashed) {
         partOutputs.push(publicOutputs[publicOutputIterator]);
         publicOutputIterator++;
       } else if (part.isPublic) {
+        // Use part's maxLength if available, otherwise fall back to decomposedRegex's maxMatchLength
+        const partMaxLength = part.maxLength ?? maxMatchLength;
+        if (!partMaxLength) {
+          throw new Error(`No maxLength found for public part. Either part.maxLength or decomposedRegex.maxMatchLength must be defined`);
+        }
+        
         let partStr = "";
-        for (let i = publicOutputIterator; i < publicOutputIterator + maxLength; i++) {
+        for (let i = publicOutputIterator; i < publicOutputIterator + partMaxLength; i++) {
           const char = toUtf8(publicOutputs[i]);
           partStr += char;
         }
         partOutputs.push(partStr);
-        publicOutputIterator += maxLength;
+        publicOutputIterator += partMaxLength;
         // The next element is the length of the part
         const partLength = parseInt(publicOutputs[publicOutputIterator], 16);
         if (partStr.length !== partLength) {
