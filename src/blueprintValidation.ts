@@ -72,6 +72,7 @@ export const blueprintFormSchema = z.object({
           return value;
         }),
       maxLength: z.coerce.number().positive().default(64),
+      maxMatchLength: z.coerce.number().positive().optional(),
       isHashed: z.boolean().optional(),
       location: z.string().regex(/(body)|(header)/),
       parts: z
@@ -120,6 +121,15 @@ export const blueprintFormSchema = z.object({
                 message: `Part ${i} must have a string 'regexDef' field`,
               });
               return z.NEVER;
+            }
+            if ("maxLength" in part && part.isPublic) {
+              if (typeof part.maxLength !== "number" || part.maxLength <= 0) {
+                ctx.addIssue({
+                  code: "custom",
+                  message: `Part ${i} 'maxLength' field must be a positive number when 'isPublic' is true`,
+                });
+                return z.NEVER;
+              }
             }
           }
           try {
