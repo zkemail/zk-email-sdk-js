@@ -158,11 +158,13 @@ export class Blueprint {
         parts: (regex?.parts || []).map((part) => ({
           isPublic: part.is_public,
           regexDef: part.regex_def,
+          maxLength: part.max_length
         })),
         name: regex.name,
         maxLength: regex.max_length,
         isHashed: regex.is_hashed,
         location: regex.location,
+        maxMatchLength : regex.max_match_length
       })),
       clientStatus: response.client_status as Status,
       serverStatus: response.server_status as Status,
@@ -211,11 +213,13 @@ export class Blueprint {
           is_public: part.isPublic || part.is_public,
           // @ts-ignore
           regex_def: part.regexDef || part.regex_def,
+          max_length : part.maxLength
         })),
         name: regex.name,
         max_length: regex.maxLength,
         is_hashed: regex.isHashed,
         location: regex.location,
+        max_match_length : regex.maxMatchLength
       })),
       verifier_contract_address: props.verifierContract?.address,
       verifier_contract_chain: props.verifierContract?.chain,
@@ -237,6 +241,7 @@ export class Blueprint {
     if (this.props.id) {
       throw new Error("Blueprint was already saved");
     }
+    logger.info("this.props are teh props that are set into teh database", this.props)
 
     const requestData = Blueprint.blueprintPropsToRequest(this.props);
 

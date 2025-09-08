@@ -31,30 +31,35 @@ export type BlueprintProps = {
   totalProofs?: number;
 };
 
+// Max length is optional and kept for backward compatibility
 export type DecomposedRegex = {
   parts: DecomposedRegexPart[];
   name: string;
-  maxLength: number;
+  maxLength?: number;
   isHashed?: boolean;
   location: "body" | "header";
+  maxMatchLength?: number;
 };
 
 export type DecomposedRegexPart = {
   isPublic: boolean;
   regexDef: string;
+  maxLength?: number;
 };
 
 export type DecomposedRegexJson = {
   parts: DecomposedRegexPartJson[];
   name: string;
-  max_length: number;
+  max_length?: number;
   is_hashed?: boolean;
   location: "body" | "header";
+  max_match_length?: number;
 };
 
 export type DecomposedRegexPartJson = {
   is_public: boolean;
   regex_def: string;
+  max_length?: number
 };
 
 export type ExternalInput = {
@@ -158,17 +163,20 @@ export type ExternalInputResponse = {
   max_length: number;
 };
 
+// max_length is optional andkept for backward compatibility.
 export type DecomposedRegexResponse = {
   parts: DecomposedRegexPartResponse[];
   name: string;
-  max_length: number;
+  max_length?: number;
   is_hashed?: boolean;
   location: "body" | "header";
+  max_match_length?: number
 };
 
 export type DecomposedRegexPartResponse = {
   is_public: boolean;
   regex_def: string;
+  max_length?: number
 };
 
 export type ListBlueprintsOptions = {
