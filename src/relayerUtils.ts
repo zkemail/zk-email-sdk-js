@@ -289,7 +289,7 @@ export async function generateProofInputs(
           // @ts-ignore
           max_length: p.maxLength || !!p.max_length, 
         })),
-        provingFramework: "noir",
+        provingFramework: "circom",
       };
     }).filter(Boolean); // Remove undefined entries
 
