@@ -4,7 +4,7 @@ import { FetchEmailOptions, GmailMessagesListResponse, RawEmailResponse } from "
 import { decodeMimeEncodedText } from "../utils";
 import { logger } from "../utils/logger";
 
-const DEFAULT_CLIENT_ID = "773062743658-rauj7nb18ikr1lrfs5bl8lt3b31r2nen.apps.googleusercontent.com";
+const DEFAULT_CLIENT_ID = "397234807794-6cseo5ap266ichua4apn34431fc1c7ug.apps.googleusercontent.com";
 /**
  * A class for handling Google OAuth login flow.
  * Note: This will only work if you first register your callback URL with the zkemail team.

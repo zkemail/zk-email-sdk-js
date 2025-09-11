@@ -7,18 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Automated release process with npm scripts
-- Release automation script (`scripts/release.sh`)
-- GitHub Actions workflow for CI/CD releases
-- Comprehensive release documentation (RELEASE.md)
-- Test script for dry-run releases (`scripts/release-test.sh`)
-
-### Changed
-- Enhanced CLAUDE.md with release automation instructions
-
-### Developer Experience
-- Simplified release process from multiple manual steps to single command
+### Fixed
+- Updated OAuth client ID to use correct ZK Email Google client credentials for Gmail authentication
 
 ## [2.0.1] - 2025-01-19
 
