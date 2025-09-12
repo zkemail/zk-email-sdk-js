@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Reverted OAuth client ID to the authorized Google client (773062743658...) to restore functionality with existing OAuth consent screen
+
 ## [2.0.2] - 2025-09-11
 
 ### Fixed
