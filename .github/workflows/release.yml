@@ -22,6 +22,7 @@ jobs:
     permissions:
       contents: write
       packages: write
+      id-token: write  # Required for provenance
       
     steps:
       - uses: actions/checkout@v4
@@ -52,10 +53,10 @@ jobs:
           git push
           git push --tags
 
-      - name: Publish to npm
-        run: npm publish --access public
+      - name: Publish to npm with provenance
+        run: npm publish --access public --provenance
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
       - name: Extract release notes
         id: extract_notes
