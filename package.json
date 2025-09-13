@@ -43,8 +43,8 @@
     "release:rc": "npm version prerelease --preid=rc && bun run release:prerelease",
     "release:alpha-major": "npm version premajor --preid=alpha && bun run release:prerelease",
     "release:alpha-minor": "npm version preminor --preid=alpha && bun run release:prerelease",
-    "release:stable": "bun run build && npm publish --access public --provenance && git push && git push --tags && gh release create v$npm_package_version --generate-notes",
-    "release:prerelease": "bun run build && npm publish --access public --provenance --tag alpha && git push && git push --tags && gh release create v$npm_package_version --prerelease --generate-notes",
+    "release:stable": "bun run build && npm publish --access public && git push && git push --tags && gh release create v$npm_package_version --generate-notes",
+    "release:prerelease": "bun run build && npm publish --access public --tag alpha && git push && git push --tags && gh release create v$npm_package_version --prerelease --generate-notes",
     "changelog": "echo 'Please update CHANGELOG.md manually before releasing'"
   },
   "keywords": [
