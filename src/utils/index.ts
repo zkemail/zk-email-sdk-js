@@ -290,8 +290,14 @@ export async function verifyPubKey(
       const redc = NoirBignum.bnToRedcLimbStrArray(modulusBigInt, 2048).map((limb: string) =>
         BigInt(limb)
       );
-
-      const pubKeyHash = (await hashRSAPublicKey(modulus, redc)).toString();
+      let pubKeyHash;
+      
+      try {
+        pubKeyHash = (await hashRSAPublicKey(modulus, redc)).toString();
+      } catch (e) {
+        console.warn("Error hashing public key:", e);
+        continue;
+      }
 
       if (pubKeyHash === hashedPublicKey) {
         return true;
