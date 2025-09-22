@@ -137,7 +137,7 @@ export async function verifyNoirProof(
   };
 
   try {
-    const isValid = await backend.verifyProof(noirProof);
+    const isValid = await backend.verifyProof(noirProof, { keccak: true });
     return isValid;
   } catch (err) {
     logger.error("err for noir backend.verifyProof: ", err);
