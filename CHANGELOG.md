@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Updated DKIM archive API endpoint from `/api/key` to `/api/key/domain` for domain key fetching during verification
+
 ## [2.0.3] - 2025-09-12
 
 ### Fixed

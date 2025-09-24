@@ -306,7 +306,7 @@ export async function verifyPubKey(
 async function getPKeys(senderDomain: string): Promise<string[]> {
   let response: Response;
   try {
-    response = await fetch(`https://archive.zk.email/api/key?domain=${senderDomain}`, {
+    response = await fetch(`https://archive.zk.email/api/key/domain?domain=${senderDomain}`, {
       method: "GET",
     });
   } catch (err) {
