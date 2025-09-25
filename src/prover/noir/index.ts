@@ -59,7 +59,7 @@ export class NoirProver extends AbstractProver implements IProver {
       } else {
         haystack = parsedEmail.cleanedBody;
       }
-      
+
       let haystack_location;
       if (dr.location === "header") {
         haystack_location = "Header";
@@ -84,7 +84,7 @@ export class NoirProver extends AbstractProver implements IProver {
           // @ts-ignore
           regex_def: p.regexDef || !!p.regex_def,
           // @ts-ignore
-          ...(p.isPublic && { maxLength:  p.maxLength || !!p.max_length }),         
+          ...(p.isPublic && { maxLength: p.maxLength || !!p.max_length }),
         })),
         proving_framework: "noir",
       };
@@ -152,7 +152,7 @@ export class NoirProver extends AbstractProver implements IProver {
     logger.timeEnd("witness");
 
     logger.time("prove");
-    const proof = await backend.generateProof(witness);
+    const proof = await backend.generateProof(witness, { keccak: true });
     logger.timeEnd("prove");
 
     this.incNumLocalProofs().catch((err) =>
@@ -233,9 +233,11 @@ export function parseNoirPublicOutputs(
         // Use part's maxLength if available, otherwise fall back to decomposedRegex's maxMatchLength
         const partMaxLength = part.maxLength ?? maxMatchLength;
         if (!partMaxLength) {
-          throw new Error(`No maxLength found for public part. Either part.maxLength or decomposedRegex.maxMatchLength must be defined`);
+          throw new Error(
+            `No maxLength found for public part. Either part.maxLength or decomposedRegex.maxMatchLength must be defined`
+          );
         }
-        
+
         let partStr = "";
         for (let i = publicOutputIterator; i < publicOutputIterator + partMaxLength; i++) {
           const char = toUtf8(publicOutputs[i]);
