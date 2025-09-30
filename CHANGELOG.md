@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.11] - 2025-09-30
+
 ### Changed
 - Improved proof status checking with exponential backoff (2s → 4s → 8s → 10s cap) instead of fixed 2.5s delay for more efficient polling
 
