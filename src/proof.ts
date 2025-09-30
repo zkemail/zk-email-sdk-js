@@ -20,6 +20,7 @@ export class Proof {
   blueprint: Blueprint;
   props: ProofProps;
   private lastCheckedStatus: Date | null = null;
+  private _checkCount: number = 0;
 
   constructor(blueprint: Blueprint, props: ProofProps) {
     if (!(blueprint instanceof Blueprint)) {
@@ -116,16 +117,26 @@ export class Proof {
       return this.props.status;
     }
 
-    // Waits for a fixed period of time before you can call checkStatus again
-    // This enables you to put checkStatus in a while(await checkStatu()) loop
+    // Waits with exponential backoff before you can call checkStatus again
+    // This enables you to put checkStatus in a while(await checkStatus()) loop
+    // Pattern: 2s → 4s → 8s → 10s (capped at 10s)
     if (!this.lastCheckedStatus) {
       this.lastCheckedStatus = new Date();
+      this._checkCount = 0;
     } else {
-      const waitTime = 2_500;
+      this._checkCount++;
+
+      // Exponential backoff: 2s, 4s, 8s, max 10s
+      const baseWait = 2000;
+      const maxWait = 10000;
+      const waitTime = Math.min(baseWait * Math.pow(2, this._checkCount), maxWait);
+
       const sinceLastChecked = new Date().getTime() - this.lastCheckedStatus.getTime();
       if (sinceLastChecked < waitTime) {
         await new Promise((r) => setTimeout(r, waitTime - sinceLastChecked));
       }
+
+      this.lastCheckedStatus = new Date();
     }
 
     // Check status
