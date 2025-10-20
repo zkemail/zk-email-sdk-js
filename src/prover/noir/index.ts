@@ -196,10 +196,11 @@ export function parseNoirPublicOutputs(
   externalInputs?: ExternalInputInput[]
 ): { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } {
   // 0: pubkey hash
-  // 1: header_hash[0]
-  // 2: header_hash[1]
-  // 3: prover_address
-  let publicOutputIterator = 4;
+  // 1: email_nullifier
+  // 2: header_hash[0]
+  // 3: header_hash[1]
+  // 4: prover_address
+  let publicOutputIterator = 5;
 
   const publicStruct: { [key: string]: string[] } = {};
   const result: { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } = {
