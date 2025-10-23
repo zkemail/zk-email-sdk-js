@@ -11,3 +11,9 @@ zk-email-sdk*.tgz
 public/wasm
 
 *.tgz
+
+# Claude Code local settings
+.claude/settings.local.json
+
+.claude
+thoughts/
