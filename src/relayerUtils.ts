@@ -166,12 +166,30 @@ async function checkInputLengths(header: string, body: string, blueprint: Bluepr
   }
 }
 
+// Function overloads for backward compatibility
 export async function testDecomposedRegex(
   body: string,
   header: string,
   decomposedRegex: DecomposedRegex | DecomposedRegexJson,
-  revealPrivate = false
-): Promise<string[]> {
+  revealPrivate?: boolean
+): Promise<string[]>;
+
+export async function testDecomposedRegex(
+  body: string,
+  header: string,
+  decomposedRegex: DecomposedRegex | DecomposedRegexJson,
+  revealPrivate: boolean,
+  returnLength: true
+): Promise<{ result: string[]; length: number }>;
+
+// Implementation
+export async function testDecomposedRegex(
+  body: string,
+  header: string,
+  decomposedRegex: DecomposedRegex | DecomposedRegexJson,
+  revealPrivate = false,
+  returnLength = false
+): Promise<string[] | { result: string[]; length: number }> {
   const inputDecomposedRegex = {
     parts: decomposedRegex.parts.map((p: DecomposedRegexPart | DecomposedRegexPartJson) => ({
       is_public: "isPublic" in p ? p.isPublic : p.is_public,
@@ -201,10 +219,16 @@ export async function testDecomposedRegex(
   }
 
   if (!revealPrivate) {
+    if (returnLength) {
+      return { result: privateResult, length: privateResult[0].length };
+    }
     return privateResult;
   }
 
   const result = extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
+  if (returnLength) {
+    return { result, length: privateResult[0].length };
+  }
   return result;
 }
 
