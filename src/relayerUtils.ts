@@ -281,14 +281,17 @@ export async function generateProofInputs(
         maxHaystackLength: maxHaystackLength,
         maxMatchLength: dcr.maxMatchLength,
         regexGraphJson: JSON.stringify(regexGraph),
-        parts: dcr.parts.map((p) => ({
-          // @ts-ignore
-          is_public: p.isPublic || !!p.is_public,
-          // @ts-ignore
-          regex_def: p.regexDef || !!p.regex_def,
-          // @ts-ignore
-          max_length: p.maxLength || !!p.max_length, 
-        })),
+        parts: dcr.parts.map((p) => {
+          const isPublic = p.isPublic ?? p.is_public ?? false;
+          const regexDef = p.regexDef ?? p.regex_def ?? "";
+          const maxLength = p.maxLength ?? p.max_length;
+
+          if (isPublic) {
+            return [regexDef, maxLength ?? 256];
+          } else {
+            return regexDef;
+          }
+        }),
         provingFramework: "circom",
       };
     }).filter(Boolean); // Remove undefined entries

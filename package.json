@@ -1,6 +1,6 @@
 {
   "name": "@zk-email/sdk",
-  "version": "3.0.0-nightly.8",
+  "version": "3.0.0-nightly.11",
   "description": "ZK Email SDK for TypeScript",
   "main": "./dist/index.js",
   "module": "./dist/zk-email-sdk.es.js",
@@ -31,7 +31,7 @@
   ],
   "scripts": {
     "build-old": "bunx tsup src/index.ts src/localProverWorker.ts --format esm,cjs --dts",
-    "build": "vite build",
+    "build": "bun install && vite build",
     "build-prove-worker": "bun x vite build --config vite.config.worker.ts && bun scripts/escape_str_chars.js",
     "publish:new": "bun run build && npm publish --access public",
     "typecheck": "tsc --noEmit",
@@ -78,7 +78,7 @@
     "@azure/msal-browser": "^4.5.1",
     "@mach-34/noir-bignum-paramgen": "^1.1.2",
     "@peculiar/webcrypto": "^1.5.0",
-    "@zk-email/relayer-utils": "0.4.66-10",
+    "@zk-email/relayer-utils": "0.4.66-12",
     "@zk-email/snarkjs": "^0.0.1",
     "ethers": "^6.13.4",
     "jszip": "^3.10.1",
