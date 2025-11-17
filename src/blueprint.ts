@@ -765,7 +765,7 @@ export class Blueprint {
   }
 
   async cancelCompilation(): Promise<void> {
-    if ([this.props.clientStatus, this.props.serverStatus].includes(Status.InProgress)) {
+    if (![this.props.clientStatus, this.props.serverStatus].includes(Status.InProgress)) {
       throw new Error("Can only cancel compilation of a blueprint that is in progress");
     }
     try {
