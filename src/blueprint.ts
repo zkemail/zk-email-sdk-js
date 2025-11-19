@@ -45,6 +45,7 @@ export class Blueprint {
       isPublic: true,
       clientStatus: Status.Draft,
       serverStatus: Status.Draft,
+      internalVersion: '0002_max_length_per_regex_part',
       ...props,
     };
 
@@ -176,6 +177,7 @@ export class Blueprint {
       stars: response.stars,
       numLocalProofs: response.num_local_proofs,
       totalProofs: response.total_proofs,
+      internalVersion: response.internal_version,
     };
 
     return props;
@@ -223,6 +225,7 @@ export class Blueprint {
       })),
       verifier_contract_address: props.verifierContract?.address,
       verifier_contract_chain: props.verifierContract?.chain,
+      internal_version: props.internalVersion,
     };
 
     return response;

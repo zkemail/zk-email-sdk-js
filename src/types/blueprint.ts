@@ -29,6 +29,7 @@ export type BlueprintProps = {
   stars?: number;
   numLocalProofs?: number;
   totalProofs?: number;
+  internalVersion?: string;
 };
 
 // Max length is optional and kept for backward compatibility
@@ -117,6 +118,7 @@ export type BlueprintRequest = {
   verifier_contract_address?: string;
   verifier_contract_chain?: number;
   version?: number;
+  internal_version?: string;
 };
 
 export type BlueprintResponse = {
@@ -151,6 +153,7 @@ export type BlueprintResponse = {
   stars: number;
   num_local_proofs: number;
   total_proofs: number;
+  internal_version?: string;
 };
 
 export type ServerDate = {
