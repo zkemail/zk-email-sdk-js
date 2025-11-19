@@ -251,14 +251,23 @@ export async function generateProofInputs(
     };
 
     await relayerUtilsInit;
+    let regexGraphs: any = null;
 
-    const regexGraphs = await blueprint.getCircomRegexGraphs();
+    regexGraphs = await blueprint.getCircomRegexGraphs();
     
     const decomposedRegexesCleaned = decomposedRegexes.map((dcr) => {
-      const regexGraph = regexGraphs[`${dcr.name}_regex.json`];
-      if (!regexGraph) {
-        throw new Error(`No regexGraph was compiled for decomposedRegexe ${dcr.name}`);
+      // Handle case where regexGraphs is null (old blueprint without regex graphs)
+      if (!regexGraphs) {
+        logger.warn(`Regex Graphs is null for circuit input`);
       }
+
+      let regexGraph;
+      if (regexGraphs) {
+        regexGraph = regexGraphs[`${dcr.name}_regex.json`];
+      } else {
+        regexGraph = null;
+      }
+
 
       let haystackLocation;
       if (dcr.location === "header") {
@@ -280,7 +289,7 @@ export async function generateProofInputs(
         haystackLocation,
         maxHaystackLength: maxHaystackLength,
         maxMatchLength: dcr.maxMatchLength,
-        regexGraphJson: JSON.stringify(regexGraph),
+        regexGraphJson: regexGraph !== null && regexGraph !== undefined ? JSON.stringify(regexGraph) : null,
         parts: dcr.parts.map((p) => {
           const isPublic = p.isPublic ?? p.is_public ?? false;
           const regexDef = p.regexDef ?? p.regex_def ?? "";
