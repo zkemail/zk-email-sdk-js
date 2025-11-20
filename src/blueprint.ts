@@ -45,6 +45,7 @@ export class Blueprint {
       isPublic: true,
       clientStatus: Status.Draft,
       serverStatus: Status.Draft,
+      internalVersion: '0002_max_length_per_regex_part',
       ...props,
     };
 
@@ -176,6 +177,7 @@ export class Blueprint {
       stars: response.stars,
       numLocalProofs: response.num_local_proofs,
       totalProofs: response.total_proofs,
+      internalVersion: response.internal_version,
     };
 
     return props;
@@ -223,6 +225,7 @@ export class Blueprint {
       })),
       verifier_contract_address: props.verifierContract?.address,
       verifier_contract_chain: props.verifierContract?.chain,
+      internal_version: props.internalVersion,
     };
 
     return response;
@@ -907,7 +910,7 @@ export class Blueprint {
     return response.url;
   }
   
-  async getCircomRegexGraphsDownloadLink(): Promise<string> {
+  async getCircomRegexGraphsDownloadLink(): Promise<string | null> {
     if (this.props.clientStatus !== Status.Done && this.props.serverStatus !== Status.Done) {
       throw new Error("The circuits are not compiled yet, nothing to download.");
     }
@@ -918,11 +921,9 @@ export class Blueprint {
         `${this.baseUrl}/blueprint/circom-regex-graphs/${this.props.id}`
       );
     } catch (err) {
-      console.error(
-        "Failed calling GET on /blueprint/circom-regex-graphs/:id in getCircomCircuitDownloadLink: ",
-        err
-      );
-      throw err;
+      // For old blueprints, circomRegexGraphs might not exist
+      logger.warn("Circom Regex Graphs not found - this might be an old blueprint", err);
+      return null; // ← Return null instead of throwing
     }
 
     return response.url;
@@ -957,10 +958,28 @@ export class Blueprint {
     }
 
     const url = await this.getCircomRegexGraphsDownloadLink();
-    const data = await downloadAndUnzipFile(url);
-    logger.debug("data: ", data);
 
-    return data;
+    // If no URL (old blueprint), return null
+    if (!url) {
+      logger.warn("No circomRegexGraphs available - using fallback for old blueprint");
+      return null;
+    }
+
+    // Try to download the file - might fail if file doesn't exist in GCS
+    try {
+      logger.debug(`Attempting to download circomRegexGraphs from: ${url}`);
+      const data = await downloadAndUnzipFile(url);
+      logger.debug("Successfully downloaded and unzipped circomRegexGraphs:", Object.keys(data));
+      return data;
+    } catch (err) {
+      // File doesn't exist in GCS (404) or download failed
+      logger.warn(
+        `Failed to download for blueprint ${this.props.id}. ` +
+        `This might be an old blueprint without circomRegexGraphs.zip regex graph files.`,
+        err
+      );
+      return null;
+    }
   }
 
   async getWasmFileDownloadLink(): Promise<string> {
