@@ -4,29 +4,71 @@ import { FetchEmailOptions } from "../types/gmail";
 import { EmailLoginProvider, EmailProvider } from ".";
 import { logger } from "../utils/logger";
 
-// MSAL configuration
-const msalConfig = {
-  auth: {
-    clientId: "6bedcd66-9008-4ea1-88fc-979f21c28bb5",
-    authority: "https://login.microsoftonline.com/common",
-    redirectUri: "http://localhost:3000",
-    navigateToLoginRequestUrl: true,
-  },
-  cache: {
-    cacheLocation: "sessionStorage",
-    storeAuthStateInCookie: false,
-  },
+export type MicrosoftLoginConfig = {
+  /**
+   * Azure AD application (client) id.
+   * Defaults to the zkEmail shared application id if not provided.
+   */
+  clientId?: string;
+  /**
+   * Azure AD authority/tenant.
+   * Defaults to `https://login.microsoftonline.com/common`.
+   */
+  authority?: string;
+  /**
+   * Redirect URI configured for your application.
+   * Defaults to `http://localhost:3000`.
+   */
+  redirectUri?: string;
+  /**
+   * MSAL cache location. Defaults to `sessionStorage`.
+   */
+  cacheLocation?: "localStorage" | "sessionStorage";
+  /**
+   * Whether to store auth state in cookies. Defaults to `false`.
+   */
+  storeAuthStateInCookie?: boolean;
+  /**
+   * Scopes to request during login. Defaults to `["User.Read", "Mail.Read"]`.
+   */
+  scopes?: string[];
 };
 
-const msalInstance = new msal.PublicClientApplication(msalConfig);
+const DEFAULT_MICROSOFT_CLIENT_ID = "6bedcd66-9008-4ea1-88fc-979f21c28bb5";
+const DEFAULT_MICROSOFT_AUTHORITY = "https://login.microsoftonline.com/common";
+const DEFAULT_MICROSOFT_REDIRECT_URI = "http://localhost:3000";
+const DEFAULT_MICROSOFT_SCOPES = ["User.Read", "Mail.Read"];
+
+function buildMsalConfig(config?: MicrosoftLoginConfig): msal.Configuration {
+  return {
+    auth: {
+      clientId: config?.clientId || DEFAULT_MICROSOFT_CLIENT_ID,
+      authority: config?.authority || DEFAULT_MICROSOFT_AUTHORITY,
+      redirectUri: config?.redirectUri || DEFAULT_MICROSOFT_REDIRECT_URI,
+      navigateToLoginRequestUrl: true,
+    },
+    cache: {
+      cacheLocation: config?.cacheLocation || "sessionStorage",
+      storeAuthStateInCookie: config?.storeAuthStateInCookie || false,
+    },
+  };
+}
 
 export class LoginWithMicrosoft implements EmailLoginProvider {
   accessToken: string | null = null;
   initialized: boolean = false;
 
+  private msalInstance: msal.PublicClientApplication;
+  private scopes: string[];
+
+  constructor(config?: MicrosoftLoginConfig) {
+    this.msalInstance = new msal.PublicClientApplication(buildMsalConfig(config));
+    this.scopes = config?.scopes || DEFAULT_MICROSOFT_SCOPES;
+  }
+
   private async ensureInitialized(): Promise<void> {
     if (!this.initialized) {
-      await msalInstance.initialize();
+      await this.msalInstance.initialize();
       this.initialized = true;
     }
   }
@@ -35,19 +77,19 @@ export class LoginWithMicrosoft implements EmailLoginProvider {
     await this.ensureInitialized();
 
     const loginRequest = {
-      scopes: ["User.Read", "Mail.Read"],
+      scopes: this.scopes,
     };
 
     try {
       logger.info("launching loginPopup");
-      const response = await msalInstance.loginPopup(loginRequest);
+      const response = await this.msalInstance.loginPopup(loginRequest);
       logger.debug("response: ", response);
 
       const account = response.account;
       logger.debug("account: ", account);
 
       if (account) {
-        const tokenResponse = await msalInstance.acquireTokenSilent({
+        const tokenResponse = await this.msalInstance.acquireTokenSilent({
           ...loginRequest,
           account,
         });
@@ -117,8 +159,8 @@ export class Outlook implements EmailProvider {
   nextPageLink: string | null = null;
   query: string = "";
 
-  constructor() {
-    this.loginWithMicrosoft = new LoginWithMicrosoft();
+  constructor(loginWithMicrosoft?: LoginWithMicrosoft) {
+    this.loginWithMicrosoft = loginWithMicrosoft || new LoginWithMicrosoft();
   }
 
   async authorize() {
