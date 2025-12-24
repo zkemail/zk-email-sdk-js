@@ -182,3 +182,55 @@ const moreEmails = await gmail.fetchMore();
 const isValid = await blueprint.validateEmail(emails[0].decodedContents);
 console.log("isValid: ", isValid);
 ```
+
+### Custom OAuth configuration (client IDs, scopes, redirect URIs)
+
+By default, the SDK uses zkEmail-managed OAuth applications for Google and Microsoft login.
+You can provide your own configuration while still falling back to these defaults when not specified.
+
+#### Google (Gmail)
+
+```ts
+import { Gmail, LoginWithGoogle } from "@zk-email/sdk";
+
+const gmail = new Gmail(
+  new LoginWithGoogle({
+    clientId: "<your-google-client-id>", // falls back to zkEmail default if omitted
+    scope: "https://www.googleapis.com/auth/gmail.readonly", // default
+    scriptSrc: "https://accounts.google.com/gsi/client", // default
+  })
+);
+```
+
+#### Microsoft (Outlook)
+
+```ts
+import { Outlook, LoginWithMicrosoft } from "@zk-email/sdk";
+
+const outlook = new Outlook(
+  new LoginWithMicrosoft({
+    clientId: "<your-azure-ad-client-id>", // falls back to zkEmail default if omitted
+    authority: "https://login.microsoftonline.com/common", // default
+    redirectUri: "http://localhost:3000", // default
+    cacheLocation: "sessionStorage", // default
+    storeAuthStateInCookie: false, // default
+    scopes: ["User.Read", "Mail.Read"], // default
+  })
+);
+```
+
+#### GitHub
+
+```ts
+import { getLoginWithGithubUrl } from "@zk-email/sdk";
+
+// Using config object (recommended)
+const githubAuthUrl = getLoginWithGithubUrl("https://your-app.com/callback", {
+  clientId: "<your-github-client-id>", // falls back to zkEmail default if omitted
+  scope: "user:email", // default
+  authorizeUrl: "https://github.com/login/oauth/authorize", // default
+});
+
+// Using client ID string directly (backward compatible)
+const githubAuthUrl = getLoginWithGithubUrl("https://your-app.com/callback", "<your-github-client-id>");
+```

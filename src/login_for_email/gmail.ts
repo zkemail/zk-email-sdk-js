@@ -4,13 +4,44 @@ import { FetchEmailOptions, GmailMessagesListResponse, RawEmailResponse } from "
 import { decodeMimeEncodedText } from "../utils";
 import { logger } from "../utils/logger";
 
-const clientId = "773062743658-rauj7nb18ikr1lrfs5bl8lt3b31r2nen.apps.googleusercontent.com";
+export type GoogleLoginConfig = {
+  /**
+   * OAuth client id to use for Google login.
+   * Defaults to the zkEmail shared client id if not provided.
+   */
+  clientId?: string;
+  /**
+   * OAuth scopes to request.
+   * Defaults to readonly Gmail access.
+   */
+  scope?: string;
+  /**
+   * URL of the Google Identity Services script.
+   * Override this if you need to self-host the script.
+   */
+  scriptSrc?: string;
+};
+
+const DEFAULT_GOOGLE_CLIENT_ID =
+  "773062743658-rauj7nb18ikr1lrfs5bl8lt3b31r2nen.apps.googleusercontent.com";
+const DEFAULT_GOOGLE_SCOPE = "https://www.googleapis.com/auth/gmail.readonly";
+const DEFAULT_GOOGLE_SCRIPT_SRC = "https://accounts.google.com/gsi/client";
 /**
  * A class for handling Google OAuth login flow.
  * Note: This will only work if you first register your callback URL with the zkemail team.
  */
 export class LoginWithGoogle implements EmailLoginProvider {
   accessToken: string | null = null;
+
+  private clientId: string;
+  private scope: string;
+  private scriptSrc: string;
+
+  constructor(config?: GoogleLoginConfig) {
+    this.clientId = config?.clientId || DEFAULT_GOOGLE_CLIENT_ID;
+    this.scope = config?.scope || DEFAULT_GOOGLE_SCOPE;
+    this.scriptSrc = config?.scriptSrc || DEFAULT_GOOGLE_SCRIPT_SRC;
+  }
 
   private loadGoogleScript(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -20,7 +51,7 @@ export class LoginWithGoogle implements EmailLoginProvider {
       }
 
       const script = document.createElement("script");
-      script.src = "https://accounts.google.com/gsi/client";
+      script.src = this.scriptSrc;
       script.async = true;
       script.defer = true;
       script.onload = () => resolve();
@@ -29,17 +60,17 @@ export class LoginWithGoogle implements EmailLoginProvider {
     });
   }
 
-  async authorize(options: any): Promise<string> {
+  async authorize(options: any = {}): Promise<string> {
     // Load Google's OAuth2 library dynamically
     await this.loadGoogleScript();
 
     return new Promise((resolve, reject) => {
       const client = google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
+        client_id: this.clientId,
         // prompt: "consent",
         // access_type: "offline",
         ...(!isPlainObject(options) ? {} : options),
-        scope: "https://www.googleapis.com/auth/gmail.readonly",
+        scope: this.scope,
         callback: (response: { access_token: string }) => {
           logger.debug("response: ", response);
           if (response.access_token) {
@@ -179,7 +210,11 @@ export class Gmail implements EmailProvider {
       pageToken: this.nextPageToken || 0,
     };
 
-    const queryParams = { ...defaultParams, ...(this.query ? { q: this.query } : {}) };
+    const queryParams: Record<string, string> = {
+      maxResults: String(defaultParams.maxResults),
+      pageToken: String(defaultParams.pageToken),
+      ...(this.query ? { q: this.query } : {}),
+    };
     const queryString = new URLSearchParams(queryParams).toString();
 
     const url = `https://www.googleapis.com/gmail/v1/users/me/messages?${queryString}`;
