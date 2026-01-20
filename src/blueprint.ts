@@ -855,7 +855,7 @@ export class Blueprint {
     try {
       response = await get<{ url: string }>(`${this.baseUrl}${endpoint}`);
     } catch (err) {
-      console.error(
+      logger.error(
         `Failed calling GET on ${endpoint} in getNoirCircuitDownloadLink: `,
         err
       );
@@ -886,7 +886,7 @@ export class Blueprint {
     try {
       response = await get<{ url: string }>(`${this.baseUrl}${endpoint}`);
     } catch (err) {
-      console.error(
+      logger.error(
         `Failed calling GET on ${endpoint} in getNoirCircuitJsonDownloadLink: `,
         err
       );
