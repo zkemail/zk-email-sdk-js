@@ -834,7 +834,11 @@ export class Blueprint {
     return response.urls;
   }
 
-  async getNoirCircuitDownloadLink(): Promise<string> {
+  /**
+   * Get Noir circuit download link for a specific key size
+   * @param keyBits - 1024 or 2048 (defaults to 2048 for backwards compatibility)
+   */
+  async getNoirCircuitDownloadLink(keyBits: 1024 | 2048 = 2048): Promise<string> {
     if (this.props.clientStatus !== Status.Done) {
       throw new Error("The circuits are not compiled yet, nothing to download.");
     }
@@ -843,14 +847,16 @@ export class Blueprint {
       throw new Error("Only a noir blueprint has a noir circuit");
     }
 
+    const endpoint = keyBits === 1024
+      ? `/blueprint/noir-circuit-1024/${this.props.id}`
+      : `/blueprint/noir-circuit-2048/${this.props.id}`;
+
     let response: { url: string };
     try {
-      response = await get<{ url: string }>(
-        `${this.baseUrl}/blueprint/noir-circuit/${this.props.id}`
-      );
+      response = await get<{ url: string }>(`${this.baseUrl}${endpoint}`);
     } catch (err) {
-      console.error(
-        "Failed calling GET on /blueprint/noir-circuit/:id in getNoirCircuitDownloadLink: ",
+      logger.error(
+        `Failed calling GET on ${endpoint} in getNoirCircuitDownloadLink: `,
         err
       );
       throw err;
@@ -859,7 +865,11 @@ export class Blueprint {
     return response.url;
   }
 
-  async getNoirCircuitJsonDownloadLink(): Promise<string> {
+  /**
+   * Get Noir circuit JSON download link for a specific key size
+   * @param keyBits - 1024 or 2048 (defaults to 2048 for backwards compatibility)
+   */
+  async getNoirCircuitJsonDownloadLink(keyBits: 1024 | 2048 = 2048): Promise<string> {
     if (this.props.clientStatus !== Status.Done) {
       throw new Error("The circuits are not compiled yet, nothing to download.");
     }
@@ -868,14 +878,16 @@ export class Blueprint {
       throw new Error("Only a noir blueprint has a noir circuit");
     }
 
+    const endpoint = keyBits === 1024
+      ? `/blueprint/noir-circuit-json-1024/${this.props.id}`
+      : `/blueprint/noir-circuit-json-2048/${this.props.id}`;
+
     let response: { url: string };
     try {
-      response = await get<{ url: string }>(
-        `${this.baseUrl}/blueprint/noir-circuit-json/${this.props.id}`
-      );
+      response = await get<{ url: string }>(`${this.baseUrl}${endpoint}`);
     } catch (err) {
-      console.error(
-        "Failed calling GET on /blueprint/noir-circuit/:id in getNoirCircuitDownloadLink: ",
+      logger.error(
+        `Failed calling GET on ${endpoint} in getNoirCircuitJsonDownloadLink: `,
         err
       );
       throw err;
@@ -929,12 +941,16 @@ export class Blueprint {
     return response.url;
   }
 
-  async getNoirCircuit(): Promise<any> {
+  /**
+   * Download and parse the Noir circuit for a specific key size
+   * @param keyBits - 1024 or 2048 (defaults to 2048 for backwards compatibility)
+   */
+  async getNoirCircuit(keyBits: 1024 | 2048 = 2048): Promise<any> {
     if (this.props.clientZkFramework !== ZkFramework.Noir) {
       throw new Error("Only a noir blueprint has a noir circuit");
     }
 
-    const circuitUrl = await this.getNoirCircuitJsonDownloadLink();
+    const circuitUrl = await this.getNoirCircuitJsonDownloadLink(keyBits);
     // TODO: type circuit
     const circuit = await downloadJsonFromUrl<any>(circuitUrl);
     return circuit;

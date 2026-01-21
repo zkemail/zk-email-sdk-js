@@ -18,6 +18,23 @@ import { addMaxLengthToExternalInputs } from "../../utils/maxLenghExternalInputs
 import { logger } from "../../utils/logger";
 
 export class NoirProver extends AbstractProver implements IProver {
+  /**
+   * Detect RSA key size from parsed email public key
+   * @param parsedEmail - Parsed email object
+   * @returns 1024 or 2048
+   * @throws Error if key size is not 1024 or 2048 bits
+   */
+  private detectKeySize(parsedEmail: { publicKey: Uint8Array }): 1024 | 2048 {
+    // Public key bytes: 128 bytes = 1024 bits, 256 bytes = 2048 bits
+    const keyBytes = parsedEmail.publicKey.length;
+    if (keyBytes !== 128 && keyBytes !== 256) {
+      throw new Error(
+        `Unsupported RSA key size: ${keyBytes * 8} bits. Only 1024-bit and 2048-bit keys are supported.`
+      );
+    }
+    return keyBytes <= 128 ? 1024 : 2048;
+  }
+
   async generateLocalProof(
     eml: string,
     externalInputs: ExternalInputInput[] = [],
@@ -29,6 +46,10 @@ export class NoirProver extends AbstractProver implements IProver {
 
     const parsedEmail = await parseEmail(eml);
 
+    // Detect key size from the email
+    const keyBits = this.detectKeySize(parsedEmail);
+    logger.info(`Detected RSA key size: ${keyBits} bits`);
+
     const { Noir, UltraHonkBackend } = options.noirWasm;
 
     const startedAt = new Date();
@@ -39,7 +60,8 @@ export class NoirProver extends AbstractProver implements IProver {
       );
     }
 
-    const circuit = await this.blueprint.getNoirCircuit();
+    // Fetch the appropriate circuit based on detected key size
+    const circuit = await this.blueprint.getNoirCircuit(keyBits);
     const regexGraphs = await this.blueprint.getNoirRegexGraphs();
 
     const regexInputs = this.blueprint.props.decomposedRegexes.map((dr) => {
@@ -97,6 +119,7 @@ export class NoirProver extends AbstractProver implements IProver {
       removeSoftLineBreaks: this.blueprint.props.removeSoftLinebreaks,
       shaPrecomputeSelector: this.blueprint.props.shaPrecomputeSelector,
       proverEthAddress: "0x0000000000000000000000000000000000000000",
+      rsaKeyBits: keyBits,  // Pass key size to relayer-utils
     };
 
     logger.info("generating inputs regexInputs: ", regexInputs);
