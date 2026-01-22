@@ -21,10 +21,10 @@ The SDK includes comprehensive logging capabilities that are **silent by default
 ### Basic Usage
 
 ```ts
-import { zkeSdk } from "@zk-email/sdk";
+import { initZkEmailSdk } from "@zk-email/sdk";
 
 // Silent by default (no logs)
-const sdk = zkeSdk();
+const sdk = initZkEmailSdk();
 
 // Enable error-level logging only
 const sdk = zkSdk({ logging: { enabled: true } });
@@ -81,8 +81,8 @@ we will provide the documentation for this shortly.
 Initialize the SDK:
 
 ```ts
-import { zkeSdk } from "@zk-email/sdk";
-const sdk = zkeSdk();
+import { initZkEmailSdk } from "@zk-email/sdk";
+const sdk = initZkEmailSdk();
 ```
 
 Next, obtain the slug of the blueprint you want to create a proof for from our [registry](https://registry.zk.email).
@@ -163,10 +163,10 @@ You can use the sdks' `Gmail` utility class to fetch users emails according to t
 **NOTE:** This will only work if you approved your domain with us.
 
 ```ts
-import { zkeSdk, Gmail } from "@zk-email/sdk";
+import { initZkEmailSdk, Gmail } from "@zk-email/sdk";
 
 const gmail = new Gmail();
-const sdk = zkeSdk();
+const sdk = initZkEmailSdk();
 
 // optional - manually start Login with Google flow and authorize before fetching emails
 await gmail.authorize();
