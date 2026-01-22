@@ -38,7 +38,7 @@ export { Outlook, LoginWithMicrosoft } from "./login_for_email/microsoft";
 export type { MicrosoftLoginConfig } from "./login_for_email/microsoft";
 
 // Exported sdk, functions that need initialization
-export default (sdkOptions?: SdkOptions) => {
+export const zkSdk = (sdkOptions?: SdkOptions) => {
   const baseUrl = sdkOptions?.baseUrl || "https://conductor.zk.email";
   
   // Configure logging

@@ -21,7 +21,7 @@ The SDK includes comprehensive logging capabilities that are **silent by default
 ### Basic Usage
 
 ```ts
-import zkeSdk from "@zk-email/sdk";
+import { zkSdk } from "@zk-email/sdk";
 
 // Silent by default (no logs)
 const sdk = zkSdk();
@@ -81,7 +81,7 @@ we will provide the documentation for this shortly.
 Initialize the SDK:
 
 ```ts
-import zkeSdk from "@zk-email/sdk";
+import { zkSdk } from "@zk-email/sdk";
 const sdk = zkSdk();
 ```
 
@@ -163,10 +163,10 @@ You can use the sdks' `Gmail` utility class to fetch users emails according to t
 **NOTE:** This will only work if you approved your domain with us.
 
 ```ts
-import zkeSdk, { Gmail } from "@zk-email/sdk";
+import { zkSdk, Gmail } from "@zk-email/sdk";
 
 const gmail = new Gmail();
-const sdk = zkeSdk();
+const sdk = zkSdk();
 
 // optional - manually start Login with Google flow and authorize before fetching emails
 await gmail.authorize();
