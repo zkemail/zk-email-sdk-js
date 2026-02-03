@@ -161,7 +161,7 @@ export class NoirProver extends AbstractProver implements IProver {
     for (const [key, value] of circuitInputs) {
       if (value && typeof value === "object" && value instanceof Map) {
         circuitInputsObject[key] = Object.fromEntries(value);
-      } else if (value) {
+      } else if (value !== undefined && value !== null) {
         circuitInputsObject[key] = value;
       }
     }
