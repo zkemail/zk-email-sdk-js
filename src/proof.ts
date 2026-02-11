@@ -233,7 +233,7 @@ export class Proof {
 
   public getHeaderHash(): string {
     if (this.props.status !== ProofStatus.Done) {
-      throw new Error("Poof is not Done yet.");
+      throw new Error("Proof is not Done yet.");
     }
 
     if (this.props.zkFramework === ZkFramework.Circom) {
@@ -317,7 +317,7 @@ export class Proof {
     // and then calling request.json() server side
     if (typeof packedProof === "object") {
       if (!packedProof.blueprintId) {
-        throw new Error("Failed to unpack proof. Please use the packPoof function");
+        throw new Error("Failed to unpack proof. Please use the packProof function");
       }
       proofProps = packedProof;
     } else {

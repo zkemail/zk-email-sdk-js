@@ -561,23 +561,19 @@ export class Blueprint {
   /**
    * Verifies a proof on chain.
    * @param proof - The generated proof you want to verify.
-   * @returns Returns true if the verification was successfull, false if it failed.
+   * @returns Returns true if the verification was successfull.
+   * @throws VerificationError if verification fails due to an unexpected error.
    */
   async verifyProofOnChain(proof: Proof): Promise<boolean> {
-    try {
-      await verifyProofOnChain(proof);
-    } catch (err) {
-      logger.error("Failed to verify proof on chain: ", err);
-      return false;
-    }
-    return true;
+    return verifyProofOnChain(proof);
   }
 
   /**
    * Verifies a locally generated proof. This can be used, e.g. to verify a proof server side that was generated locally.
    * @param publicOutputs - The public outputs of the proof as string
    * @param proofData - The proof data to verify as string.
-   * @returns Returns true if the verification was successfull, false if it failed.
+   * @returns Returns true if the verification was successfull.
+   * @throws VerificationError if verification fails due to an unexpected error.
    */
   async verifyProofData(publicOutputs: string, proofData: string): Promise<boolean> {
     if (
@@ -587,13 +583,7 @@ export class Blueprint {
       throw new Error("Can only verify a Circom proof from data. Use verifyProof instead.");
     }
 
-    let vkey: string;
-    try {
-      vkey = await this.getVkey();
-    } catch (err) {
-      logger.error("Failed to get vkey: ", err);
-      return false;
-    }
+    const vkey = await this.getVkey();
 
     return verifyProofData({
       publicOutputs,
@@ -975,10 +965,13 @@ export class Blueprint {
     try {
       const downloadUrl = await this.getVkeyFileDownloadLink();
       const response = await fetch(downloadUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to download vkey: ${response.status} ${response.statusText}`);
+      }
       const vkey = await response.text();
       return vkey;
     } catch (err) {
-      logger.error("error in getVkey");
+      logger.error("error in getVkey: ", err);
       throw err;
     }
   }

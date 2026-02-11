@@ -123,8 +123,9 @@ describe("Proof test suite", async () => {
       });
 
       test("Get fetch created proof", async () => {
+        const { getProof } = sdk({ auth });
         const id = proof.getId();
-        const fetchedProof = await Proof.getPoofById(id);
+        const fetchedProof = await getProof(id);
         expect(fetchedProof.getId()).toBe(id);
         expect(fetchedProof.props.startedAt instanceof Date).toBe(true);
         // expect(fetchedProof.props.input).toBe(emlTxt);

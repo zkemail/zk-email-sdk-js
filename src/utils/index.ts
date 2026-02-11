@@ -12,6 +12,7 @@ import { getTokenFromAuth } from "../auth";
 import { DkimRecord, HashingAlgorithm, ZkFramework } from "../types";
 import { Crypto } from "@peculiar/webcrypto";
 import { logger } from "./logger";
+import { ApiError, ApiErrorResponse } from "../errors";
 
 const crypto = new Crypto();
 
@@ -40,19 +41,20 @@ export async function post<T>(url: string, data?: object | null, auth?: Auth): P
     }
 
     const response = await fetch(url, request);
-
     const body = await response.json();
 
     if (!response.ok) {
-      if (response.status === 401) {
-        auth!.onTokenExpired();
+      if (response.status === 401 && auth) {
+        auth.onTokenExpired();
       }
-      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
+      throw ApiError.fromResponse(response.status, body as ApiErrorResponse);
     }
 
     return body;
   } catch (error) {
-    // TODO: Handle token expired
+    if (error instanceof ApiError) {
+      throw error;
+    }
     logger.error("POST Error:", error);
     throw error;
   }
@@ -83,18 +85,20 @@ export async function patch<T>(url: string, data?: object | null, auth?: Auth): 
     }
 
     const response = await fetch(url, request);
-
     const body = await response.json();
 
     if (!response.ok) {
-      if (response.status === 401) {
-        auth!.onTokenExpired();
+      if (response.status === 401 && auth) {
+        auth.onTokenExpired();
       }
-      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
+      throw ApiError.fromResponse(response.status, body as ApiErrorResponse);
     }
 
     return body;
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
     logger.error("PATCH Error:", error);
     throw error;
   }
@@ -133,15 +137,20 @@ export async function get<T>(url: string, queryParams?: object | null, auth?: Au
       },
     });
 
+    const body = await response.json();
+
     if (!response.ok) {
-      if (response.status === 401) {
-        auth!.onTokenExpired();
+      if (response.status === 401 && auth) {
+        auth.onTokenExpired();
       }
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw ApiError.fromResponse(response.status, body as ApiErrorResponse);
     }
 
-    return await response.json();
+    return body;
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
     logger.error("GET Error:", error);
     throw error;
   }
@@ -172,19 +181,20 @@ export async function del<T>(url: string, data?: object | null, auth?: Auth): Pr
     }
 
     const response = await fetch(url, request);
-
     const body = await response.json();
 
     if (!response.ok) {
-      if (response.status === 401) {
-        auth!.onTokenExpired();
+      if (response.status === 401 && auth) {
+        auth.onTokenExpired();
       }
-      throw new Error(`HTTP error! status: ${response.status}, message: ${body}`);
+      throw ApiError.fromResponse(response.status, body as ApiErrorResponse);
     }
 
     return body;
   } catch (error) {
-    // TODO: Handle token expired
+    if (error instanceof ApiError) {
+      throw error;
+    }
     logger.error("DELETE Error:", error);
     throw error;
   }
@@ -309,9 +319,12 @@ async function getPKeys(senderDomain: string): Promise<string[]> {
     response = await fetch(`https://archive.zk.email/api/key/domain?domain=${senderDomain}`, {
       method: "GET",
     });
+    if (!response.ok) {
+      throw new Error(`Failed to get pubkey records: ${response.status} ${response.statusText}`);
+    }
   } catch (err) {
     logger.error("Failed to get pubkey records from archive", err);
-    return [];
+    throw err;
   }
 
   const records = (await response.json()) as DkimRecord[];

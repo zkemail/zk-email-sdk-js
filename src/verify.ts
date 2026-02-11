@@ -6,6 +6,7 @@ import * as snarkjs from "@zk-email/snarkjs";
 import { verifySp1Proof } from "./relayerUtils";
 import { GenerateProofOptions, NoirWasm } from "./types";
 import { logger } from "./utils/logger";
+import { VerificationError } from "./errors";
 
 type VerifyProofDataProps = {
   publicOutputs: string;
@@ -32,8 +33,10 @@ export async function verifyProofData({
       return false;
     }
   } catch (err) {
-    logger.warn("Failed to verify proofs public key");
-    return false;
+    logger.error("Failed to verify proof's public key: ", err);
+    throw new VerificationError("Failed to verify proof's public key", {
+      cause: err instanceof Error ? err : new Error(String(err)),
+    });
   }
 
   try {
@@ -45,13 +48,15 @@ export async function verifyProofData({
     return verified;
   } catch (err) {
     logger.error("Failed to verify proof: ", err);
+    throw new VerificationError("Failed to verify proof", {
+      cause: err instanceof Error ? err : new Error(String(err)),
+    });
   }
-  return false;
 }
 
-export async function verifyProof(proof: Proof, options?: GenerateProofOptions) {
+export async function verifyProof(proof: Proof, options?: GenerateProofOptions): Promise<boolean> {
   if (proof.props.blueprintId !== proof.blueprint.props.id) {
-    throw Error(`The proof was generated using a different blueprint: ${proof.props.blueprintId}`);
+    throw new Error(`The proof was generated using a different blueprint: ${proof.props.blueprintId}`);
   }
 
   try {
@@ -66,16 +71,13 @@ export async function verifyProof(proof: Proof, options?: GenerateProofOptions) 
       logger.warn(
         "Public key of proof is invalid. The domains of blueprint and proof don't match"
       );
-      if (!validPubKey) {
-        logger.warn(
-          "Public key of proof is invalid. The domains of blueprint and proof don't match"
-        );
-        return false;
-      }
+      return false;
     }
   } catch (err) {
-    console.warn("Failed to verify proofs public key: ", err);
-    return false;
+    logger.error("Failed to verify proof's public key: ", err);
+    throw new VerificationError("Failed to verify proof's public key", {
+      cause: err instanceof Error ? err : new Error(String(err)),
+    });
   }
 
   try {
@@ -112,9 +114,17 @@ export async function verifyProof(proof: Proof, options?: GenerateProofOptions) 
       );
     }
   } catch (err) {
-    logger.warn("Failed to verify proof: ", err);
+    // Re-throw VerificationError and other expected errors
+    if (err instanceof VerificationError || err instanceof Error && err.message.includes("noirWasm")) {
+      throw err;
+    }
+    logger.error("Failed to verify proof: ", err);
+    throw new VerificationError("Failed to verify proof", {
+      cause: err instanceof Error ? err : new Error(String(err)),
+    });
   }
-  return false;
+
+  throw new Error(`Unsupported zkFramework: ${proof.props.zkFramework}`);
 }
 
 export async function verifyNoirProof(
@@ -140,7 +150,9 @@ export async function verifyNoirProof(
     const isValid = await backend.verifyProof(noirProof);
     return isValid;
   } catch (err) {
-    logger.error("err for noir backend.verifyProof: ", err);
-    return false;
+    logger.error("Error in noir backend.verifyProof: ", err);
+    throw new VerificationError("Failed to verify Noir proof", {
+      cause: err instanceof Error ? err : new Error(String(err)),
+    });
   }
 }

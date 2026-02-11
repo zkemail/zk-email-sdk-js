@@ -5,6 +5,7 @@ import { ProofData } from "../types";
 // @ts-ignore Does not provide types
 import * as snarkjs from "snarkjs";
 import { logger } from "../utils/logger";
+import { VerificationError } from "../errors";
 
 function getVerifierContractAbi(signalLength: number) {
   return [
@@ -108,6 +109,8 @@ export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
     return true;
   } catch (error) {
     logger.error("Error verifying proof on chain:", error);
-    return false;
+    throw new VerificationError("Failed to verify proof on chain", {
+      cause: error instanceof Error ? error : new Error(String(error)),
+    });
   }
 }

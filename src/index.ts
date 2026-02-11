@@ -17,6 +17,9 @@ export type { Auth } from "./types/auth";
 export type { ParsedEmail } from "./types/utils";
 // Re-Export zod types to avoid version mismatches if package importing this sdk has zod
 export type { ValidationErrors } from "./blueprintValidation";
+// Export error types for programmatic error handling
+export { ApiError, ErrorCode, VerificationError } from "./errors";
+export type { ApiErrorResponse, ErrorCodeType } from "./errors";
 
 // Exports that don't need initialization or options
 export { startJsonFileDownload, getDKIMSelector } from "./utils";
