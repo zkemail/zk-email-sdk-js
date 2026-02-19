@@ -169,6 +169,8 @@ export class Blueprint {
       })),
       clientStatus: response.client_status as Status,
       serverStatus: response.server_status as Status,
+      clientError: response.client_error,
+      serverError: response.server_error,
       verifierContract: {
         address: response.verifier_contract_address,
         chain: response.verifier_contract_chain,
@@ -445,7 +447,11 @@ export class Blueprint {
   private async _checkStatus(): Promise<CompilationStatus> {
     let response: StatusResponse;
     try {
-      response = await get<StatusResponse>(`${this.baseUrl}/blueprint/status/${this.props.id}`);
+      response = await get<StatusResponse>(
+        `${this.baseUrl}/blueprint/status/${this.props.id}`,
+        undefined,
+        this.auth
+      );
     } catch (err) {
       logger.error("Failed calling GET /blueprint/status in getStatus(): ", err);
       throw err;
@@ -453,9 +459,13 @@ export class Blueprint {
 
     this.props.clientStatus = response.client_status;
     this.props.serverStatus = response.server_status;
+    this.props.clientError = response.client_error;
+    this.props.serverError = response.server_error;
     return {
       clientStatus: this.props.clientStatus,
       serverStatus: this.props.serverStatus,
+      clientError: this.props.clientError,
+      serverError: this.props.serverError,
     };
   }
 
@@ -468,9 +478,11 @@ export class Blueprint {
   async checkStatus(): Promise<CompilationStatus> {
     // Blueprint wasn't saved yet, return default status
 
-    const compilationStatus = {
+    const compilationStatus: CompilationStatus = {
       clientStatus: this.props.clientStatus!,
       serverStatus: this.props.serverStatus!,
+      clientError: this.props.clientError,
+      serverError: this.props.serverError,
     };
 
     if (!this.props.id) {

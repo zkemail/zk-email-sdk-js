@@ -24,6 +24,8 @@ export type BlueprintProps = {
   decomposedRegexes: DecomposedRegex[];
   clientStatus?: Status;
   serverStatus?: Status;
+  clientError?: string;
+  serverError?: string;
   verifierContract?: VerifierContract;
   version?: number;
   stars?: number;
@@ -147,6 +149,8 @@ export type BlueprintResponse = {
   decomposed_regexes: DecomposedRegexResponse[];
   client_status: number;
   server_status: number;
+  client_error?: string;
+  server_error?: string;
   verifier_contract_address: string;
   verifier_contract_chain: number;
   version: number;
@@ -202,9 +206,14 @@ export type ChunkedZkeyUrl = {
 export type StatusResponse = {
   client_status: Status;
   server_status: Status;
+  client_error?: string;
+  server_error?: string;
+  github_username?: string;
 };
 
 export type CompilationStatus = {
   clientStatus: Status;
   serverStatus: Status;
+  clientError?: string;
+  serverError?: string;
 };
