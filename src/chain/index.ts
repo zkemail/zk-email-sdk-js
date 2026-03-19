@@ -1,5 +1,5 @@
 import { createPublicClient, http, encodeAbiParameters, parseAbiParameters, toHex, defineChain } from "viem";
-import { sepolia } from "viem/chains";
+import { baseSepolia, sepolia } from "viem/chains";
 import type { Chain } from "viem";
 import { Proof } from "../proof";
 import { logger } from "../utils/logger";
@@ -14,6 +14,7 @@ const paseoTestnet = defineChain({
 });
 
 const CHAIN_MAP: Record<number, Chain> = {
+  84532: baseSepolia,
   11155111: sepolia,
   420420417: paseoTestnet,
 };
