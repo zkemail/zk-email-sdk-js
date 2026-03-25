@@ -79,6 +79,7 @@
     "@mach-34/noir-bignum-paramgen": "^1.1.2",
     "@peculiar/webcrypto": "^1.5.0",
     "@zk-email/relayer-utils": "0.4.66-17",
+    "@zk-email/zkemail-nr": "^2.0.0",
     "@zk-email/snarkjs": "^0.0.1",
     "ethers": "^6.13.4",
     "jszip": "^3.10.1",

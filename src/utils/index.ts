@@ -1,5 +1,6 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
 import { poseidonLarge } from "./hash";
+import { hashRSAPublicKey } from "@zk-email/zkemail-nr";
 // @ts-ignore no types available
 import RSAKey from "rsa-key";
 import JSZip from "jszip";
@@ -257,7 +258,7 @@ export async function verifyPubKey(
     return false;
   }
 
-  if (zkFramework === ZkFramework.Circom || zkFramework === ZkFramework.Noir) {
+  if (zkFramework === ZkFramework.Circom) {
     for (const pKey of pKeys) {
       const jwt = await importPEMPublicKey(pKey);
 
@@ -268,6 +269,29 @@ export async function verifyPubKey(
       const poseidonHash = await poseidonLarge(modulusBigInt, 9, 242);
 
       if (poseidonHash.toString() === hashedPublicKey) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  if (zkFramework === ZkFramework.Noir) {
+    for (const pKey of pKeys) {
+      const jwt = await importPEMPublicKey(pKey);
+      if (!jwt.n) continue;
+
+      const modulusBigInt = base64UrlToBigInt(jwt.n);
+      const bitLength = modulusBigInt.toString(2).length;
+      const numLimbs = bitLength <= 1024 ? 9 : 18;
+
+      // Split modulus into 120-bit limbs (little-endian)
+      const modulusLimbs = bigIntToLimbs(modulusBigInt, 120, numLimbs);
+      // Dummy redc limbs — we only verify the modulus hash
+      const dummyRedcLimbs = new Array(numLimbs).fill(0n);
+
+      const { modulusHash } = await hashRSAPublicKey(modulusLimbs, dummyRedcLimbs);
+
+      if (modulusHash.toString() === hashedPublicKey) {
         return true;
       }
     }
@@ -327,6 +351,15 @@ async function importPEMPublicKey(pemKey: string): Promise<JsonWebKey> {
 
   // Export the key as a JWK, which gives you an object with properties like `n` and `e`
   return await crypto.subtle.exportKey("jwk", cryptoKey);
+}
+
+function bigIntToLimbs(num: bigint, bitsPerLimb: number, numLimbs: number): bigint[] {
+  const limbs: bigint[] = [];
+  const mask = (1n << BigInt(bitsPerLimb)) - 1n;
+  for (let i = 0; i < numLimbs; i++) {
+    limbs.push((num >> BigInt(i * bitsPerLimb)) & mask);
+  }
+  return limbs;
 }
 
 function base64UrlToBigInt(base64Url: string): bigint {
