@@ -1,7 +1,7 @@
 import { test, describe, expect } from "bun:test";
 import zkeSdk from "../src";
 
-const sdk = zkeSdk({ baseUrl: "https://dev-conductor.zk.email" });
+const sdk = zkeSdk({ baseUrl: "https://staging-conductor.zk.email" });
 
 describe("on chain verification test suite", () => {
   test("", async () => {

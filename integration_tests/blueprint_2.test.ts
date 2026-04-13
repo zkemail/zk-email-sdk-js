@@ -9,7 +9,7 @@ const sdk = zkeSdk({
       "",
     onTokenExpired: async () => {},
   },
-  baseUrl: "https://dev-conductor.zk.email",
+  baseUrl: "https://staging-conductor.zk.email",
   // baseUrl: "http://127.0.0.1:8080",
 });
 

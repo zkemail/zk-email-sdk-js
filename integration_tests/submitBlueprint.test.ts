@@ -2,7 +2,7 @@ import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import zkeSdk from "../src";
 
 const sdk = zkeSdk({
-  baseUrl: "https://dev-conductor.zk.email",
+  baseUrl: "https://staging-conductor.zk.email",
   auth: {
     getToken: async () =>
     "",
