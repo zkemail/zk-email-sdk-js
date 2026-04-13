@@ -3,7 +3,7 @@ import zkeSdk from "../src";
 import { readFile } from "fs/promises";
 
 const sdk = zkeSdk({
-  baseUrl: "https://dev-conductor.zk.email",
+  baseUrl: "https://staging-conductor.zk.email",
   // baseUrl: "http://127.0.0.1:8080",
   logging: { enabled: true, level: 'debug' }
 });
