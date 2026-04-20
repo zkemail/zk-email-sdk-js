@@ -240,7 +240,8 @@ export function getDKIMSelector(emlContent: string): string | null {
 export async function verifyPubKey(
   senderDomain: string,
   hashedPublicKey: string,
-  zkFramework: ZkFramework
+  zkFramework: ZkFramework,
+  hashedRedcKey?: string
 ): Promise<boolean> {
   const pKeys = await getPKeys(senderDomain);
 
@@ -282,16 +283,14 @@ export async function verifyPubKey(
 
       const modulusBigInt = base64UrlToBigInt(jwt.n);
       const bitLength = modulusBigInt.toString(2).length;
-      const numLimbs = bitLength <= 1024 ? 9 : 18;
+      const numBits = bitLength <= 1024 ? 1024 : 2048;
 
-      // Split modulus into 120-bit limbs (little-endian)
-      const modulusLimbs = bigIntToLimbs(modulusBigInt, 120, numLimbs);
-      // Dummy redc limbs — we only verify the modulus hash
-      const dummyRedcLimbs = new Array(numLimbs).fill(0n);
+      const modulusLimbs = NoirBignum.bnToLimbStrArray(modulusBigInt, numBits).map(BigInt);
+      const redcLimbs = NoirBignum.bnToRedcLimbStrArray(modulusBigInt, numBits).map(BigInt);
 
-      const { modulusHash } = await hashRSAPublicKey(modulusLimbs, dummyRedcLimbs);
+      const { modulusHash, redcHash } = await hashRSAPublicKey(modulusLimbs, redcLimbs);
 
-      if (modulusHash.toString() === hashedPublicKey) {
+      if (modulusHash.toString() === hashedPublicKey && (!hashedRedcKey || redcHash.toString() === hashedRedcKey)) {
         return true;
       }
     }
@@ -351,15 +350,6 @@ async function importPEMPublicKey(pemKey: string): Promise<JsonWebKey> {
 
   // Export the key as a JWK, which gives you an object with properties like `n` and `e`
   return await crypto.subtle.exportKey("jwk", cryptoKey);
-}
-
-function bigIntToLimbs(num: bigint, bitsPerLimb: number, numLimbs: number): bigint[] {
-  const limbs: bigint[] = [];
-  const mask = (1n << BigInt(bitsPerLimb)) - 1n;
-  for (let i = 0; i < numLimbs; i++) {
-    limbs.push((num >> BigInt(i * bitsPerLimb)) & mask);
-  }
-  return limbs;
 }
 
 function base64UrlToBigInt(base64Url: string): bigint {

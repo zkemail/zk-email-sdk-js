@@ -56,11 +56,16 @@ export async function verifyProof(proof: Proof, options?: GenerateProofOptions) 
 
   try {
     const pubKeyHash = await proof.getPubKeyHash();
+    const redcHash =
+      proof.props.zkFramework === ZkFramework.Noir
+        ? BigInt((proof.props.publicOutputs as string[])[1]).toString()
+        : undefined;
 
     const validPubKey = await verifyPubKey(
       proof.blueprint.props.senderDomain!,
       pubKeyHash,
-      proof.props.zkFramework
+      proof.props.zkFramework,
+      redcHash
     );
     if (!validPubKey) {
       logger.warn(
