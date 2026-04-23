@@ -56,10 +56,16 @@ export async function verifyProof(proof: Proof, options?: GenerateProofOptions) 
 
   try {
     const pubKeyHash = await proof.getPubKeyHash();
-    const redcHash =
-      proof.props.zkFramework === ZkFramework.Noir
-        ? BigInt((proof.props.publicOutputs as string[])[1]).toString()
-        : undefined;
+    let redcHash: string | undefined;
+    if (proof.props.zkFramework === ZkFramework.Noir) {
+      const outputs = proof.props.publicOutputs;
+      if (!Array.isArray(outputs) || outputs.length < 2 || !outputs[1]) {
+        throw new Error(
+          "Noir proof is missing required publicOutputs[1] (redc hash). Expected zkemail.nr v2.0.0+ output layout."
+        );
+      }
+      redcHash = BigInt(outputs[1]).toString();
+    }
 
     const validPubKey = await verifyPubKey(
       proof.blueprint.props.senderDomain!,
