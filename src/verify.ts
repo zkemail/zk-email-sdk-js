@@ -71,15 +71,10 @@ export async function verifyProof(proof: Proof, options?: GenerateProofOptions) 
       logger.warn(
         "Public key of proof is invalid. The domains of blueprint and proof don't match"
       );
-      if (!validPubKey) {
-        logger.warn(
-          "Public key of proof is invalid. The domains of blueprint and proof don't match"
-        );
-        return false;
-      }
+      return false;
     }
   } catch (err) {
-    console.warn("Failed to verify proofs public key: ", err);
+    logger.warn("Failed to verify proofs public key: ", err);
     return false;
   }
 
