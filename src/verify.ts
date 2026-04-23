@@ -59,9 +59,14 @@ export async function verifyProof(proof: Proof, options?: GenerateProofOptions) 
     let redcHash: string | undefined;
     if (proof.props.zkFramework === ZkFramework.Noir) {
       const outputs = proof.props.publicOutputs;
-      if (!Array.isArray(outputs) || outputs.length < 2 || !outputs[1]) {
+      if (!Array.isArray(outputs) || outputs.length < 6) {
         throw new Error(
-          "Noir proof is missing required publicOutputs[1] (redc hash). Expected zkemail.nr v2.0.0+ output layout."
+          `This Noir proof was generated against a pre-v2.0.0 zkemail.nr circuit and can no longer be verified securely (REG-670). The circuit did not commit to the Barrett reduction parameters, so the public-key check can be bypassed. Recompile the blueprint against zkemail.nr v2.0.0+ and regenerate the proof. (Found ${Array.isArray(outputs) ? outputs.length : "non-array"} public outputs; v2.0.0+ requires at least 6.)`
+        );
+      }
+      if (!outputs[1]) {
+        throw new Error(
+          "Noir proof publicOutputs[1] (redc hash) is empty. Expected zkemail.nr v2.0.0+ output layout — regenerate the proof against a v2.0.0+ circuit."
         );
       }
       redcHash = BigInt(outputs[1]).toString();

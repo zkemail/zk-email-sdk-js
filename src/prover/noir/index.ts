@@ -228,7 +228,7 @@ export function parseNoirPublicOutputs(
   const NOIR_V2_FIXED_OUTPUTS = 6;
   if (publicOutputs.length < NOIR_V2_FIXED_OUTPUTS) {
     throw new Error(
-      `Noir publicOutputs has ${publicOutputs.length} entries, expected at least ${NOIR_V2_FIXED_OUTPUTS} (zkemail.nr v2.0.0+ layout). This proof may have been generated against a pre-v2.0.0 circuit.`
+      `This blueprint's Noir circuit emitted ${publicOutputs.length} public outputs, but zkemail.nr v2.0.0+ requires at least ${NOIR_V2_FIXED_OUTPUTS} (modulus_hash, redc_hash, email_nullifier, header_hash[0..1], prover_address). The blueprint was compiled against a pre-v2.0.0 circuit and must be recompiled — proofs generated against the old circuit cannot be verified securely (REG-670).`
     );
   }
   let publicOutputIterator = NOIR_V2_FIXED_OUTPUTS;
