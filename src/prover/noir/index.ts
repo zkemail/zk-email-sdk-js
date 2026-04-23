@@ -218,13 +218,20 @@ export function parseNoirPublicOutputs(
   externalInputDefinition?: ExternalInput[],
   externalInputs?: ExternalInputInput[]
 ): { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } {
+  // Noir public output layout (zkemail.nr v2.0.0+):
   // 0: pubkey_modulus_hash
   // 1: pubkey_redc_hash
   // 2: email_nullifier
   // 3: header_hash[0]
   // 4: header_hash[1]
   // 5: prover_address
-  let publicOutputIterator = 6;
+  const NOIR_V2_FIXED_OUTPUTS = 6;
+  if (publicOutputs.length < NOIR_V2_FIXED_OUTPUTS) {
+    throw new Error(
+      `Noir publicOutputs has ${publicOutputs.length} entries, expected at least ${NOIR_V2_FIXED_OUTPUTS} (zkemail.nr v2.0.0+ layout). This proof may have been generated against a pre-v2.0.0 circuit.`
+    );
+  }
+  let publicOutputIterator = NOIR_V2_FIXED_OUTPUTS;
 
   const publicStruct: { [key: string]: string[] } = {};
   const result: { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } = {
