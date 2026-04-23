@@ -277,6 +277,11 @@ export async function verifyPubKey(
   }
 
   if (zkFramework === ZkFramework.Noir) {
+    if (!hashedRedcKey) {
+      throw new Error(
+        "hashedRedcKey is required for Noir proof verification (REG-670). Pass the redc hash from publicOutputs[1]."
+      );
+    }
     for (const pKey of pKeys) {
       const jwt = await importPEMPublicKey(pKey);
       if (!jwt.n) continue;
@@ -290,7 +295,7 @@ export async function verifyPubKey(
 
       const { modulusHash, redcHash } = await hashRSAPublicKey(modulusLimbs, redcLimbs);
 
-      if (modulusHash.toString() === hashedPublicKey && (!hashedRedcKey || redcHash.toString() === hashedRedcKey)) {
+      if (modulusHash.toString() === hashedPublicKey && redcHash.toString() === hashedRedcKey) {
         return true;
       }
     }
