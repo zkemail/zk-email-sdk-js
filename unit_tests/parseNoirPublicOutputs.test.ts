@@ -22,14 +22,17 @@ describe("parsePublicSignalsNoir", () => {
         ],
         name: "trew",
         maxLength: 128,
+        maxMatchLength: 128,
         location: "header",
       },
     ];
 
     const publicOutputs = [
       "0x02f30f056428e02c16f1322e94ba6b6b2ebc0ca30037e80838d3eab3220fa010",
+      "0x0000000000000000000000000000000000000000000000000000000000aabbcc",
       "0x000000000000000000000000000000002762c5f9cec4e694920e13b88733508b",
       "0x00000000000000000000000000000000ce2efef4c16e50ee1799f4f6b78a073a",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       "0x0000000000000000000000000000000000000000000000000000000000000053",
       "0x0000000000000000000000000000000000000000000000000000000000000075",
@@ -193,6 +196,7 @@ describe("parsePublicSignalsNoir", () => {
         ],
         name: "trews",
         maxLength: 64,
+        maxMatchLength: 64,
         location: "header",
       },
       {
@@ -211,8 +215,10 @@ describe("parsePublicSignalsNoir", () => {
 
     const publicOutputs = [
       "0x02f30f056428e02c16f1322e94ba6b6b2ebc0ca30037e80838d3eab3220fa010",
+      "0x0000000000000000000000000000000000000000000000000000000000aabbcc",
       "0x000000000000000000000000000000002762c5f9cec4e694920e13b88733508b",
       "0x00000000000000000000000000000000ce2efef4c16e50ee1799f4f6b78a073a",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       "0x0000000000000000000000000000000000000000000000000000000000000053",
       "0x0000000000000000000000000000000000000000000000000000000000000075",
@@ -390,6 +396,7 @@ describe("parsePublicSignalsNoir", () => {
         ],
         name: "trews",
         maxLength: 64,
+        maxMatchLength: 64,
         location: "header",
       },
       {
@@ -408,8 +415,10 @@ describe("parsePublicSignalsNoir", () => {
 
     const publicOutputs = [
       "0x02f30f056428e02c16f1322e94ba6b6b2ebc0ca30037e80838d3eab3220fa010",
+      "0x0000000000000000000000000000000000000000000000000000000000aabbcc",
       "0x000000000000000000000000000000002762c5f9cec4e694920e13b88733508b",
       "0x00000000000000000000000000000000ce2efef4c16e50ee1799f4f6b78a073a",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
       "0x0000000000000000000000000000000000000000000000000000000000000000",
       "0x000000000000000000000000000000000000000000000000000072657473616d",
       "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -546,7 +555,31 @@ describe("parsePublicSignalsNoir", () => {
       "0x11b14e35c3a92073ff2b15a906e305408f71422a3c548a6bbb52eae7f66a5c49",
     ];
 
-    const outputs = parseNoirPublicOutputs(publicOutputs, decomposedRegexes, externalInputs);
-    console.log("outputs: ", outputs);
+    const externalInputDefinitions: ExternalInput[] = [
+      { name: "name", maxLength: 32 },
+    ];
+    const outputs = parseNoirPublicOutputs(publicOutputs, decomposedRegexes, externalInputDefinitions, externalInputs);
+    expect(outputs.publicData.trews[0]).toBe("Succinct");
+    expect(outputs.publicData.trews[1]).toBe("den");
+    expect(outputs.externalInputsProof?.name).toBe("master");
+  });
+
+  test("REG-670: throws when publicOutputs has fewer than 6 fixed slots (pre-v2.0.0 layout)", () => {
+    // 5 slots = pre-v2.0.0 layout (no redc_hash); v2.0.0+ requires 6.
+    const fiveSlotOutputs = [
+      "0x02f30f056428e02c16f1322e94ba6b6b2ebc0ca30037e80838d3eab3220fa010",
+      "0x000000000000000000000000000000002762c5f9cec4e694920e13b88733508b",
+      "0x00000000000000000000000000000000ce2efef4c16e50ee1799f4f6b78a073a",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+    ];
+
+    expect(() => parseNoirPublicOutputs(fiveSlotOutputs, [])).toThrow(/REG-670/);
+    expect(() => parseNoirPublicOutputs(fiveSlotOutputs, [])).toThrow(/v2\.0\.0/);
+    expect(() => parseNoirPublicOutputs(fiveSlotOutputs, [])).toThrow(/at least 6/);
+  });
+
+  test("REG-670: throws on empty publicOutputs", () => {
+    expect(() => parseNoirPublicOutputs([], [])).toThrow(/REG-670/);
   });
 });

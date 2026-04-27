@@ -1,5 +1,6 @@
 const PUBLIC_SDK_KEY = "pk_live_51NXwT8cHf0vYAjQK9LzB3pM6R8gWx2F";
 import { poseidonLarge } from "./hash";
+import { hashRSAPublicKey } from "@zk-email/zkemail-nr";
 // @ts-ignore no types available
 import RSAKey from "rsa-key";
 import JSZip from "jszip";
@@ -239,7 +240,8 @@ export function getDKIMSelector(emlContent: string): string | null {
 export async function verifyPubKey(
   senderDomain: string,
   hashedPublicKey: string,
-  zkFramework: ZkFramework
+  zkFramework: ZkFramework,
+  hashedRedcKey?: string
 ): Promise<boolean> {
   const pKeys = await getPKeys(senderDomain);
 
@@ -257,7 +259,7 @@ export async function verifyPubKey(
     return false;
   }
 
-  if (zkFramework === ZkFramework.Circom || zkFramework === ZkFramework.Noir) {
+  if (zkFramework === ZkFramework.Circom) {
     for (const pKey of pKeys) {
       const jwt = await importPEMPublicKey(pKey);
 
@@ -268,6 +270,41 @@ export async function verifyPubKey(
       const poseidonHash = await poseidonLarge(modulusBigInt, 9, 242);
 
       if (poseidonHash.toString() === hashedPublicKey) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  if (zkFramework === ZkFramework.Noir) {
+    if (!hashedRedcKey) {
+      throw new Error(
+        "hashedRedcKey is required for Noir proof verification (REG-670). Pass the redc hash from publicOutputs[1]."
+      );
+    }
+    for (const pKey of pKeys) {
+      const jwt = await importPEMPublicKey(pKey);
+      if (!jwt.n) continue;
+
+      const modulusBigInt = base64UrlToBigInt(jwt.n);
+      const bitLength = modulusBigInt.toString(2).length;
+      let numBits: 1024 | 2048;
+      if (bitLength === 1024) {
+        numBits = 1024;
+      } else if (bitLength === 2048) {
+        numBits = 2048;
+      } else {
+        throw new Error(
+          `Unsupported RSA key size for Noir verification: ${bitLength} bits. Supported sizes are 1024 and 2048 (mirrors NoirProver.detectKeySize).`
+        );
+      }
+
+      const modulusLimbs = NoirBignum.bnToLimbStrArray(modulusBigInt, numBits).map(BigInt);
+      const redcLimbs = NoirBignum.bnToRedcLimbStrArray(modulusBigInt, numBits).map(BigInt);
+
+      const { modulusHash, redcHash } = await hashRSAPublicKey(modulusLimbs, redcLimbs);
+
+      if (modulusHash.toString() === hashedPublicKey && redcHash.toString() === hashedRedcKey) {
         return true;
       }
     }
