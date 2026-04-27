@@ -211,6 +211,15 @@ export class NoirProver extends AbstractProver implements IProver {
   }
 }
 
+// Noir public output layout (zkemail.nr v2.0.0+):
+// 0: pubkey_modulus_hash
+// 1: pubkey_redc_hash
+// 2: email_nullifier
+// 3: header_hash[0]
+// 4: header_hash[1]
+// 5: prover_address
+export const NOIR_V2_FIXED_OUTPUTS = 6;
+
 // external inputs first
 export function parseNoirPublicOutputs(
   publicOutputs: string[],
@@ -218,14 +227,6 @@ export function parseNoirPublicOutputs(
   externalInputDefinition?: ExternalInput[],
   externalInputs?: ExternalInputInput[]
 ): { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } {
-  // Noir public output layout (zkemail.nr v2.0.0+):
-  // 0: pubkey_modulus_hash
-  // 1: pubkey_redc_hash
-  // 2: email_nullifier
-  // 3: header_hash[0]
-  // 4: header_hash[1]
-  // 5: prover_address
-  const NOIR_V2_FIXED_OUTPUTS = 6;
   if (publicOutputs.length < NOIR_V2_FIXED_OUTPUTS) {
     throw new Error(
       `This blueprint's Noir circuit emitted ${publicOutputs.length} public outputs, but zkemail.nr v2.0.0+ requires at least ${NOIR_V2_FIXED_OUTPUTS} (modulus_hash, redc_hash, email_nullifier, header_hash[0..1], prover_address). The blueprint was compiled against a pre-v2.0.0 circuit and must be recompiled — proofs generated against the old circuit cannot be verified securely (REG-670).`
@@ -259,6 +260,11 @@ export function parseNoirPublicOutputs(
     const { maxMatchLength } = decomposedRegex;
     decomposedRegex.parts.forEach((part) => {
       if (decomposedRegex.isHashed) {
+        if (publicOutputIterator >= publicOutputs.length) {
+          throw new Error(
+            `parseNoirPublicOutputs: ran out of public outputs at index ${publicOutputIterator} while parsing hashed regex "${decomposedRegex.name}" — circuit layout does not match this blueprint.`
+          );
+        }
         partOutputs.push(publicOutputs[publicOutputIterator]);
         publicOutputIterator++;
       } else if (part.isPublic) {
@@ -267,6 +273,12 @@ export function parseNoirPublicOutputs(
         if (!partMaxLength) {
           throw new Error(
             `No maxLength found for public part. Either part.maxLength or decomposedRegex.maxMatchLength must be defined`
+          );
+        }
+
+        if (publicOutputIterator + partMaxLength >= publicOutputs.length) {
+          throw new Error(
+            `parseNoirPublicOutputs: ran out of public outputs while parsing regex "${decomposedRegex.name}" at index ${publicOutputIterator} (need ${partMaxLength + 1} more slots, have ${publicOutputs.length - publicOutputIterator}). Circuit layout does not match this blueprint.`
           );
         }
 
