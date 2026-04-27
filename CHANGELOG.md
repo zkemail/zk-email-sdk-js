@@ -21,23 +21,36 @@ uses [semantic versioning](https://semver.org/).
 
 ### Changed (breaking)
 
-- **Noir public output layout**: `parseNoirPublicOutputs` now expects the
-  `zkemail.nr` v2.0.0+ layout with six fixed slots (was five):
-  `[modulus_hash, redc_hash, email_nullifier, header_hash[0],
+- **BREAKING — Noir public output layout**: `parseNoirPublicOutputs` now
+  expects the `zkemail.nr` v2.0.0+ layout with six fixed slots (was
+  five): `[modulus_hash, redc_hash, email_nullifier, header_hash[0],
   header_hash[1], prover_address]`. Proofs generated against a
   pre-v2.0.0 circuit will fail with an explicit length check instead of
   silently returning shifted `publicData`. Regenerate Noir proofs
   against circuits compiled with `@zk-email/zkemail-nr` v2.0.0+.
-- **`Blueprint.verifyProofOnChain`**: now returns the actual
+  - Before: `[modulus_hash, email_nullifier, header_hash[0], header_hash[1], prover_address, ...]`
+  - After:  `[modulus_hash, redc_hash, email_nullifier, header_hash[0], header_hash[1], prover_address, ...]`
+- **BREAKING — `Blueprint.verifyProofOnChain`**: now returns the actual
   `ZKEmailVerifier.verifyEmailProof` result. Previously it always
   returned `true` regardless of on-chain outcome. Callers that treated
   a resolved promise as a successful verification must now inspect the
   boolean.
-- **Noir RSA key size**: both proving (`NoirProver`) and verification
-  (`verifyPubKey`) now throw an explicit error for RSA keys that are
-  not 1024-bit or 2048-bit. Keys larger than 2048 bits used to be
-  silently clamped to 2048 and would fail verification with a misleading
-  "domains don't match" message.
+  - Before: `await blueprint.verifyProofOnChain(proof); // implicit success`
+  - After:  `const ok = await blueprint.verifyProofOnChain(proof); if (!ok) { ... }`
+- **BREAKING — Noir RSA key size**: both proving (`NoirProver`) and
+  verification (`verifyPubKey`) now throw an explicit error for RSA
+  keys that are not exactly 1024-bit or 2048-bit. Keys larger than
+  2048 bits used to be silently clamped to 2048 and would fail
+  verification with a misleading "domains don't match" message.
+  - Migration: ensure DKIM keys upstream are 1024 or 2048 bits; non-standard
+    sizes must be re-issued before verification will succeed.
+- **BREAKING — `verifyPubKey` signature**: requires a fourth argument
+  `hashedRedcKey` when `zkFramework === ZkFramework.Noir`. Calls that
+  pass `ZkFramework.Noir` without it now throw at runtime.
+  - Before: `verifyPubKey(domain, modulusHash, ZkFramework.Noir)`
+  - After:  `verifyPubKey(domain, modulusHash, ZkFramework.Noir, redcHash)`
+  - `verifyProof` derives `redcHash` from `publicOutputs[1]` automatically,
+    so internal callers do not need to update.
 
 ### Added
 
