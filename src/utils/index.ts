@@ -288,14 +288,14 @@ export async function verifyPubKey(
 
       const modulusBigInt = base64UrlToBigInt(jwt.n);
       const bitLength = modulusBigInt.toString(2).length;
-      let numBits: number;
-      if (bitLength <= 1024) {
+      let numBits: 1024 | 2048;
+      if (bitLength === 1024) {
         numBits = 1024;
-      } else if (bitLength <= 2048) {
+      } else if (bitLength === 2048) {
         numBits = 2048;
       } else {
         throw new Error(
-          `Unsupported RSA key size for Noir verification: ${bitLength} bits. Supported sizes are 1024 and 2048.`
+          `Unsupported RSA key size for Noir verification: ${bitLength} bits. Supported sizes are 1024 and 2048 (mirrors NoirProver.detectKeySize).`
         );
       }
 
