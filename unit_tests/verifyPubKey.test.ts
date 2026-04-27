@@ -12,9 +12,10 @@ const emptyArchiveResponse = () =>
   } as Response);
 
 describe("verifyPubKey - Noir (REG-670)", () => {
-  const originalFetch = globalThis.fetch;
+  let originalFetch: typeof globalThis.fetch;
 
   beforeEach(() => {
+    originalFetch = globalThis.fetch;
     globalThis.fetch = mock(emptyArchiveResponse) as unknown as typeof fetch;
   });
 
