@@ -88,6 +88,10 @@ export default defineConfig({
       zlib: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/zlib"),
       tty: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/tty"),
       domain: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/domain"),
+      tls: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/empty.js"),
+      "node:tls": path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/empty.js"),
+      net: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/empty.js"),
+      "node:net": path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/empty.js"),
     },
   },
   define: {
