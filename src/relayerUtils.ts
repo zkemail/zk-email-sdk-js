@@ -293,13 +293,8 @@ export async function generateProofInputs(
         parts: dcr.parts.map((p) => {
           const isPublic = p.isPublic ?? (p as any).is_public ?? false;
           const regexDef = p.regexDef ?? (p as any).regex_def ?? "";
-          const maxLength = p.maxLength ?? (p as any).max_length;
 
-          if (isPublic) {
-            return [regexDef, maxLength ?? 256];
-          } else {
-            return regexDef;
-          }
+          return { isPublic, regexDef };
         }),
         provingFramework: "circom",
       };
