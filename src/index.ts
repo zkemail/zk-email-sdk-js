@@ -1,4 +1,4 @@
-import { Blueprint, BlueprintProps, ListBlueprintsOptions } from "./blueprint";
+import { Blueprint, BlueprintProps, ListBlueprintsOptions, ZkFramework } from "./blueprint";
 import { BlueprintGroup } from "./blueprintGroup";
 import { Proof } from "./proof";
 import { BlueprintGroupProps } from "./types/blueprintGroup";
@@ -50,6 +50,13 @@ export const initZkEmailSdk = (sdkOptions?: SdkOptions) => {
     createBlueprint(props: BlueprintProps) {
       if (!sdkOptions && !sdkOptions!.auth) {
         throw new Error("You need to specify options.auth to use createBlueprint");
+      }
+      const disallowedFrameworks = [ZkFramework.Sp1, ZkFramework.Noir];
+      if (props.clientZkFramework && disallowedFrameworks.includes(props.clientZkFramework)) {
+        throw new Error("Only ZkFramework.Circom is currently supported for clientZkFramework");
+      }
+      if (props.serverZkFramework && disallowedFrameworks.includes(props.serverZkFramework)) {
+        throw new Error("Only ZkFramework.Circom is currently supported for serverZkFramework");
       }
       const blueprint = new Blueprint(props, baseUrl, sdkOptions!.auth);
       return blueprint;

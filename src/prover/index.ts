@@ -50,11 +50,8 @@ export abstract class AbstractProver implements IProver {
       throw new Error("Invalid blueprint: must be an instance of Blueprint class");
     }
     logger.debug("blueprint.props.clientZkFramework!: ", blueprint.props.clientZkFramework!);
-    if (
-      options?.isLocal &&
-      ![ZkFramework.Circom, ZkFramework.Noir].includes(blueprint.props.clientZkFramework!)
-    ) {
-      throw new Error("Local proving is currently only supported using Circom");
+    if (options?.isLocal) {
+      throw new Error("Local proving is currently disabled; only remote proving is supported");
     }
 
     this.blueprint = blueprint;
