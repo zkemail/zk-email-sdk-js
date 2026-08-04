@@ -291,9 +291,9 @@ export async function generateProofInputs(
         maxMatchLength: dcr.maxMatchLength,
         regexGraphJson: regexGraph !== null && regexGraph !== undefined ? JSON.stringify(regexGraph) : null,
         parts: dcr.parts.map((p) => {
-          const isPublic = p.isPublic ?? p.is_public ?? false;
-          const regexDef = p.regexDef ?? p.regex_def ?? "";
-          const maxLength = p.maxLength ?? p.max_length;
+          const isPublic = p.isPublic ?? (p as any).is_public ?? false;
+          const regexDef = p.regexDef ?? (p as any).regex_def ?? "";
+          const maxLength = p.maxLength ?? (p as any).max_length;
 
           if (isPublic) {
             return [regexDef, maxLength ?? 256];
