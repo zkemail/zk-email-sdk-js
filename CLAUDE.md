@@ -82,7 +82,7 @@ Example user prompts that trigger this:
 - **`Gmail`/`Outlook`** (`src/login_for_email/`) - OAuth and email fetching implementations
 
 ### Key Patterns
-- **Factory Pattern**: SDK initialization via `zkSdk({ baseUrl, auth })`
+- **Factory Pattern**: SDK initialization via `initZkEmailSdk({ baseUrl, auth })`
 - **Strategy Pattern**: Local vs remote proof generation strategies
 
 ### Entry Points

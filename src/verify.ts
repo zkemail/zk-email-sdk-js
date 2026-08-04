@@ -102,7 +102,7 @@ export async function verifyProof(proof: Proof, options?: GenerateProofOptions) 
       if (!options || !options.noirWasm) {
         throw new Error("You must pass initialized noirWasm to the options");
       }
-      const circuit = await proof.blueprint.getNoirCircuit();
+      const circuit = await proof.blueprint.getNoirCircuit(proof.props.dkimKeyBits);
       const proofDataHex = proof.props.proofData!;
       return await verifyNoirProof(
         proofDataHex,
@@ -137,7 +137,7 @@ export async function verifyNoirProof(
   };
 
   try {
-    const isValid = await backend.verifyProof(noirProof);
+    const isValid = await backend.verifyProof(noirProof, { keccak: true });
     return isValid;
   } catch (err) {
     logger.error("err for noir backend.verifyProof: ", err);

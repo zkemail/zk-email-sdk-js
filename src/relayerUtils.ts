@@ -3,6 +3,7 @@ import {
   DecomposedRegexJson,
   DecomposedRegexPart,
   DecomposedRegexPartJson,
+  Blueprint, 
 } from "./blueprint";
 import {
   BlueprintProps,
@@ -103,6 +104,7 @@ export async function testBlueprint(
   revealPrivate = false
 ): Promise<string[][]> {
   const parsedEmail = await parseEmail(eml, blueprint.ignoreBodyHashCheck);
+  console.log("parsedEmail: ", parsedEmail);
   const domain = getSenderDomain(parsedEmail);
 
   if (blueprint.senderDomain !== domain) {
@@ -119,6 +121,7 @@ export async function testBlueprint(
   let body = parsedEmail.cleanedBody;
   if (blueprint.shaPrecomputeSelector) {
     const splitEmail = body.split(blueprint.shaPrecomputeSelector)[1];
+    console.log("splitEmail: ", splitEmail);
     if (!splitEmail) {
       throw new Error(
         `Precompute selector was not found in email, selector: ${blueprint.shaPrecomputeSelector}`
@@ -128,8 +131,11 @@ export async function testBlueprint(
   }
 
   const header = parsedEmail.canonicalizedHeader;
+  console.log("header: ", header);
 
+  console.log("checkInputLengths");
   await checkInputLengths(header, body, blueprint);
+  console.log("checkInputLengths done");
 
   const output = await Promise.all(
     blueprint.decomposedRegexes.flatMap((dcr: DecomposedRegex) => [
@@ -154,11 +160,15 @@ async function checkInputLengths(header: string, body: string, blueprint: Bluepr
   if (!blueprint.ignoreBodyHashCheck) {
     const bodyData = encoder.encode(body);
 
+    console.log("body.length: ", body.length);
     const bodyShaLength = ((body.length + 63 + 65) / 64) * 64;
+    console.log("bodyShaLength: ", bodyShaLength);
 
     const maxShaBytes = Math.max(bodyShaLength, blueprint.emailBodyMaxLength!);
+    console.log("maxShaBytes: ", maxShaBytes);
 
     const bodyLength = (await sha256Pad(bodyData, maxShaBytes)).get("messageLength");
+    console.log("bodyLength: ", bodyLength);
 
     if (bodyLength > blueprint.emailBodyMaxLength!) {
       throw new Error(`emailBodyMaxLength of ${blueprint.emailBodyMaxLength} was exceeded`);
@@ -187,16 +197,28 @@ export async function testDecomposedRegex(
   } else {
     throw Error(`Unsupported location ${decomposedRegex.location}`);
   }
-
   const maxLength =
-    "maxLength" in decomposedRegex ? decomposedRegex.maxLength : decomposedRegex.max_length;
+    "maxLength" in decomposedRegex ? decomposedRegex.maxLength : 
+    ("max_length" in decomposedRegex ? decomposedRegex.max_length : undefined);
+    
+  const maxMatchLength = 
+    "maxMatchLength" in decomposedRegex ? decomposedRegex.maxMatchLength : 
+    ("max_match_length" in decomposedRegex ? decomposedRegex.max_match_length : undefined);
 
+  console.log("inputStr: ", inputStr);
+  console.log("inputDecomposedRegex: ", inputDecomposedRegex);
   await relayerUtilsInit;
   const privateResult = extractSubstr(inputStr, inputDecomposedRegex, false);
 
-  if (privateResult[0].length > maxLength) {
+  if (maxLength && privateResult[0].length > maxLength) {
     throw new Error(
       `Max length of ${maxLength} of extracted result was exceeded for decomposed regex ${decomposedRegex.name}`
+    );
+  }
+
+  if (maxMatchLength && privateResult[0].length > maxMatchLength) {
+    throw new Error(
+      `Max match length of ${maxMatchLength} of extracted result was exceeded for decomposed regex ${decomposedRegex.name}`
     );
   }
 
@@ -204,6 +226,10 @@ export async function testDecomposedRegex(
     return privateResult;
   }
 
+  console.log("calling extractSubstr");
+  console.log("revealPrivate: ", revealPrivate);
+  console.log("inputDecomposedRegex: ", inputDecomposedRegex);
+  console.log("inputStr: ", inputStr);
   const result = extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
   return result;
 }
@@ -212,7 +238,8 @@ export async function generateProofInputs(
   eml: string,
   decomposedRegexes: DecomposedRegex[],
   externalInputs: (ExternalInputInput & { maxLength: number })[],
-  params: GenerateProofInputsParams
+  params: GenerateProofInputsParams,
+  blueprint: Blueprint 
 ): Promise<string> {
   try {
     const internalParams: GenerateProofInputsParamsInternal = {
@@ -224,18 +251,59 @@ export async function generateProofInputs(
     };
 
     await relayerUtilsInit;
+    let regexGraphs: any = null;
 
+    regexGraphs = await blueprint.getCircomRegexGraphs();
+    
     const decomposedRegexesCleaned = decomposedRegexes.map((dcr) => {
+      // Handle case where regexGraphs is null (old blueprint without regex graphs)
+      if (!regexGraphs) {
+        logger.warn(`Regex Graphs is null for circuit input`);
+      }
+
+      let regexGraph;
+      if (regexGraphs) {
+        regexGraph = regexGraphs[`${dcr.name}_regex.json`];
+      } else {
+        regexGraph = null;
+      }
+
+
+      let haystackLocation;
+      if (dcr.location === "header") {
+        haystackLocation = "header";
+      } else {
+        haystackLocation = "body";
+      }
+      console.log("dcr \n", dcr);
+
+      const maxHaystackLength =
+        dcr.location === "header"
+          ? blueprint.props.emailHeaderMaxLength
+          : blueprint.props.emailBodyMaxLength;
+      
+      if (!maxHaystackLength) return;
+
       return {
-        ...dcr,
-        parts: dcr.parts.map((p) => ({
-          // @ts-ignore
-          is_public: p.isPublic || !!p.is_public,
-          // @ts-ignore
-          regex_def: p.regexDef || !!p.regex_def,
-        })),
+        name: dcr.name,
+        haystackLocation,
+        maxHaystackLength: maxHaystackLength,
+        maxMatchLength: dcr.maxMatchLength,
+        regexGraphJson: regexGraph !== null && regexGraph !== undefined ? JSON.stringify(regexGraph) : null,
+        parts: dcr.parts.map((p) => {
+          const isPublic = p.isPublic ?? (p as any).is_public ?? false;
+          const regexDef = p.regexDef ?? (p as any).regex_def ?? "";
+          const maxLength = p.maxLength ?? (p as any).max_length;
+
+          if (isPublic) {
+            return [regexDef, maxLength ?? 256];
+          } else {
+            return regexDef;
+          }
+        }),
+        provingFramework: "circom",
       };
-    });
+    }).filter(Boolean); // Remove undefined entries
 
     logger.debug("calling generateCircuitInputsWithDecomposedRegexesAndExternalInputs");
     const inputs = await generateCircuitInputsWithDecomposedRegexesAndExternalInputs(
@@ -338,7 +406,7 @@ export function parsePublicSignals(
   decomposedRegexes.forEach((decomposedRegex) => {
     let signalLength = 1;
     if (!decomposedRegex.isHashed) {
-      signalLength = Math.ceil(decomposedRegex.maxLength / 31);
+      signalLength = Math.ceil((decomposedRegex.maxLength || 0) / 31);
     }
 
     const partOutputs: string[] = [];

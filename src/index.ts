@@ -30,13 +30,17 @@ export {
   getMaxEmailBodyLength,
   extractEMLDetails,
 } from "./relayerUtils";
-export { getLoginWithGithubUrl } from "./auth";
+export { getLoginWithGithubUrl, DEFAULT_GITHUB_CLIENT_ID, DEFAULT_GITHUB_SCOPE, DEFAULT_GITHUB_AUTHORIZE_URL } from "./auth";
+export type { GitHubLoginConfig } from "./auth";
 // Re-Export zod class to avoid version mismatches if package importing this sdk has zod
 export { ZodError } from "./blueprintValidation";
 export { LoginWithGoogle, Gmail } from "./login_for_email/gmail";
+export type { GoogleLoginConfig } from "./login_for_email/gmail";
 export { Outlook, LoginWithMicrosoft } from "./login_for_email/microsoft";
+export type { MicrosoftLoginConfig } from "./login_for_email/microsoft";
 
-export function initZkEmailSdk(sdkOptions?: SdkOptions) {
+// Exported sdk, functions that need initialization
+export const initZkEmailSdk = (sdkOptions?: SdkOptions) => {
   const baseUrl = sdkOptions?.baseUrl || "https://conductor.zk.email";
   
   // Configure logging

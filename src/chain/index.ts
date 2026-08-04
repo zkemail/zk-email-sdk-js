@@ -1,55 +1,43 @@
-import { createPublicClient, http } from "viem";
-import { base } from "viem/chains";
+import { createPublicClient, http, encodeAbiParameters, parseAbiParameters, toHex, defineChain } from "viem";
+import { baseSepolia, sepolia } from "viem/chains";
+import type { Chain } from "viem";
 import { Proof } from "../proof";
-import { ProofData } from "../types";
-// @ts-ignore Does not provide types
-import * as snarkjs from "snarkjs";
 import { logger } from "../utils/logger";
 
-function getVerifierContractAbi(signalLength: number) {
-  return [
-    {
-      type: "function",
-      name: "verify",
-      inputs: [
-        {
-          name: "proofType",
-          type: "uint8",
-          internalType: "ProofType",
-        },
-        {
-          name: "a",
-          type: "uint256[2]",
-          internalType: "uint256[2]",
-        },
-        {
-          name: "b",
-          type: "uint256[2][2]",
-          internalType: "uint256[2][2]",
-        },
-        {
-          name: "c",
-          type: "uint256[2]",
-          internalType: "uint256[2]",
-        },
-        {
-          name: "signals",
-          type: `uint256[${signalLength}]`,
-          internalType: `uint256[${signalLength}]`,
-        },
-      ],
-      outputs: [],
-      stateMutability: "view",
-    },
-  ];
-}
+const paseoTestnet = defineChain({
+  id: 420420417,
+  name: "Polkadot Hub Testnet",
+  nativeCurrency: { name: "PAS", symbol: "PAS", decimals: 18 },
+  rpcUrls: {
+    default: { http: ["https://services.polkadothub-rpc.com/testnet"] },
+  },
+});
+
+const CHAIN_MAP: Record<number, Chain> = {
+  84532: baseSepolia,
+  11155111: sepolia,
+  420420417: paseoTestnet,
+};
+
+const VERIFIER_ABI = [
+  {
+    type: "function",
+    name: "verify",
+    inputs: [
+      { name: "proof", type: "bytes" },
+      { name: "publicInputs", type: "bytes32[]" },
+    ],
+    outputs: [],
+    stateMutability: "view",
+  },
+] as const;
 
 export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
   logger.debug("verifierContract: ", proof.blueprint.props.verifierContract);
-  if (
-    !proof.blueprint.props.verifierContract?.chain ||
-    !proof.blueprint.props.verifierContract?.address
-  ) {
+
+  const { chain: chainId, address } = proof.blueprint.props.verifierContract ?? {};
+
+  if (!chainId || !address) {
     throw new Error("No verifier contract deployed for the blueprint of this proof");
   }
 
@@ -62,48 +50,50 @@ export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
     throw new Error("Not a correct proof type");
   }
 
-  // Create public client for Base Sepolia
+  const chain = CHAIN_MAP[chainId];
+  if (!chain) {
+    throw new Error(`Unsupported chain id: ${chainId}`);
+  }
+
   const client = createPublicClient({
-    chain: base,
-    transport: http("https://sepolia.base.org"),
+    chain,
+    transport: http(),
   });
 
   // TODO: this is parsed when getting the data from the backend,
-  // add propper typing from the start
+  // add proper typing from the start
   // @ts-ignore
-  const proofData = proof.props.proofData as ProofData;
+  const proofData = proof.props.proofData as {
+    pi_a: string[];
+    pi_b: string[][];
+    pi_c: string[];
+  };
 
-  const args = [
-    [BigInt(proofData.pi_a[0]), BigInt(proofData.pi_a[1])],
-    [
-      [
-        BigInt(proofData.pi_b[0][1]), // swap coordinates
-        BigInt(proofData.pi_b[0][0]),
-      ],
-      [
-        BigInt(proofData.pi_b[1][1]), // swap coordinates
-        BigInt(proofData.pi_b[1][0]),
-      ],
-    ],
-    [BigInt(proofData.pi_c[0]), BigInt(proofData.pi_c[1])],
-    // TODO: this is parsed when getting the data from the backend,
-    // add propper typing from the start
-    // @ts-ignore
-    proof.props.publicOutputs.map((output) => BigInt(output)),
-  ] as const;
+  const pA: [bigint, bigint] = [BigInt(proofData.pi_a[0]), BigInt(proofData.pi_a[1])];
+  const pB: [[bigint, bigint], [bigint, bigint]] = [
+    [BigInt(proofData.pi_b[0][1]), BigInt(proofData.pi_b[0][0])], // swap coordinates
+    [BigInt(proofData.pi_b[1][1]), BigInt(proofData.pi_b[1][0])], // swap coordinates
+  ];
+  const pC: [bigint, bigint] = [BigInt(proofData.pi_c[0]), BigInt(proofData.pi_c[1])];
 
-  let calldata = await snarkjs.groth16.exportSolidityCallData(proofData, proof.props.publicOutputs);
-  calldata = JSON.parse(`[${calldata}]`);
+  // ABI-encode (pA, pB, pC) into bytes
+  const proofBytes = encodeAbiParameters(
+    parseAbiParameters("uint256[2], uint256[2][2], uint256[2]"),
+    [pA, pB, pC]
+  );
+
+  // Convert each public output to bytes32 (left-padded, matching uint256 layout)
+  // @ts-ignore
+  const publicInputs = (proof.props.publicOutputs as string[]).map(
+    (o) => toHex(BigInt(o), { size: 32 })
+  );
 
   try {
     await client.readContract({
-      address: proof.blueprint.props.verifierContract.address as `0x${string}`,
-      // TODO: this is parsed when getting the data from the backend,
-      // add propper typing from the start
-      // @ts-ignore
-      abi: getVerifierContractAbi(proof.props.publicOutputs.length),
+      address: address as `0x${string}`,
+      abi: VERIFIER_ABI,
       functionName: "verify",
-      args: [1, ...calldata],
+      args: [proofBytes, publicInputs],
     });
     return true;
   } catch (error) {

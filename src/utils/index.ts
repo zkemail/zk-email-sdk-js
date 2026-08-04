@@ -5,8 +5,6 @@ import RSAKey from "rsa-key";
 import JSZip from "jszip";
 import { Buffer } from "buffer";
 import * as NoirBignum from "@mach-34/noir-bignum-paramgen";
-import { hashRSAPublicKey } from "@zk-email/zkemail-nr";
-
 import { Auth } from "../types/auth";
 import { getTokenFromAuth } from "../auth";
 import { DkimRecord, HashingAlgorithm, ZkFramework } from "../types";
@@ -259,7 +257,7 @@ export async function verifyPubKey(
     return false;
   }
 
-  if (zkFramework === ZkFramework.Circom) {
+  if (zkFramework === ZkFramework.Circom || zkFramework === ZkFramework.Noir) {
     for (const pKey of pKeys) {
       const jwt = await importPEMPublicKey(pKey);
 
@@ -270,30 +268,6 @@ export async function verifyPubKey(
       const poseidonHash = await poseidonLarge(modulusBigInt, 9, 242);
 
       if (poseidonHash.toString() === hashedPublicKey) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  if (zkFramework === ZkFramework.Noir) {
-    for (const pKey of pKeys) {
-      const jwt = await importPEMPublicKey(pKey);
-
-      // Make sure the key has an 'n' property
-      if (!jwt.n) continue;
-
-      const modulusBigInt = base64UrlToBigInt(jwt.n); // pubkey
-      const modulus = NoirBignum.bnToLimbStrArray(modulusBigInt, 2048).map((limb: string) =>
-        BigInt(limb)
-      );
-      const redc = NoirBignum.bnToRedcLimbStrArray(modulusBigInt, 2048).map((limb: string) =>
-        BigInt(limb)
-      );
-
-      const pubKeyHash = (await hashRSAPublicKey(modulus, redc)).toString();
-
-      if (pubKeyHash === hashedPublicKey) {
         return true;
       }
     }

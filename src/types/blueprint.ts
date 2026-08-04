@@ -24,37 +24,45 @@ export type BlueprintProps = {
   decomposedRegexes: DecomposedRegex[];
   clientStatus?: Status;
   serverStatus?: Status;
+  clientError?: string;
+  serverError?: string;
   verifierContract?: VerifierContract;
   version?: number;
   stars?: number;
   numLocalProofs?: number;
   totalProofs?: number;
+  internalVersion?: string;
 };
 
+// Max length is optional and kept for backward compatibility
 export type DecomposedRegex = {
   parts: DecomposedRegexPart[];
   name: string;
-  maxLength: number;
+  maxLength?: number;
   isHashed?: boolean;
   location: "body" | "header";
+  maxMatchLength?: number;
 };
 
 export type DecomposedRegexPart = {
   isPublic: boolean;
   regexDef: string;
+  maxLength?: number;
 };
 
 export type DecomposedRegexJson = {
   parts: DecomposedRegexPartJson[];
   name: string;
-  max_length: number;
+  max_length?: number;
   is_hashed?: boolean;
   location: "body" | "header";
+  max_match_length?: number;
 };
 
 export type DecomposedRegexPartJson = {
   is_public: boolean;
   regex_def: string;
+  max_length?: number
 };
 
 export type ExternalInput = {
@@ -112,6 +120,7 @@ export type BlueprintRequest = {
   verifier_contract_address?: string;
   verifier_contract_chain?: number;
   version?: number;
+  internal_version?: string;
 };
 
 export type BlueprintResponse = {
@@ -140,12 +149,15 @@ export type BlueprintResponse = {
   decomposed_regexes: DecomposedRegexResponse[];
   client_status: number;
   server_status: number;
+  client_error?: string;
+  server_error?: string;
   verifier_contract_address: string;
   verifier_contract_chain: number;
   version: number;
   stars: number;
   num_local_proofs: number;
   total_proofs: number;
+  internal_version?: string;
 };
 
 export type ServerDate = {
@@ -158,17 +170,20 @@ export type ExternalInputResponse = {
   max_length: number;
 };
 
+// max_length is optional andkept for backward compatibility.
 export type DecomposedRegexResponse = {
   parts: DecomposedRegexPartResponse[];
   name: string;
-  max_length: number;
+  max_length?: number;
   is_hashed?: boolean;
   location: "body" | "header";
+  max_match_length?: number
 };
 
 export type DecomposedRegexPartResponse = {
   is_public: boolean;
   regex_def: string;
+  max_length?: number
 };
 
 export type ListBlueprintsOptions = {
@@ -191,9 +206,14 @@ export type ChunkedZkeyUrl = {
 export type StatusResponse = {
   client_status: Status;
   server_status: Status;
+  client_error?: string;
+  server_error?: string;
+  github_username?: string;
 };
 
 export type CompilationStatus = {
   clientStatus: Status;
   serverStatus: Status;
+  clientError?: string;
+  serverError?: string;
 };

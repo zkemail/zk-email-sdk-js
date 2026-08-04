@@ -18,6 +18,23 @@ import { addMaxLengthToExternalInputs } from "../../utils/maxLenghExternalInputs
 import { logger } from "../../utils/logger";
 
 export class NoirProver extends AbstractProver implements IProver {
+  /**
+   * Detect RSA key size from parsed email public key
+   * @param parsedEmail - Parsed email object
+   * @returns 1024 or 2048
+   * @throws Error if key size is not 1024 or 2048 bits
+   */
+  private detectKeySize(parsedEmail: { publicKey: Uint8Array }): 1024 | 2048 {
+    // Public key bytes: 128 bytes = 1024 bits, 256 bytes = 2048 bits
+    const keyBytes = parsedEmail.publicKey.length;
+    if (keyBytes !== 128 && keyBytes !== 256) {
+      throw new Error(
+        `Unsupported RSA key size: ${keyBytes * 8} bits. Only 1024-bit and 2048-bit keys are supported.`
+      );
+    }
+    return keyBytes <= 128 ? 1024 : 2048;
+  }
+
   async generateLocalProof(
     eml: string,
     externalInputs: ExternalInputInput[] = [],
@@ -29,6 +46,10 @@ export class NoirProver extends AbstractProver implements IProver {
 
     const parsedEmail = await parseEmail(eml);
 
+    // Detect key size from the email
+    const keyBits = this.detectKeySize(parsedEmail);
+    logger.info(`Detected RSA key size: ${keyBits} bits`);
+
     const { Noir, UltraHonkBackend } = options.noirWasm;
 
     const startedAt = new Date();
@@ -39,7 +60,8 @@ export class NoirProver extends AbstractProver implements IProver {
       );
     }
 
-    const circuit = await this.blueprint.getNoirCircuit();
+    // Fetch the appropriate circuit based on detected key size
+    const circuit = await this.blueprint.getNoirCircuit(keyBits);
     const regexGraphs = await this.blueprint.getNoirRegexGraphs();
 
     const regexInputs = this.blueprint.props.decomposedRegexes.map((dr) => {
@@ -48,8 +70,24 @@ export class NoirProver extends AbstractProver implements IProver {
         throw new Error(`No regexGraph was compiled for decomposedRegexe ${dr.name}`);
       }
 
-      const haystack =
-        dr.location === "header" ? parsedEmail.canonicalizedHeader : parsedEmail.cleanedBody;
+      // const haystack =
+      //   dr.location === "header" ? parsedEmail.canonicalizedHeader : parsedEmail.cleanedBody;
+
+      let haystack;
+      if (dr.location === "header") {
+        haystack = parsedEmail.canonicalizedHeader;
+      } else if (this.blueprint.props.shaPrecomputeSelector) {
+        haystack = parsedEmail.cleanedBody.split(this.blueprint.props.shaPrecomputeSelector)[1];
+      } else {
+        haystack = parsedEmail.cleanedBody;
+      }
+
+      let haystack_location;
+      if (dr.location === "header") {
+        haystack_location = "Header";
+      } else {
+        haystack_location = "Body";
+      }
 
       const maxHaystackLength =
         dr.location === "header"
@@ -59,9 +97,17 @@ export class NoirProver extends AbstractProver implements IProver {
       return {
         name: dr.name,
         regex_graph_json: JSON.stringify(regexGraph),
-        haystack,
+        haystack_location,
         max_haystack_length: maxHaystackLength,
-        max_match_length: dr.maxLength,
+        max_match_length: dr.maxMatchLength || dr.maxLength,
+        parts: dr.parts.map((p) => ({
+          // @ts-ignore
+          is_public: p.isPublic || !!p.is_public,
+          // @ts-ignore
+          regex_def: p.regexDef || !!p.regex_def,
+          // @ts-ignore
+          ...(p.isPublic && { maxLength: p.maxLength || !!p.max_length }),
+        })),
         proving_framework: "noir",
       };
     });
@@ -69,20 +115,23 @@ export class NoirProver extends AbstractProver implements IProver {
     const noirParams = {
       maxHeaderLength: this.blueprint.props.emailHeaderMaxLength || 512,
       maxBodyLength: this.blueprint.props.emailBodyMaxLength || 0,
-      ignoreBodyHashCheck: this.blueprint.props.ignoreBodyHashCheck || true,
-      removeSoftLineBreaks: this.blueprint.props.removeSoftLinebreaks || true,
+      ignoreBodyHashCheck: this.blueprint.props.ignoreBodyHashCheck,
+      removeSoftLineBreaks: this.blueprint.props.removeSoftLinebreaks,
       shaPrecomputeSelector: this.blueprint.props.shaPrecomputeSelector,
       proverEthAddress: "0x0000000000000000000000000000000000000000",
+      rsaKeyBits: keyBits,  // Pass key size to relayer-utils
     };
 
-    logger.debug("generating inputs regexInputs: ", regexInputs);
-    logger.debug("generating inputs externalInputs: ", externalInputs);
-    logger.debug("generating inputs noirParams: ", noirParams);
+    logger.info("generating inputs regexInputs: ", regexInputs);
+    logger.info("generating inputs externalInputs: ", externalInputs);
+    logger.info("generating inputs noirParams: ", noirParams);
 
     const externalInputsWithMaxLength = addMaxLengthToExternalInputs(
       externalInputs,
       this.blueprint.props.externalInputs
     );
+
+    console.log("externalInputsWithMaxLength: ", externalInputsWithMaxLength);
 
     const circuitInputs = await generateNoirCircuitInputsWithRegexesAndExternalInputs(
       eml,
@@ -90,6 +139,7 @@ export class NoirProver extends AbstractProver implements IProver {
       externalInputsWithMaxLength,
       noirParams
     );
+    console.log("circuitInputs: ", circuitInputs);
 
     logger.debug("circuitInputs: ", circuitInputs);
 
@@ -99,7 +149,9 @@ export class NoirProver extends AbstractProver implements IProver {
 
     const compiledProgram = circuit as any;
 
+    console.log("new noir");
     const noir = new Noir(compiledProgram);
+    console.log("got new noir");
     // TODO: we can use threads here, although not defining threads is the same speed
     // const backend = new UltraHonkBackend(circuit.bytecode, threads ? { threads } : {});
     const backend = new UltraHonkBackend(compiledProgram.bytecode);
@@ -109,19 +161,21 @@ export class NoirProver extends AbstractProver implements IProver {
     for (const [key, value] of circuitInputs) {
       if (value && typeof value === "object" && value instanceof Map) {
         circuitInputsObject[key] = Object.fromEntries(value);
-      } else if (value) {
+      } else if (value !== undefined && value !== null) {
         circuitInputsObject[key] = value;
       }
     }
 
-    delete circuitInputsObject.dkim_header_sequence;
+    console.log("circuitInputsObject: ", circuitInputsObject);
+    // delete circuitInputsObject.dkim_header_sequence;
 
     logger.time("witness");
+    console.log("getting noir");
     const { witness } = await noir.execute(circuitInputsObject);
     logger.timeEnd("witness");
 
     logger.time("prove");
-    const proof = await backend.generateProof(witness);
+    const proof = await backend.generateProof(witness, { keccak: true });
     logger.timeEnd("prove");
 
     this.incNumLocalProofs().catch((err) =>
@@ -153,6 +207,7 @@ export class NoirProver extends AbstractProver implements IProver {
       zkFramework: ZkFramework.Noir,
       status: ProofStatus.Done,
       externalInputs: externalInputsProof,
+      dkimKeyBits: keyBits,
     });
   }
 }
@@ -162,13 +217,14 @@ export function parseNoirPublicOutputs(
   publicOutputs: string[],
   decomposedRegexes: DecomposedRegex[],
   externalInputDefinition?: ExternalInput[],
-  externalInputs?: ExternalInputInput[],
+  externalInputs?: ExternalInputInput[]
 ): { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } {
   // 0: pubkey hash
-  // 1: header_hash[0]
-  // 2: header_hash[1]
-  // 3: prover_address
-  let publicOutputIterator = 4;
+  // 1: email_nullifier
+  // 2: header_hash[0]
+  // 3: header_hash[1]
+  // 4: prover_address
+  let publicOutputIterator = 5;
 
   const publicStruct: { [key: string]: string[] } = {};
   const result: { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } = {
@@ -180,7 +236,7 @@ export function parseNoirPublicOutputs(
       externalInputs,
       externalInputDefinition
     );
-    
+
     result.externalInputsProof = {};
     externalInputsWithMaxLength.forEach((externalInput) => {
       const signalLength =
@@ -193,19 +249,27 @@ export function parseNoirPublicOutputs(
   decomposedRegexes.forEach((decomposedRegex) => {
     const partOutputs: string[] = [];
 
-    const { maxLength } = decomposedRegex;
+    const { maxMatchLength } = decomposedRegex;
     decomposedRegex.parts.forEach((part) => {
       if (decomposedRegex.isHashed) {
         partOutputs.push(publicOutputs[publicOutputIterator]);
         publicOutputIterator++;
       } else if (part.isPublic) {
+        // Use part's maxLength if available, otherwise fall back to decomposedRegex's maxMatchLength
+        const partMaxLength = part.maxLength ?? maxMatchLength;
+        if (!partMaxLength) {
+          throw new Error(
+            `No maxLength found for public part. Either part.maxLength or decomposedRegex.maxMatchLength must be defined`
+          );
+        }
+
         let partStr = "";
-        for (let i = publicOutputIterator; i < publicOutputIterator + maxLength; i++) {
+        for (let i = publicOutputIterator; i < publicOutputIterator + partMaxLength; i++) {
           const char = toUtf8(publicOutputs[i]);
           partStr += char;
         }
         partOutputs.push(partStr);
-        publicOutputIterator += maxLength;
+        publicOutputIterator += partMaxLength;
         // The next element is the length of the part
         const partLength = parseInt(publicOutputs[publicOutputIterator], 16);
         if (partStr.length !== partLength) {

@@ -45,6 +45,7 @@ export class Blueprint {
       isPublic: true,
       clientStatus: Status.Draft,
       serverStatus: Status.Draft,
+      internalVersion: '0002_max_length_per_regex_part',
       ...props,
     };
 
@@ -75,7 +76,11 @@ export class Blueprint {
       throw err;
     }
 
+    console.log("blueprintResponse: ", blueprintResponse);
+
     const blueprintProps = this.responseToBlueprintProps(blueprintResponse);
+
+    console.log("blueprintProps: ", blueprintProps);
 
     const blueprint = new Blueprint(blueprintProps, baseUrl, auth);
 
@@ -132,18 +137,18 @@ export class Blueprint {
       tags: response.tags,
       emailQuery: response.email_query,
       circuitName: response.circuit_name,
-      ignoreBodyHashCheck: response.ignore_body_hash_check,
+      ignoreBodyHashCheck: response.ignore_body_hash_check || false,
       shaPrecomputeSelector: response.sha_precompute_selector,
       emailBodyMaxLength: response.email_body_max_length,
       emailHeaderMaxLength: response.email_header_max_length,
-      removeSoftLinebreaks: response.remove_soft_linebreaks,
+      removeSoftLinebreaks: response.remove_soft_linebreaks || false,
       githubUsername: response.github_username,
       senderDomain: response.sender_domain,
-      enableHeaderMasking: response.enable_header_masking,
-      enableBodyMasking: response.enable_body_masking,
-      clientZkFramework: (response.client_zk_framework as ZkFramework) || ZkFramework.Circom,
-      serverZkFramework: (response.server_zk_framework as ZkFramework) || ZkFramework.Circom,
-      isPublic: response.is_public,
+      enableHeaderMasking: response.enable_header_masking || false,
+      enableBodyMasking: response.enable_body_masking || false,
+      clientZkFramework: (response.client_zk_framework as ZkFramework) || ZkFramework.None,
+      serverZkFramework: (response.server_zk_framework as ZkFramework) || ZkFramework.None,
+      isPublic: response.is_public || false,
       createdAt: new Date(response.created_at.seconds * 1000),
       updatedAt: new Date(response.updated_at.seconds * 1000),
       externalInputs: response.external_inputs?.map((input) => ({
@@ -154,14 +159,18 @@ export class Blueprint {
         parts: (regex?.parts || []).map((part) => ({
           isPublic: part.is_public,
           regexDef: part.regex_def,
+          maxLength: part.max_length
         })),
         name: regex.name,
         maxLength: regex.max_length,
         isHashed: regex.is_hashed,
         location: regex.location,
+        maxMatchLength : regex.max_match_length
       })),
       clientStatus: response.client_status as Status,
       serverStatus: response.server_status as Status,
+      clientError: response.client_error,
+      serverError: response.server_error,
       verifierContract: {
         address: response.verifier_contract_address,
         chain: response.verifier_contract_chain,
@@ -170,6 +179,7 @@ export class Blueprint {
       stars: response.stars,
       numLocalProofs: response.num_local_proofs,
       totalProofs: response.total_proofs,
+      internalVersion: response.internal_version,
     };
 
     return props;
@@ -207,14 +217,17 @@ export class Blueprint {
           is_public: part.isPublic || part.is_public,
           // @ts-ignore
           regex_def: part.regexDef || part.regex_def,
+          max_length : part.maxLength
         })),
         name: regex.name,
         max_length: regex.maxLength,
         is_hashed: regex.isHashed,
         location: regex.location,
+        max_match_length : regex.maxMatchLength
       })),
       verifier_contract_address: props.verifierContract?.address,
       verifier_contract_chain: props.verifierContract?.chain,
+      internal_version: props.internalVersion,
     };
 
     return response;
@@ -233,6 +246,7 @@ export class Blueprint {
     if (this.props.id) {
       throw new Error("Blueprint was already saved");
     }
+    logger.info("this.props are teh props that are set into teh database", this.props)
 
     const requestData = Blueprint.blueprintPropsToRequest(this.props);
 
@@ -433,7 +447,11 @@ export class Blueprint {
   private async _checkStatus(): Promise<CompilationStatus> {
     let response: StatusResponse;
     try {
-      response = await get<StatusResponse>(`${this.baseUrl}/blueprint/status/${this.props.id}`);
+      response = await get<StatusResponse>(
+        `${this.baseUrl}/blueprint/status/${this.props.id}`,
+        undefined,
+        this.auth
+      );
     } catch (err) {
       logger.error("Failed calling GET /blueprint/status in getStatus(): ", err);
       throw err;
@@ -441,9 +459,13 @@ export class Blueprint {
 
     this.props.clientStatus = response.client_status;
     this.props.serverStatus = response.server_status;
+    this.props.clientError = response.client_error;
+    this.props.serverError = response.server_error;
     return {
       clientStatus: this.props.clientStatus,
       serverStatus: this.props.serverStatus,
+      clientError: this.props.clientError,
+      serverError: this.props.serverError,
     };
   }
 
@@ -456,9 +478,11 @@ export class Blueprint {
   async checkStatus(): Promise<CompilationStatus> {
     // Blueprint wasn't saved yet, return default status
 
-    const compilationStatus = {
+    const compilationStatus: CompilationStatus = {
       clientStatus: this.props.clientStatus!,
       serverStatus: this.props.serverStatus!,
+      clientError: this.props.clientError,
+      serverError: this.props.serverError,
     };
 
     if (!this.props.id) {
@@ -822,7 +846,11 @@ export class Blueprint {
     return response.urls;
   }
 
-  async getNoirCircuitDownloadLink(): Promise<string> {
+  /**
+   * Get Noir circuit download link for a specific key size
+   * @param keyBits - 1024 or 2048 (defaults to 2048 for backwards compatibility)
+   */
+  async getNoirCircuitDownloadLink(keyBits: 1024 | 2048 = 2048): Promise<string> {
     if (this.props.clientStatus !== Status.Done) {
       throw new Error("The circuits are not compiled yet, nothing to download.");
     }
@@ -831,14 +859,16 @@ export class Blueprint {
       throw new Error("Only a noir blueprint has a noir circuit");
     }
 
+    const endpoint = keyBits === 1024
+      ? `/blueprint/noir-circuit-1024/${this.props.id}`
+      : `/blueprint/noir-circuit-2048/${this.props.id}`;
+
     let response: { url: string };
     try {
-      response = await get<{ url: string }>(
-        `${this.baseUrl}/blueprint/noir-circuit/${this.props.id}`
-      );
+      response = await get<{ url: string }>(`${this.baseUrl}${endpoint}`);
     } catch (err) {
-      console.error(
-        "Failed calling GET on /blueprint/noir-circuit/:id in getNoirCircuitDownloadLink: ",
+      logger.error(
+        `Failed calling GET on ${endpoint} in getNoirCircuitDownloadLink: `,
         err
       );
       throw err;
@@ -847,7 +877,11 @@ export class Blueprint {
     return response.url;
   }
 
-  async getNoirCircuitJsonDownloadLink(): Promise<string> {
+  /**
+   * Get Noir circuit JSON download link for a specific key size
+   * @param keyBits - 1024 or 2048 (defaults to 2048 for backwards compatibility)
+   */
+  async getNoirCircuitJsonDownloadLink(keyBits: 1024 | 2048 = 2048): Promise<string> {
     if (this.props.clientStatus !== Status.Done) {
       throw new Error("The circuits are not compiled yet, nothing to download.");
     }
@@ -856,14 +890,16 @@ export class Blueprint {
       throw new Error("Only a noir blueprint has a noir circuit");
     }
 
+    const endpoint = keyBits === 1024
+      ? `/blueprint/noir-circuit-json-1024/${this.props.id}`
+      : `/blueprint/noir-circuit-json-2048/${this.props.id}`;
+
     let response: { url: string };
     try {
-      response = await get<{ url: string }>(
-        `${this.baseUrl}/blueprint/noir-circuit-json/${this.props.id}`
-      );
+      response = await get<{ url: string }>(`${this.baseUrl}${endpoint}`);
     } catch (err) {
-      console.error(
-        "Failed calling GET on /blueprint/noir-circuit/:id in getNoirCircuitDownloadLink: ",
+      logger.error(
+        `Failed calling GET on ${endpoint} in getNoirCircuitJsonDownloadLink: `,
         err
       );
       throw err;
@@ -871,6 +907,7 @@ export class Blueprint {
 
     return response.url;
   }
+  
 
   async getNoirRegexGraphsDownloadLink(): Promise<string> {
     if (this.props.clientStatus !== Status.Done) {
@@ -896,18 +933,41 @@ export class Blueprint {
 
     return response.url;
   }
+  
+  async getCircomRegexGraphsDownloadLink(): Promise<string | null> {
+    if (this.props.clientStatus !== Status.Done && this.props.serverStatus !== Status.Done) {
+      throw new Error("The circuits are not compiled yet, nothing to download.");
+    }
 
-  async getNoirCircuit(): Promise<any> {
+    let response: { url: string };
+    try {
+      response = await get<{ url: string }>(
+        `${this.baseUrl}/blueprint/circom-regex-graphs/${this.props.id}`
+      );
+    } catch (err) {
+      // For old blueprints, circomRegexGraphs might not exist
+      logger.warn("Circom Regex Graphs not found - this might be an old blueprint", err);
+      return null; // ← Return null instead of throwing
+    }
+
+    return response.url;
+  }
+
+  /**
+   * Download and parse the Noir circuit for a specific key size
+   * @param keyBits - 1024 or 2048 (defaults to 2048 for backwards compatibility)
+   */
+  async getNoirCircuit(keyBits: 1024 | 2048 = 2048): Promise<any> {
     if (this.props.clientZkFramework !== ZkFramework.Noir) {
       throw new Error("Only a noir blueprint has a noir circuit");
     }
 
-    const circuitUrl = await this.getNoirCircuitJsonDownloadLink();
+    const circuitUrl = await this.getNoirCircuitJsonDownloadLink(keyBits);
     // TODO: type circuit
     const circuit = await downloadJsonFromUrl<any>(circuitUrl);
     return circuit;
   }
-
+  
   async getNoirRegexGraphs(): Promise<any> {
     if (this.props.clientZkFramework !== ZkFramework.Noir) {
       throw new Error("Only a noir blueprint has a noir circuit");
@@ -918,6 +978,36 @@ export class Blueprint {
     logger.debug("data: ", data);
 
     return data;
+  }
+  
+  async getCircomRegexGraphs(): Promise<any> {
+    if (this.props.clientZkFramework !== ZkFramework.Circom && this.props.serverZkFramework !== ZkFramework.Circom) {
+      throw new Error("Only a circom blueprint has a circom circuit");
+    }
+
+    const url = await this.getCircomRegexGraphsDownloadLink();
+
+    // If no URL (old blueprint), return null
+    if (!url) {
+      logger.warn("No circomRegexGraphs available - using fallback for old blueprint");
+      return null;
+    }
+
+    // Try to download the file - might fail if file doesn't exist in GCS
+    try {
+      logger.debug(`Attempting to download circomRegexGraphs from: ${url}`);
+      const data = await downloadAndUnzipFile(url);
+      logger.debug("Successfully downloaded and unzipped circomRegexGraphs:", Object.keys(data));
+      return data;
+    } catch (err) {
+      // File doesn't exist in GCS (404) or download failed
+      logger.warn(
+        `Failed to download for blueprint ${this.props.id}. ` +
+        `This might be an old blueprint without circomRegexGraphs.zip regex graph files.`,
+        err
+      );
+      return null;
+    }
   }
 
   async getWasmFileDownloadLink(): Promise<string> {

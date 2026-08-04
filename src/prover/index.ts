@@ -134,7 +134,8 @@ export abstract class AbstractProver implements IProver {
         eml,
         this.blueprint.props.decomposedRegexes,
         externalInputsWithMaxLength,
-        params
+        params,
+        this.blueprint
       );
 
       logger.debug("got proof inputs: ", inputs);
@@ -182,8 +183,12 @@ export abstract class AbstractProver implements IProver {
       };
 
       if (this.blueprint.props.serverZkFramework === ZkFramework.Circom) {
-        const inputs = await this.generateProofInputs(eml, externalInputs);
-        requestData.input = JSON.parse(inputs);
+        if (options?._inputs) {
+          requestData.input = JSON.parse(options._inputs);
+        } else {
+          const inputs = await this.generateProofInputs(eml, externalInputs);
+          requestData.input = JSON.parse(inputs);
+        }
       }
 
       if (this.blueprint.props.serverZkFramework === ZkFramework.Sp1) {
@@ -232,7 +237,12 @@ export abstract class AbstractProver implements IProver {
     }
 
     const startTime = new Date();
-    const inputs = await this.generateProofInputs(eml, externalInputs);
+    let inputs: string;
+    if (options?._inputs) {
+      inputs = options._inputs;
+    } else {
+      inputs = await this.generateProofInputs(eml, externalInputs);
+    }
 
     const [chunkedZkeyUrls, wasmUrl] = await Promise.all([
       this.blueprint.getChunkedZkeyDownloadLinks(),

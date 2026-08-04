@@ -17,4 +17,6 @@ export type NoirWasm = {
 
 export type GenerateProofOptions = {
   noirWasm?: NoirWasm;
+  // Circuit inputs; Should only be used for testing;
+  _inputs?: string;
 };

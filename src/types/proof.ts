@@ -39,6 +39,7 @@ export type ProofProps = {
   isLocal: boolean;
   sp1VkeyHash?: string;
   zkFramework: ZkFramework;
+  dkimKeyBits?: 1024 | 2048;
 };
 
 export type ProofResponse = {
