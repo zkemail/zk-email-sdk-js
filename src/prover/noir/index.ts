@@ -207,6 +207,7 @@ export class NoirProver extends AbstractProver implements IProver {
       zkFramework: ZkFramework.Noir,
       status: ProofStatus.Done,
       externalInputs: externalInputsProof,
+      dkimKeyBits: keyBits,
     });
   }
 }
