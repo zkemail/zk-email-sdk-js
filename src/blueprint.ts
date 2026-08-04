@@ -76,11 +76,11 @@ export class Blueprint {
       throw err;
     }
 
-    console.log("blueprintResponse: ", blueprintResponse);
+    logger.debug("blueprintResponse: ", blueprintResponse);
 
     const blueprintProps = this.responseToBlueprintProps(blueprintResponse);
 
-    console.log("blueprintProps: ", blueprintProps);
+    logger.debug("blueprintProps: ", blueprintProps);
 
     const blueprint = new Blueprint(blueprintProps, baseUrl, auth);
 
