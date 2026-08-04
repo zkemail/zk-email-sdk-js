@@ -38,7 +38,7 @@
     "build": "bun install && vite build",
     "build-prove-worker": "bun x vite build --config vite.config.worker.ts && bun scripts/escape_str_chars.js",
     "publish:new": "bun run build && npm publish --access public",
-    "publish": "bun run build && bun run build-prove-worker && npm publish --access public",
+    "publish:manual": "bun run build && bun run build-prove-worker && npm publish --access public",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist",
