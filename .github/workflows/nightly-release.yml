@@ -38,6 +38,14 @@ jobs:
           npm version prerelease --preid=nightly --no-git-tag-version
           echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
 
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Build
+        run: |
+          bun run build
+          bun run build-prove-worker
+
       - name: Commit and tag
         run: |
           git config user.name "github-actions[bot]"
@@ -46,11 +54,6 @@ jobs:
           git commit -m "chore(release): nightly v${{ steps.version.outputs.version }} [skip ci]"
           git tag "v${{ steps.version.outputs.version }}"
           git push origin staging --follow-tags
-
-      - name: Build
-        run: |
-          bun run build
-          bun run build-prove-worker
 
       - name: Publish to npm
         run: npm publish --access public --tag nightly --provenance
