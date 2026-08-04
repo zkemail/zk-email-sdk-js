@@ -20,7 +20,8 @@ export type { ValidationErrors } from "./blueprintValidation";
 
 // Exports that don't need initialization or options
 export { startJsonFileDownload, getDKIMSelector } from "./utils";
-export { verifyProofOnChain } from "./chain";
+export { verifyProofOnChain, encodeProofForOnChainVerification } from "./chain";
+export type { EncodedProofForOnChainVerification } from "./chain";
 export { logger } from "./utils/logger";
 export type { LogLevel, LoggingOptions } from "./types/sdk";
 export {
