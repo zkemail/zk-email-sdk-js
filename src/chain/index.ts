@@ -32,15 +32,18 @@ const VERIFIER_ABI = [
   },
 ] as const;
 
-export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
-  logger.debug("verifierContract: ", proof.blueprint.props.verifierContract);
+export type EncodedProofForOnChainVerification = {
+  proofBytes: `0x${string}`;
+  publicInputs: `0x${string}`[];
+};
 
-  const { chain: chainId, address } = proof.blueprint.props.verifierContract ?? {};
-
-  if (!chainId || !address) {
-    throw new Error("No verifier contract deployed for the blueprint of this proof");
-  }
-
+/**
+ * ABI-encodes a proof into the exact (proof, publicInputs) calldata the
+ * deployed IZKEmailVerifier's verify() function expects. Exposed separately
+ * from verifyProofOnChain so this calldata can be inspected or handed to an
+ * external tool (e.g. `cast call`) to verify independently of the SDK.
+ */
+export function encodeProofForOnChainVerification(proof: Proof): EncodedProofForOnChainVerification {
   if (!proof.props.proofData || !proof.props.publicOutputs) {
     throw new Error("No proof data generated yet");
   }
@@ -49,16 +52,6 @@ export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
   if (!proof.props.publicOutputs || !proof.props.publicOutputs.length) {
     throw new Error("Not a correct proof type");
   }
-
-  const chain = CHAIN_MAP[chainId];
-  if (!chain) {
-    throw new Error(`Unsupported chain id: ${chainId}`);
-  }
-
-  const client = createPublicClient({
-    chain,
-    transport: http(),
-  });
 
   // TODO: this is parsed when getting the data from the backend,
   // add proper typing from the start
@@ -87,6 +80,30 @@ export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
   const publicInputs = (proof.props.publicOutputs as string[]).map(
     (o) => toHex(BigInt(o), { size: 32 })
   );
+
+  return { proofBytes, publicInputs };
+}
+
+export async function verifyProofOnChain(proof: Proof): Promise<boolean> {
+  logger.debug("verifierContract: ", proof.blueprint.props.verifierContract);
+
+  const { chain: chainId, address } = proof.blueprint.props.verifierContract ?? {};
+
+  if (!chainId || !address) {
+    throw new Error("No verifier contract deployed for the blueprint of this proof");
+  }
+
+  const chain = CHAIN_MAP[chainId];
+  if (!chain) {
+    throw new Error(`Unsupported chain id: ${chainId}`);
+  }
+
+  const { proofBytes, publicInputs } = encodeProofForOnChainVerification(proof);
+
+  const client = createPublicClient({
+    chain,
+    transport: http(),
+  });
 
   try {
     await client.readContract({
