@@ -1,5 +1,5 @@
 import { test, describe, expect } from "bun:test";
-import zkeSdk from "../src";
+import zkeSdk from "../../src";
 import { readFile } from "fs/promises";
 
 const sdk = zkeSdk({

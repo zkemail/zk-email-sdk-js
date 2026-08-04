@@ -1,10 +1,10 @@
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 import pg from "pg";
-import sdk, { Blueprint, BlueprintProps, Status } from "../src";
-import { ProofStatus } from "../src/types/proof";
-import { Proof } from "../src/proof";
+import sdk, { Blueprint, BlueprintProps, Status } from "../../src";
+import { ProofStatus } from "../../src/types/proof";
+import { Proof } from "../../src/proof";
 import { getAuthToken } from "./test-utils";
-import { Auth } from "../src/types/auth";
+import { Auth } from "../../src/types/auth";
 import { readFile } from "fs/promises";
 
 function getBlueprintProps(
@@ -90,7 +90,7 @@ describe("Proof test suite", async () => {
   const blueprintId = blueprint.getId();
   blueprintIds.push(blueprintId!);
 
-  const emlTxt = await readFile("unit_tests/test.eml", "utf-8");
+  const emlTxt = await readFile("tests_legacy/unit/test.eml", "utf-8");
 
   afterAll(async () => {
     try {

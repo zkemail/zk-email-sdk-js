@@ -1,5 +1,5 @@
 import { test, describe } from "bun:test";
-import zkeSdk, { testBlueprint } from "../src";
+import zkeSdk, { testBlueprint } from "../../src";
 import { readFile } from "fs/promises";
 const sdk = zkeSdk({
   baseUrl: "https://staging-conductor.zk.email",

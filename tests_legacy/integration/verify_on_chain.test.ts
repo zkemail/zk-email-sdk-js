@@ -1,5 +1,5 @@
 import { test, describe, expect } from "bun:test";
-import zkeSdk from "../src";
+import zkeSdk from "../../src";
 
 const sdk = zkeSdk({ baseUrl: "https://staging-conductor.zk.email" });
 

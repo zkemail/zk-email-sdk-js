@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
 // import pg from "pg";
-import zkeSdk, { BlueprintProps, ZkFramework } from "../src";
+import zkeSdk, { BlueprintProps, ZkFramework } from "../../src";
 import { readFile } from "fs/promises";
 
 const sdk = zkeSdk({

@@ -6,14 +6,14 @@ import {
   parseEmail,
   testBlueprint,
   testDecomposedRegex,
-} from "../src/relayerUtils";
+} from "../../src/relayerUtils";
 import {
   Blueprint,
   BlueprintProps,
   DecomposedRegex,
   DecomposedRegexJson,
   GenerateProofInputsParams,
-} from "../src";
+} from "../../src";
 import { readFileSync } from "fs";
 
 const timeout = 10_000;

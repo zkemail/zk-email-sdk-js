@@ -6,7 +6,7 @@ import zkeSdk, {
   Status,
   testBlueprint,
   ZkFramework,
-} from "../src";
+} from "../../src";
 import { readFile } from "fs/promises";
 
 // local use only

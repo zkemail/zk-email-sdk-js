@@ -1,7 +1,7 @@
 import { expect, test, describe, beforeAll, afterAll, it } from "bun:test";
 import { readFileSync } from "fs";
-import { Blueprint, generateProofInputs } from "../src";
-import zkeSdk from "../src";
+import { Blueprint, generateProofInputs } from "../../src";
+import zkeSdk from "../../src";
 
 const eml = readFileSync("emls/amazon.eml", "utf-8");
 

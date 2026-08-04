@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
-import zkeSdk from "../src";
-import { verifyProofOnChain } from "../src/chain";
+import zkeSdk from "../../src";
+import { verifyProofOnChain } from "../../src/chain";
 
 describe("On chain verification", () => {
   const { getProof } = zkeSdk();
