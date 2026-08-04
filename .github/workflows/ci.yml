@@ -24,3 +24,6 @@ jobs:
         run: |
           bun run build
           bun run build-prove-worker
+
+      - name: Integration tests
+        run: bun run test:integration

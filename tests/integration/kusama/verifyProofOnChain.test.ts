@@ -1,6 +1,6 @@
 import { expect, test, describe } from "bun:test";
-import { initZkEmailSdk } from "../../src";
-import { verifyProofOnChain } from "../../src/chain";
+import { initZkEmailSdk } from "../../../src";
+import { verifyProofOnChain } from "../../../src/chain";
 
 // zkemailverify/kusama_grant_paseo_e2e (blueprint e94e7f93-7575-4e26-a147-de894b19ce3e),
 // compiled and deployed to Paseo through the current pipeline. Lives in the staging
