@@ -66,6 +66,7 @@ export default defineConfig({
       querystring: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/qs"),
       url: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/url"),
       crypto: "crypto-browserify",
+      "node:crypto": "crypto-browserify",
       http: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/http"),
       https: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/http"),
       os: path.resolve("node_modules/rollup-plugin-node-polyfills/polyfills/os"),
