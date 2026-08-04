@@ -1,5 +1,5 @@
 import open from "open";
-import { getLoginWithGithubUrl } from "../src";
+import { getLoginWithGithubUrl } from "../../src";
 
 export async function getAuthToken(): Promise<string> {
   let tokenResolver: ((token: string) => void) | null = null;

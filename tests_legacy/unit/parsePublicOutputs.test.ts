@@ -1,6 +1,6 @@
 import { test, describe, expect } from "bun:test";
-import { parsePublicSignals } from "../src/relayerUtils";
-import { DecomposedRegex } from "../src";
+import { parsePublicSignals } from "../../src/relayerUtils";
+import { DecomposedRegex } from "../../src";
 
 describe("parsePublicSignals", () => {
   test("should parse public signals", () => {

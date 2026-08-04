@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
-import { Blueprint, BlueprintProps, ZkFramework, initZkEmailSdk } from "../src";
-import { BlueprintGroupProps } from "../src/types/blueprintGroup";
+import { Blueprint, BlueprintProps, ZkFramework, initZkEmailSdk } from "../../src";
+import { BlueprintGroupProps } from "../../src/types/blueprintGroup";
 
 const sdk = initZkEmailSdk({
   auth: {

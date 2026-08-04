@@ -1,5 +1,5 @@
 import { DecomposedRegex, DecomposedRegexJson, testDecomposedRegex } from "./src";
-import helloTestEmail from "./unit_tests/hello_eml";
+import helloTestEmail from "./tests_legacy/unit/hello_eml";
 
 async function testEmailBody() {
   // Wait for wasm to initialize

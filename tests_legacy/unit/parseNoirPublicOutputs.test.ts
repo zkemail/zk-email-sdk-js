@@ -1,6 +1,6 @@
 import { test, describe, expect } from "bun:test";
-import { DecomposedRegex, ExternalInput, ExternalInputInput } from "../src";
-import { parseNoirPublicOutputs } from "../src/prover/noir";
+import { DecomposedRegex, ExternalInput, ExternalInputInput } from "../../src";
+import { parseNoirPublicOutputs } from "../../src/prover/noir";
 
 describe("parsePublicSignalsNoir", () => {
   test("should parse public outputs noir", () => {

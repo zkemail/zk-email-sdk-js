@@ -3,7 +3,7 @@
   Some tests also test the prod database directly.
 */
 import { expect, test, describe, beforeAll, afterAll } from "bun:test";
-import zkeSdk, { Status, ZkFramework } from "../src";
+import zkeSdk, { Status, ZkFramework } from "../../src";
 
 describe("Blueprint prod test suite", () => {
   test("Should list by status", async () => {
