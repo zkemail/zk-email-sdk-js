@@ -104,7 +104,7 @@ export async function testBlueprint(
   revealPrivate = false
 ): Promise<string[][]> {
   const parsedEmail = await parseEmail(eml, blueprint.ignoreBodyHashCheck);
-  console.log("parsedEmail: ", parsedEmail);
+  logger.debug("parsedEmail: ", parsedEmail);
   const domain = getSenderDomain(parsedEmail);
 
   if (blueprint.senderDomain !== domain) {
@@ -121,7 +121,7 @@ export async function testBlueprint(
   let body = parsedEmail.cleanedBody;
   if (blueprint.shaPrecomputeSelector) {
     const splitEmail = body.split(blueprint.shaPrecomputeSelector)[1];
-    console.log("splitEmail: ", splitEmail);
+    logger.debug("splitEmail: ", splitEmail);
     if (!splitEmail) {
       throw new Error(
         `Precompute selector was not found in email, selector: ${blueprint.shaPrecomputeSelector}`
@@ -131,11 +131,11 @@ export async function testBlueprint(
   }
 
   const header = parsedEmail.canonicalizedHeader;
-  console.log("header: ", header);
+  logger.debug("header: ", header);
 
-  console.log("checkInputLengths");
+  logger.debug("checkInputLengths");
   await checkInputLengths(header, body, blueprint);
-  console.log("checkInputLengths done");
+  logger.debug("checkInputLengths done");
 
   const output = await Promise.all(
     blueprint.decomposedRegexes.flatMap((dcr: DecomposedRegex) => [
@@ -160,15 +160,15 @@ async function checkInputLengths(header: string, body: string, blueprint: Bluepr
   if (!blueprint.ignoreBodyHashCheck) {
     const bodyData = encoder.encode(body);
 
-    console.log("body.length: ", body.length);
+    logger.debug("body.length: ", body.length);
     const bodyShaLength = ((body.length + 63 + 65) / 64) * 64;
-    console.log("bodyShaLength: ", bodyShaLength);
+    logger.debug("bodyShaLength: ", bodyShaLength);
 
     const maxShaBytes = Math.max(bodyShaLength, blueprint.emailBodyMaxLength!);
-    console.log("maxShaBytes: ", maxShaBytes);
+    logger.debug("maxShaBytes: ", maxShaBytes);
 
     const bodyLength = (await sha256Pad(bodyData, maxShaBytes)).get("messageLength");
-    console.log("bodyLength: ", bodyLength);
+    logger.debug("bodyLength: ", bodyLength);
 
     if (bodyLength > blueprint.emailBodyMaxLength!) {
       throw new Error(`emailBodyMaxLength of ${blueprint.emailBodyMaxLength} was exceeded`);
@@ -205,8 +205,8 @@ export async function testDecomposedRegex(
     "maxMatchLength" in decomposedRegex ? decomposedRegex.maxMatchLength : 
     ("max_match_length" in decomposedRegex ? decomposedRegex.max_match_length : undefined);
 
-  console.log("inputStr: ", inputStr);
-  console.log("inputDecomposedRegex: ", inputDecomposedRegex);
+  logger.debug("inputStr: ", inputStr);
+  logger.debug("inputDecomposedRegex: ", inputDecomposedRegex);
   await relayerUtilsInit;
   const privateResult = extractSubstr(inputStr, inputDecomposedRegex, false);
 
@@ -226,10 +226,10 @@ export async function testDecomposedRegex(
     return privateResult;
   }
 
-  console.log("calling extractSubstr");
-  console.log("revealPrivate: ", revealPrivate);
-  console.log("inputDecomposedRegex: ", inputDecomposedRegex);
-  console.log("inputStr: ", inputStr);
+  logger.debug("calling extractSubstr");
+  logger.debug("revealPrivate: ", revealPrivate);
+  logger.debug("inputDecomposedRegex: ", inputDecomposedRegex);
+  logger.debug("inputStr: ", inputStr);
   const result = extractSubstr(inputStr, inputDecomposedRegex, revealPrivate);
   return result;
 }
@@ -275,7 +275,7 @@ export async function generateProofInputs(
       } else {
         haystackLocation = "body";
       }
-      console.log("dcr \n", dcr);
+      logger.debug("dcr \n", dcr);
 
       const maxHaystackLength =
         dcr.location === "header"
