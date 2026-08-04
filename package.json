@@ -2,19 +2,23 @@
   "name": "@zk-email/sdk",
   "version": "3.0.0-nightly.21",
   "description": "ZK Email SDK for TypeScript",
-  "main": "./dist/index.js",
-  "module": "./dist/zk-email-sdk.es.js",
+  "main": "./dist/zk-email-sdk.index.cjs",
+  "module": "./dist/zk-email-sdk.index.mjs",
   "types": "./dist/types/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zkemail/zk-email-sdk-js.git"
+  },
   "exports": {
     ".": {
-      "require": "./dist/zk-email-sdk.index.cjs.js",
-      "import": "./dist/zk-email-sdk.index.es.js",
-      "types": "./dist/types/index.d.ts"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/zk-email-sdk.index.mjs",
+      "require": "./dist/zk-email-sdk.index.cjs"
     },
     "./initNoirWasm": {
-      "require": "./dist/zk-email-sdk.initNoirWasm.cjs.js",
-      "import": "./dist/zk-email-sdk.initNoirWasm.es.js",
-      "types": "./dist/types/initNoirWasm.d.ts"
+      "types": "./dist/types/initNoirWasm.d.ts",
+      "import": "./dist/zk-email-sdk.initNoirWasm.mjs",
+      "require": "./dist/zk-email-sdk.initNoirWasm.cjs"
     }
   },
   "files": [
@@ -34,10 +38,22 @@
     "build": "bun install && vite build",
     "build-prove-worker": "bun x vite build --config vite.config.worker.ts && bun scripts/escape_str_chars.js",
     "publish:new": "bun run build && npm publish --access public",
+    "publish": "bun run build && bun run build-prove-worker && npm publish --access public",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist",
-    "publish-nightly": "bun run build && npm publish --access public --tag nightly"
+    "publish-nightly": "bun run build && bun run build-prove-worker && npm publish --access public --tag nightly",
+    "release:patch": "npm version patch && bun run release:stable",
+    "release:minor": "npm version minor && bun run release:stable",
+    "release:major": "npm version major && bun run release:stable",
+    "release:alpha": "npm version prerelease --preid=alpha && bun run release:prerelease",
+    "release:beta": "npm version prerelease --preid=beta && bun run release:prerelease",
+    "release:rc": "npm version prerelease --preid=rc && bun run release:prerelease",
+    "release:alpha-major": "npm version premajor --preid=alpha && bun run release:prerelease",
+    "release:alpha-minor": "npm version preminor --preid=alpha && bun run release:prerelease",
+    "release:stable": "bun run build && bun run build-prove-worker && npm publish --access public && git push && git push --tags && gh release create v$npm_package_version --generate-notes",
+    "release:prerelease": "bun run build && bun run build-prove-worker && npm publish --access public --tag alpha && git push && git push --tags && gh release create v$npm_package_version --prerelease --generate-notes",
+    "changelog": "echo 'Please update CHANGELOG.md manually before releasing'"
   },
   "keywords": [
     "zk",
@@ -56,6 +72,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/bun": "^1.1.12",
+    "@types/google.accounts": "^0.0.17",
     "@types/pg": "^8.11.10",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
@@ -78,7 +95,7 @@
     "@azure/msal-browser": "^4.5.1",
     "@mach-34/noir-bignum-paramgen": "^1.1.2",
     "@peculiar/webcrypto": "^1.5.0",
-    "@zk-email/relayer-utils": "0.4.66-18",
+    "@zk-email/relayer-utils": "0.4.67-alpha.1",
     "@zk-email/snarkjs": "^0.0.1",
     "ethers": "^6.13.4",
     "jszip": "^3.10.1",

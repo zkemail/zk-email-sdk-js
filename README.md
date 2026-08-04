@@ -27,13 +27,13 @@ import { initZkEmailSdk } from "@zk-email/sdk";
 const sdk = initZkEmailSdk();
 
 // Enable error-level logging only
-const sdk = zkSdk({ logging: { enabled: true } });
+const sdk = initZkEmailSdk({ logging: { enabled: true } });
 
 // Enable all logs including debug information
-const sdk = zkSdk({ logging: { level: 'debug', enabled: true } });
+const sdk = initZkEmailSdk({ logging: { level: 'debug', enabled: true } });
 
 // Completely disable all logging
-const sdk = zkSdk({ logging: { enabled: false } });
+const sdk = initZkEmailSdk({ logging: { enabled: false } });
 ```
 
 ### Log Levels
@@ -59,16 +59,16 @@ The SDK supports the following log levels in order of verbosity:
 
 ```ts
 // Show only errors (recommended for production)
-const sdk = zkSdk({ logging: { enabled: true } });
+const sdk = initZkEmailSdk({ logging: { enabled: true } });
 
 // Show errors and warnings
-const sdk = zkSdk({ logging: { level: 'warn', enabled: true } });
+const sdk = initZkEmailSdk({ logging: { level: 'warn', enabled: true } });
 
 // Show all logs for debugging
-const sdk = zkSdk({ logging: { level: 'debug', enabled: true } });
+const sdk = initZkEmailSdk({ logging: { level: 'debug', enabled: true } });
 
 // Completely silent
-const sdk = zkSdk({ logging: { enabled: false } });
+const sdk = initZkEmailSdk({ logging: { enabled: false } });
 ```
 
 ## Create a blueprint
