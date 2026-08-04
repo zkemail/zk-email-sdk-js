@@ -49,6 +49,9 @@ jobs:
           bun run build
           bun run build-prove-worker
 
+      - name: Integration tests
+        run: bun run test:integration
+
       - name: Commit and tag
         run: |
           git config user.name "github-actions[bot]"

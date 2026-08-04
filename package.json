@@ -41,6 +41,8 @@
     "publish:manual": "bun run build && bun run build-prove-worker && npm publish --access public",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test:unit": "bun test tests/unit",
+    "test:integration": "bun test tests/integration",
     "clean": "rm -rf dist",
     "publish-nightly": "bun run build && bun run build-prove-worker && npm publish --access public --tag nightly",
     "release:patch": "npm version patch && bun run release:stable",
