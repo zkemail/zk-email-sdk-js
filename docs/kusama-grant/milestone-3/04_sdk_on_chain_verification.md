@@ -19,9 +19,11 @@ Real (no mocking) on-chain verification test at [`tests/integration/kusama/verif
 
 | Test | Exercises |
 | --- | --- |
-| verifies a real proof against the deployed Paseo verifier | A real, already-completed proof succeeds against the deployed verifier contract (`0x72616B78d29d0cccBfEec1bf00E108885286D2f3`) on Paseo Testnet (Polkadot). |
-| rejects a tampered proof | A proof with a corrupted signal correctly resolves `false` rather than being accepted. |
+| verifies a real proof against the deployed Paseo verifier | A real, already-completed proof succeeds against the deployed verifier contract (`0x72616B78d29d0cccBfEec1bf00E108885286D2f3`) on Paseo Testnet (Polkadot), via the standalone `verifyProofOnChain` function. |
+| rejects a tampered proof | A proof with a corrupted signal correctly resolves `false` rather than being accepted, via the standalone function. |
+| `blueprint.verifyProofOnChain` verifies a real proof against the deployed Paseo verifier | Same real proof, through `Blueprint.verifyProofOnChain` - the method the registry UI actually calls. |
+| `blueprint.verifyProofOnChain` rejects a tampered proof | Same tampered proof, through `Blueprint.verifyProofOnChain`. Added after a curator review (2026-08-11) found this method discarded the standalone call's result and always returned `true` unless the SDK itself threw, so a tampered proof reported success through the method the UI uses. Fixed in [#104](https://github.com/zkemail/zk-email-sdk-js/pull/104); this case pins the regression. |
 
 Runs automatically in CI: on every pull request via [`.github/workflows/ci.yml`](../../../.github/workflows/ci.yml) (`test` job), and again on every push to `staging` via [`.github/workflows/nightly-release.yml`](../../../.github/workflows/nightly-release.yml) as a gate before a nightly release is published - a broken on-chain verification path blocks the release from shipping.
 
-Example passing `test` job (2026-08-04): https://github.com/zkemail/zk-email-sdk-js/actions/runs/30915738460/job/92013291458. Example passing nightly release run including this check (2026-08-04): https://github.com/zkemail/zk-email-sdk-js/actions/runs/30915827055/job/92013591387. For the current state of the branch, see the [Actions tab](https://github.com/zkemail/zk-email-sdk-js/actions/workflows/nightly-release.yml?query=branch%3Astaging).
+Example passing `test` job (2026-08-26, with the `blueprint.verifyProofOnChain` fix and its regression tests): https://github.com/zkemail/zk-email-sdk-js/actions/runs/32988725595/job/98240971775. Example passing nightly release run including this check (2026-08-26, published as `3.0.0-nightly.36`): https://github.com/zkemail/zk-email-sdk-js/actions/runs/32990471554/job/98246594796. For the current state of the branch, see the [Actions tab](https://github.com/zkemail/zk-email-sdk-js/actions/workflows/nightly-release.yml?query=branch%3Astaging).
