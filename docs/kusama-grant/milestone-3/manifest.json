@@ -1,0 +1,24 @@
+{
+  "repo": "zk-email-sdk-js",
+  "updated_at": "2026-08-26T20:00:00Z",
+  "branch": "staging",
+  "commit_sha": "e6fc7bc613871536075cf1c03e92fa933e9963ce",
+  "npm": {
+    "package": "@zk-email/sdk",
+    "version": "3.0.0-nightly.36",
+    "integrity": "sha512-KcNzBJoTdEkFKzTq61vwWGo415XTqWLb4GRxrvacwqnOF+AW89CREaAii5KLdmwoO85h5CLdZ/J26GwvEVg3bw==",
+    "git_head": "e6fc7bc613871536075cf1c03e92fa933e9963ce"
+  },
+  "ci": {
+    "ci.yml": {
+      "job": "test",
+      "run_url": "https://github.com/zkemail/zk-email-sdk-js/actions/runs/32988725595/job/98240971775",
+      "date": "2026-08-26"
+    },
+    "nightly-release.yml": {
+      "job": "release",
+      "run_url": "https://github.com/zkemail/zk-email-sdk-js/actions/runs/32990471554/job/98246594796",
+      "date": "2026-08-26"
+    }
+  }
+}
