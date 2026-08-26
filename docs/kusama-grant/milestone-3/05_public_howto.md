@@ -11,7 +11,7 @@ mkdir zk-email-onchain-verification-demo
 cd zk-email-onchain-verification-demo
 npm init -y
 npm pkg set type=module
-npm install @zk-email/sdk@3.0.0-nightly.34
+npm install @zk-email/sdk@3.0.0-nightly.36
 npm install -D tsx
 ```
 
