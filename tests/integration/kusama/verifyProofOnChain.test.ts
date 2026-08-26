@@ -25,4 +25,21 @@ describe("On chain verification against Paseo (kusama_grant_paseo_e2e)", () => {
     const result = await verifyProofOnChain(proof);
     expect(result).toBe(false);
   });
+
+  // These go through proof.blueprint.verifyProofOnChain, the method the registry UI actually
+  // calls, rather than the standalone import above.
+  test("blueprint.verifyProofOnChain verifies a real proof against the deployed Paseo verifier", async () => {
+    const proof = await sdk.getProof(PROOF_ID);
+    const result = await proof.blueprint.verifyProofOnChain(proof);
+    expect(result).toBe(true);
+  });
+
+  test("blueprint.verifyProofOnChain rejects a tampered proof", async () => {
+    const proof = await sdk.getProof(PROOF_ID);
+    // @ts-ignore
+    proof.props.proofData.pi_a[0] = "9999999999" + proof.props.proofData.pi_a[0].slice(10);
+
+    const result = await proof.blueprint.verifyProofOnChain(proof);
+    expect(result).toBe(false);
+  });
 });

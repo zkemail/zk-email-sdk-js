@@ -589,12 +589,11 @@ export class Blueprint {
    */
   async verifyProofOnChain(proof: Proof): Promise<boolean> {
     try {
-      await verifyProofOnChain(proof);
+      return await verifyProofOnChain(proof);
     } catch (err) {
       logger.error("Failed to verify proof on chain: ", err);
       return false;
     }
-    return true;
   }
 
   /**
