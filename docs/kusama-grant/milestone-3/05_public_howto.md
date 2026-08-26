@@ -155,7 +155,7 @@ Independently confirm the verifier contract and the proof's on-chain result with
 
 `verifyProofOnChain` already confirmed the proof verifies, but that only reads the result without submitting a transaction - it doesn't leave an on-chain record. For those who want a permanent, linkable transaction, the full example above prints a ready-to-run `cast send` command for this exact proof, built with `encodeProofForOnChainVerification`, entirely independently of the SDK.
 
-This needs a funded testnet account - create and fund one the same way as in [milestone-1's how-to](https://github.com/zkemail/zk-email-verify/blob/kusama-grant/packages/contracts/kusama-grant/milestone-1/04_public_howto.md):
+This needs a funded testnet account - create and fund one the same way as in [milestone-1's how-to](https://github.com/zkemail/zk-email-verify/blob/kusama-grant/packages/contracts/docs/kusama-grant/milestone-1/04_public_howto.md):
 
 ```bash
 cast wallet new
