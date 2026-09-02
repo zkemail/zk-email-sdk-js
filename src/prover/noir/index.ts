@@ -14,7 +14,10 @@ import {
   parseEmail,
   generateNoirCircuitInputsWithRegexesAndExternalInputs,
 } from "@zk-email/relayer-utils";
-import { addMaxLengthToExternalInputs } from "../../utils/maxLenghExternalInputs";
+import {
+  addMaxLengthToExternalInputs,
+  formatExternalInputRequirements,
+} from "../../utils/maxLenghExternalInputs";
 import { logger } from "../../utils/logger";
 
 export class NoirProver extends AbstractProver implements IProver {
@@ -56,7 +59,7 @@ export class NoirProver extends AbstractProver implements IProver {
 
     if (this.blueprint.props.externalInputs?.length && !externalInputs.length) {
       throw new Error(
-        `The ${this.blueprint.props.slug} blueprint requires external inputs: ${this.blueprint.props.externalInputs}`
+        `The ${this.blueprint.props.slug} blueprint requires external inputs: ${formatExternalInputRequirements(this.blueprint.props.externalInputs)}`
       );
     }
 

@@ -1,5 +1,9 @@
 import { ExternalInput, ExternalInputInput } from "../types";
 
+export function formatExternalInputRequirements(externalInputs: ExternalInput[]): string {
+  return externalInputs.map(({ name }) => name).join(", ");
+}
+
 export function addMaxLengthToExternalInputs(
   externalInputs: ExternalInputInput[],
   externalInputDefinitions?: ExternalInput[]
