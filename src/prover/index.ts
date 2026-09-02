@@ -12,7 +12,10 @@ import {
 import { ExternalInputInput, GenerateProofOptions, ProverOptions } from "../types/prover";
 import { patch, post } from "../utils";
 import { localProverWorkerCode } from "../localProverWorkerString";
-import { addMaxLengthToExternalInputs } from "../utils/maxLenghExternalInputs";
+import {
+  addMaxLengthToExternalInputs,
+  formatExternalInputRequirements,
+} from "../utils/maxLenghExternalInputs";
 import { logger } from "../utils/logger";
 
 export interface IProver {
@@ -108,7 +111,7 @@ export abstract class AbstractProver implements IProver {
 
     if (this.blueprint.props.externalInputs?.length && !externalInputs.length) {
       throw new Error(
-        `The ${this.blueprint.props.slug} blueprint requires external inputs: ${this.blueprint.props.externalInputs}`
+        `The ${this.blueprint.props.slug} blueprint requires external inputs: ${formatExternalInputRequirements(this.blueprint.props.externalInputs)}`
       );
     }
 
