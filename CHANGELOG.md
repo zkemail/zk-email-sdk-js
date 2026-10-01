@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- `verifyProof` / `Proof.verify` now return `false` when the proof's `publicData` is not exactly what its verified public outputs decode to (publicData travels next to the proof and was previously not checked).
+- Circom and Noir public outputs are canonicalized before verification (0x-hex or decimal below the BN254 modulus; anything else is rejected); verification and decoding use the same canonical array. Also applies to `verifyProofData`.
+
+### Fixed
+- Noir public outputs are decoded by each part's committed length as UTF-8: bytes below 0x10 (tab, newline) were dropped, multi-byte characters were garbled, and byte slots above 0xff were accepted.
+- `getDKIMSelector`, `getSenderDomain` and `testBlueprint` read d=/s= from every (folded) DKIM-Signature field instead of the first line containing "DKIM-Signature" (which also matched X-Google-DKIM-Signature); `testBlueprint` accepts the blueprint's domain if any signature has it. New `getSenderDomains`.
+- A rate-limited / non-list key archive response no longer throws inside `verifyPubKey`.
+
 ## [2.0.11] - 2025-09-30
 
 ### Changed

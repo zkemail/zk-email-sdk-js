@@ -22,6 +22,7 @@ import {
   verifySp1Proof as verifySp1ProofUtils,
 } from "@zk-email/relayer-utils";
 import { logger } from "./utils/logger";
+import { dkimSignaturesFromHeaderMap } from "./utils/dkimSignature";
 
 let relayerUtilsResolver: (value: any) => void;
 const relayerUtilsInit: Promise<void> = new Promise((resolve) => {
@@ -105,9 +106,10 @@ export async function testBlueprint(
 ): Promise<string[][]> {
   const parsedEmail = await parseEmail(eml, blueprint.ignoreBodyHashCheck);
   logger.debug("parsedEmail: ", parsedEmail);
-  const domain = getSenderDomain(parsedEmail);
+  // REASON: the email may carry several DKIM signatures; any of them can be the blueprint's.
+  const domains = getSenderDomains(parsedEmail);
 
-  if (blueprint.senderDomain !== domain) {
+  if (!domains.includes((blueprint.senderDomain ?? "").toLowerCase())) {
     throw new Error("The senderDomain of Blueprint and email are different");
   }
 
@@ -375,8 +377,7 @@ export async function extractEMLDetails(
   const emailBodyMaxLength = parsedEmail.cleanedBody.length;
   const headerLength = parsedEmail.canonicalizedHeader.length;
 
-  const dkimHeader = parsedEmail.headers.get("DKIM-Signature")?.[0] || "";
-  const selector = dkimHeader.match(/s=([^;]+)/)?.[1] || "";
+  const selector = dkimSignaturesFromHeaderMap(parsedEmail.headers)[0]?.selector ?? "";
 
   const senderDomain = getSenderDomain(parsedEmail);
   const emailQuery = `from:${senderDomain}`;
@@ -385,8 +386,12 @@ export async function extractEMLDetails(
 }
 
 export function getSenderDomain(parsedEmail: ParsedEmail): string {
-  const dkimHeader = parsedEmail.headers.get("DKIM-Signature")?.[0] || "";
-  return dkimHeader.match(/d=([^;]+)/)?.[1] || "";
+  return getSenderDomains(parsedEmail)[0] ?? "";
+}
+
+/** d= of every DKIM-Signature in the email, in header order (see utils/dkimSignature.ts). */
+export function getSenderDomains(parsedEmail: ParsedEmail): string[] {
+  return [...new Set(dkimSignaturesFromHeaderMap(parsedEmail.headers).map((s) => s.domain))];
 }
 
 // Parses public signals from a proof to readable outputs
