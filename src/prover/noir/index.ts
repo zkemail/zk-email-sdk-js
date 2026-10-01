@@ -16,6 +16,7 @@ import {
 } from "@zk-email/relayer-utils";
 import { addMaxLengthToExternalInputs } from "../../utils/maxLenghExternalInputs";
 import { logger } from "../../utils/logger";
+import { canonicalPublicOutputs, decodeNoirRegexOutputs } from "../../utils/publicOutputs";
 
 export class NoirProver extends AbstractProver implements IProver {
   /**
@@ -119,7 +120,7 @@ export class NoirProver extends AbstractProver implements IProver {
       removeSoftLineBreaks: this.blueprint.props.removeSoftLinebreaks,
       shaPrecomputeSelector: this.blueprint.props.shaPrecomputeSelector,
       proverEthAddress: "0x0000000000000000000000000000000000000000",
-      rsaKeyBits: keyBits,  // Pass key size to relayer-utils
+      rsaKeyBits: keyBits, // Pass key size to relayer-utils
     };
 
     logger.info("generating inputs regexInputs: ", regexInputs);
@@ -226,9 +227,8 @@ export function parseNoirPublicOutputs(
   // 4: prover_address
   let publicOutputIterator = 5;
 
-  const publicStruct: { [key: string]: string[] } = {};
   const result: { publicData: PublicProofData; externalInputsProof?: ExternalInputProof } = {
-    publicData: publicStruct,
+    publicData: {},
   };
 
   if (externalInputs) {
@@ -246,56 +246,13 @@ export function parseNoirPublicOutputs(
     });
   }
 
-  decomposedRegexes.forEach((decomposedRegex) => {
-    const partOutputs: string[] = [];
-
-    const { maxMatchLength } = decomposedRegex;
-    decomposedRegex.parts.forEach((part) => {
-      if (decomposedRegex.isHashed) {
-        partOutputs.push(publicOutputs[publicOutputIterator]);
-        publicOutputIterator++;
-      } else if (part.isPublic) {
-        // Use part's maxLength if available, otherwise fall back to decomposedRegex's maxMatchLength
-        const partMaxLength = part.maxLength ?? maxMatchLength;
-        if (!partMaxLength) {
-          throw new Error(
-            `No maxLength found for public part. Either part.maxLength or decomposedRegex.maxMatchLength must be defined`
-          );
-        }
-
-        let partStr = "";
-        for (let i = publicOutputIterator; i < publicOutputIterator + partMaxLength; i++) {
-          const char = toUtf8(publicOutputs[i]);
-          partStr += char;
-        }
-        partOutputs.push(partStr);
-        publicOutputIterator += partMaxLength;
-        // The next element is the length of the part
-        const partLength = parseInt(publicOutputs[publicOutputIterator], 16);
-        if (partStr.length !== partLength) {
-          throw new Error("Length of part didn't match the given length output");
-        }
-        publicOutputIterator++;
-      }
-    });
-
-    // Collect all part outputs for this decomposedRegex
-    publicStruct[decomposedRegex.name] = partOutputs;
-  });
+  // REASON: decode the canonical spelling of each output, by each part's committed length
+  // (see utils/publicOutputs.ts); verifyProof decodes the same way to check publicData.
+  result.publicData = decodeNoirRegexOutputs(
+    canonicalPublicOutputs(publicOutputs, "hex"),
+    decomposedRegexes,
+    publicOutputIterator
+  );
 
   return result;
-}
-
-function toUtf8(hex: string): string {
-  // Remove '0x' prefix and leading zeros
-  const cleanHex = hex.slice(2).replace(/^0+/, "");
-
-  // Convert the hex to a Uint8Array
-  const bytes = new Uint8Array(cleanHex.length / 2);
-  for (let i = 0; i < cleanHex.length; i += 2) {
-    bytes[i / 2] = parseInt(cleanHex.substring(i, i + 2), 16);
-  }
-
-  // Use TextDecoder to convert to UTF-8
-  return new TextDecoder().decode(bytes);
 }

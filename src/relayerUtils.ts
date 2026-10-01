@@ -22,6 +22,7 @@ import {
   verifySp1Proof as verifySp1ProofUtils,
 } from "@zk-email/relayer-utils";
 import { logger } from "./utils/logger";
+import { dkimSignaturesFromHeaderMap } from "./utils/dkimSignature";
 
 let relayerUtilsResolver: (value: any) => void;
 const relayerUtilsInit: Promise<void> = new Promise((resolve) => {
@@ -105,9 +106,10 @@ export async function testBlueprint(
 ): Promise<string[][]> {
   const parsedEmail = await parseEmail(eml, blueprint.ignoreBodyHashCheck);
   logger.debug("parsedEmail: ", parsedEmail);
-  const domain = getSenderDomain(parsedEmail);
+  // REASON: the email may carry several DKIM signatures; any of them can be the blueprint's.
+  const domains = getSenderDomains(parsedEmail);
 
-  if (blueprint.senderDomain !== domain) {
+  if (!domains.includes((blueprint.senderDomain ?? "").toLowerCase())) {
     throw new Error("The senderDomain of Blueprint and email are different");
   }
 
@@ -375,8 +377,7 @@ export async function extractEMLDetails(
   const emailBodyMaxLength = parsedEmail.cleanedBody.length;
   const headerLength = parsedEmail.canonicalizedHeader.length;
 
-  const dkimHeader = parsedEmail.headers.get("DKIM-Signature")?.[0] || "";
-  const selector = dkimHeader.match(/s=([^;]+)/)?.[1] || "";
+  const selector = dkimSignaturesFromHeaderMap(parsedEmail.headers)[0]?.selector ?? "";
 
   const senderDomain = getSenderDomain(parsedEmail);
   const emailQuery = `from:${senderDomain}`;
@@ -385,49 +386,58 @@ export async function extractEMLDetails(
 }
 
 export function getSenderDomain(parsedEmail: ParsedEmail): string {
-  const dkimHeader = parsedEmail.headers.get("DKIM-Signature")?.[0] || "";
-  return dkimHeader.match(/d=([^;]+)/)?.[1] || "";
+  return getSenderDomains(parsedEmail)[0] ?? "";
+}
+
+/** d= of every DKIM-Signature in the email, in header order (see utils/dkimSignature.ts). */
+export function getSenderDomains(parsedEmail: ParsedEmail): string[] {
+  return [...new Set(dkimSignaturesFromHeaderMap(parsedEmail.headers).map((s) => s.domain))];
 }
 
 // Parses public signals from a proof to readable outputs
 // Translated from our existing go code internal/temporal/workflows/circom_workflows.go
+// NOTE: keep in step with the server (conductor processDecomposedRegexV0001/V0002): remote proofs
+// carry the server's decoding as publicData, and verifyProof compares it with this one.
 export function parsePublicSignals(
   publicSignals: string[],
-  decomposedRegexes: DecomposedRegex[]
+  decomposedRegexes: DecomposedRegex[],
+  internalVersion?: string
 ): PublicProofData {
   let publicOutputIterator = 3; // like publicOutputIterator in Go
   const publicStruct: { [key: string]: string[] } = {};
+  // REASON: "0002" blueprints size each public part by its own maxLength; older ones size every
+  // part like the regex. The previous code always used decomposedRegex.maxLength, which "0002"
+  // blueprints don't set, so it read 0 fields per part and returned empty strings.
+  const perPart = internalVersion === "0002_max_length_per_regex_part";
 
   decomposedRegexes.forEach((decomposedRegex) => {
-    let signalLength = 1;
-    if (!decomposedRegex.isHashed) {
-      signalLength = Math.ceil((decomposedRegex.maxLength || 0) / 31);
-    }
-
+    const firstPublicMax = decomposedRegex.parts.find((p) => p.isPublic && (p.maxLength ?? 0) > 0)?.maxLength;
     const partOutputs: string[] = [];
 
     decomposedRegex.parts.forEach((part) => {
-      if (part.isPublic) {
-        // Slice out the relevant subset from publicSignals
-        const publicOutputsSlice = publicSignals.slice(
-          publicOutputIterator,
-          publicOutputIterator + signalLength
-        );
-
-        // Decode using the replicated Go logic
-        let output = "";
-        if (decomposedRegex.isHashed) {
-          output = publicOutputsSlice + "";
-        } else {
-          output = processIntegers(publicOutputsSlice);
-        }
-
-        // Store the decoded result
-        partOutputs.push(output);
-
-        // Advance the iterator
-        publicOutputIterator += signalLength;
+      if (!part.isPublic) return;
+      let signalLength: number;
+      if (decomposedRegex.isHashed) {
+        signalLength = 1;
+      } else if (perPart) {
+        if (!part.maxLength || part.maxLength <= 0) return; // the server skips these too
+        signalLength = Math.ceil(part.maxLength / 31);
+      } else {
+        signalLength = Math.ceil((firstPublicMax ?? decomposedRegex.maxLength ?? 0) / 31);
       }
+
+      if (publicOutputIterator + signalLength > publicSignals.length) {
+        throw new Error("public output array index out of bounds - this circuit might need recompilation");
+      }
+      const publicOutputsSlice = publicSignals.slice(
+        publicOutputIterator,
+        publicOutputIterator + signalLength
+      );
+
+      partOutputs.push(
+        decomposedRegex.isHashed ? publicOutputsSlice.join("") : processIntegers(publicOutputsSlice)
+      );
+      publicOutputIterator += signalLength;
     });
 
     // Collect all part outputs for this decomposedRegex

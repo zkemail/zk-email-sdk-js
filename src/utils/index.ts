@@ -10,6 +10,7 @@ import { getTokenFromAuth } from "../auth";
 import { DkimRecord, HashingAlgorithm, ZkFramework } from "../types";
 import { Crypto } from "@peculiar/webcrypto";
 import { logger } from "./logger";
+import { dkimSignaturesFromEml } from "./dkimSignature";
 
 const crypto = new Crypto();
 
@@ -205,29 +206,9 @@ export function startJsonFileDownload(json: string, name = "data") {
   URL.revokeObjectURL(url);
 }
 
+/** s= of the first DKIM-Signature in a raw email (see utils/dkimSignature.ts), or null. */
 export function getDKIMSelector(emlContent: string): string | null {
-  const headerLines: string[] = [];
-  const lines = emlContent.split("\n");
-  for (const line of lines) {
-    if (line.trim() === "") break;
-    // If line starts with whitespace, it's a continuation of previous header
-    if (line.startsWith(" ") || line.startsWith("\t")) {
-      headerLines[headerLines.length - 1] += line.trim();
-    } else {
-      headerLines.push(line);
-    }
-  }
-
-  // Then look for DKIM-Signature in the joined headers
-  for (const line of headerLines) {
-    if (line.includes("DKIM-Signature")) {
-      const match = line.match(/s=([^;]+)/);
-      if (match && match[1]) {
-        return match[1].trim();
-      }
-    }
-  }
-  return null;
+  return dkimSignaturesFromEml(emlContent)[0]?.selector ?? null;
 }
 
 /**
@@ -288,7 +269,13 @@ async function getPKeys(senderDomain: string): Promise<string[]> {
     return [];
   }
 
-  const records = (await response.json()) as DkimRecord[];
+  const records = (await response.json().catch(() => null)) as DkimRecord[] | null;
+  // NOTE: when rate-limited the archive answers 429 with an error object, not a list; that used
+  // to throw "records.filter is not a function". No keys -> the proof's key can't be matched.
+  if (!Array.isArray(records)) {
+    logger.error(`Key archive returned no key list (HTTP ${response.status}) for ${senderDomain}`);
+    return [];
+  }
 
   return records
     .filter((record) => record.domain === senderDomain)
