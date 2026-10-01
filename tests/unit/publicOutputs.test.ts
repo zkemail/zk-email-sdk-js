@@ -12,12 +12,17 @@ mock.module("@zk-email/snarkjs", () => ({ groth16: { verify: async () => true } 
 const { Blueprint, ZkFramework } = await import("../../src/blueprint");
 const { Proof } = await import("../../src/proof");
 const { verifyProof } = await import("../../src/verify");
+const { parsePublicSignals } = await import("../../src/relayerUtils");
 const { parseNoirPublicOutputs } = await import("../../src/prover/noir");
 const { canonicalPublicOutputs, BN254_FIELD_MODULUS } =
   await import("../../src/utils/publicOutputs");
 const { poseidonLarge } = await import("../../src/utils/hash");
 const { getDKIMSelector } = await import("../../src/utils");
 const { dkimSignaturesFromEml } = await import("../../src/utils/dkimSignature");
+
+/** Up to 31 bytes of `text`, little-endian in one field (Circom PackBytes layout). */
+const packField = (text: string) =>
+  new TextEncoder().encode(text).reduceRight((acc, b) => (acc << 8n) | BigInt(b), 0n);
 
 const hex = (v: number | bigint) => "0x" + BigInt(v).toString(16).padStart(64, "0");
 
@@ -81,7 +86,11 @@ describe("verifyProof binds publicData to the verified outputs (Circom)", () => 
     globalThis.fetch = realFetch;
   });
 
-  async function circomProof(publicData: Record<string, string[]>, publicOutputs?: string[]) {
+  async function circomProof(
+    publicData: Record<string, string[]> | undefined,
+    publicOutputs?: string[],
+    text = "Hi"
+  ) {
     // Throwaway key "published" for the blueprint's domain via a stubbed archive.
     const { publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
     const p = publicKey.export({ format: "der", type: "spki" }).toString("base64");
@@ -99,8 +108,8 @@ describe("verifyProof binds publicData to the verified outputs (Circom)", () => 
       )) as any;
     const keyHash = (await poseidonLarge(n, 9, 242)).toString();
 
-    // "Hi" packed little-endian into one 31-byte field, as the Circom blueprint circuit outputs it.
-    const packed = (BigInt("i".charCodeAt(0)) << 8n) | BigInt("H".charCodeAt(0));
+    // `text` packed little-endian into one 31-byte field, as the Circom blueprint circuit outputs it.
+    const packed = packField(text);
     const blueprint = new Blueprint(
       {
         id: "bp",
@@ -109,8 +118,7 @@ describe("verifyProof binds publicData to the verified outputs (Circom)", () => 
           {
             name: "subject",
             location: "header",
-            maxLength: 31,
-            parts: [{ isPublic: true, regexDef: "Hi" }],
+            parts: [{ isPublic: true, regexDef: "[^\\r\\n]+", maxLength: 31 }],
           },
         ],
       } as any,
@@ -124,6 +132,7 @@ describe("verifyProof binds publicData to the verified outputs (Circom)", () => 
       proofData: {} as any,
       publicOutputs: publicOutputs ?? [keyHash, "1", "2", packed.toString()],
       publicData,
+      status: 2, // ProofStatus.Done
       isLocal: false,
     } as any);
   }
@@ -132,8 +141,17 @@ describe("verifyProof binds publicData to the verified outputs (Circom)", () => 
     expect(await verifyProof(await circomProof({ subject: ["Hi"] }))).toBe(true);
   });
 
-  test("REGRESSION: edited publicData is rejected although the proof itself is valid", async () => {
-    expect(await verifyProof(await circomProof({ subject: ["Bye"] }))).toBe(false);
+  test("REGRESSION: edited publicData is replaced by the verified values", async () => {
+    const proof = await circomProof({ subject: ["Bye"] });
+    expect(await verifyProof(proof)).toBe(true);
+    expect(proof.getProofData().publicData).toEqual({ subject: ["Hi"] });
+  });
+
+  test("honest remote proof whose server decoding differs (non-ASCII) still verifies", async () => {
+    // The server's Go decoder reverses UTF-8 runes, not bytes, so its text for non-ASCII differs.
+    const proof = await circomProof({ subject: ["\uFFFD\uFFFDcole"] }, undefined, "école");
+    expect(await verifyProof(proof)).toBe(true);
+    expect(proof.getProofData().publicData).toEqual({ subject: ["école"] });
   });
 
   test("non-canonical public outputs are rejected", async () => {
@@ -142,6 +160,36 @@ describe("verifyProof binds publicData to the verified outputs (Circom)", () => 
     outputs[3] = ` ${outputs[3]}`;
     proof.props.publicOutputs = outputs;
     expect(await verifyProof(proof)).toBe(false);
+  });
+});
+
+describe("parsePublicSignals follows the blueprint's internalVersion (as the server does)", () => {
+  // Two public parts: maxLength 31 (1 field) and 40 (2 fields).
+  const regex = [
+    {
+      name: "r",
+      location: "header",
+      parts: [
+        { isPublic: true, regexDef: "a", maxLength: 31 },
+        { isPublic: false, regexDef: ":" },
+        { isPublic: true, regexDef: "b", maxLength: 40 },
+      ],
+    },
+  ] as any;
+
+  test("0002: each part sized by its own maxLength", () => {
+    const outputs = ["0", "0", "0", packField("first"), packField("second"), "0"].map(String);
+    expect(parsePublicSignals(outputs, regex, "0002_max_length_per_regex_part")).toEqual({
+      r: ["first", "second"],
+    });
+  });
+
+  test("0001 / unset: every part sized like the first public part", () => {
+    const outputs = ["0", "0", "0", packField("first"), packField("second")].map(String);
+    expect(parsePublicSignals(outputs, regex, "0001_max_length_per_decomposed_regex")).toEqual({
+      r: ["first", "second"],
+    });
+    expect(parsePublicSignals(outputs, regex)).toEqual({ r: ["first", "second"] });
   });
 });
 

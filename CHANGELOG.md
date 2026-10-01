@@ -8,10 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Security
-- `verifyProof` / `Proof.verify` now return `false` when the proof's `publicData` is not exactly what its verified public outputs decode to (publicData travels next to the proof and was previously not checked).
+- `verifyProof` / `Proof.verify` now set the proof's `publicData` to what its verified public outputs decode to (it travels next to the proof and was previously trusted as-is). A differing `publicData` is replaced and a warning logged; verification fails only if the outputs can't be decoded for the blueprint.
 - Circom and Noir public outputs are canonicalized before verification (0x-hex or decimal below the BN254 modulus; anything else is rejected); verification and decoding use the same canonical array. Also applies to `verifyProofData`.
 
 ### Fixed
+- `parsePublicSignals` follows the blueprint's `internalVersion` like the server: `0002_max_length_per_regex_part` sizes each public part by its own `maxLength` (it read 0 fields per part and returned empty strings when the regex had no top-level `maxLength`).
 - Noir public outputs are decoded by each part's committed length as UTF-8: bytes below 0x10 (tab, newline) were dropped, multi-byte characters were garbled, and byte slots above 0xff were accepted.
 - `getDKIMSelector`, `getSenderDomain` and `testBlueprint` read d=/s= from every (folded) DKIM-Signature field instead of the first line containing "DKIM-Signature" (which also matched X-Google-DKIM-Signature); `testBlueprint` accepts the blueprint's domain if any signature has it. New `getSenderDomains`.
 - A rate-limited / non-list key archive response no longer throws inside `verifyPubKey`.

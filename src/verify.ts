@@ -128,7 +128,7 @@ export async function verifyProof(proof: Proof, options?: GenerateProofOptions) 
       const proofDataHex = proof.props.proofData!;
       verified = await verifyNoirProof(proofDataHex, outputs!, circuit, options.noirWasm);
     }
-    return verified && publicDataIsProven(proof, outputs!);
+    return verified && applyProvenPublicData(proof, outputs!);
   } catch (err) {
     logger.warn("Failed to verify proof: ", err);
   }
@@ -136,29 +136,36 @@ export async function verifyProof(proof: Proof, options?: GenerateProofOptions) 
 }
 
 /**
- * True if the proof's `publicData` (the decoded regex parts shown to users) is exactly what its
- * verified outputs decode to.
+ * Make the proof's `publicData` (the decoded regex parts shown to users) exactly what its verified
+ * outputs decode to. Returns false only if the outputs can't be decoded for this blueprint.
  *
- * REASON: publicData travels next to the proof (e.g. packProof() -> server -> unPackProof()) and
- * is not covered by the proof system. Without this check, verify() returned true for a valid
- * proof whose publicData had been edited, and callers then read the edited values.
+ * REASON: publicData travels next to the proof (e.g. packProof() -> server -> unPackProof(),
+ * the "prove on the client, verify on the server" flow) and is not covered by the proof system.
+ * It used to be trusted as-is, so verify() returned true for a valid proof whose publicData had
+ * been edited, and callers then read the edited values.
+ * NOTE: a mismatch REPLACES publicData instead of failing verification. Remote Circom proofs carry
+ * publicData decoded by the server (conductor, Go), which differs from this decoder for some
+ * honest proofs (e.g. it reverses UTF-8 runes rather than bytes, so non-ASCII text differs);
+ * rejecting those would break legitimate proofs. The client decoding is authoritative either way.
  */
-export function publicDataIsProven(proof: Proof, outputs: string[]): boolean {
-  const { decomposedRegexes = [], externalInputs = [] } = proof.blueprint.props;
+export function applyProvenPublicData(proof: Proof, outputs: string[]): boolean {
+  const { decomposedRegexes = [], externalInputs = [], internalVersion } = proof.blueprint.props;
   let decoded: { [name: string]: string[] };
   try {
     decoded =
       proof.props.zkFramework === ZkFramework.Noir
         ? decodeNoirRegexOutputs(outputs, decomposedRegexes, noirRegexOutputsStart(externalInputs))
-        : parsePublicSignals(outputs, decomposedRegexes);
+        : parsePublicSignals(outputs, decomposedRegexes, internalVersion);
   } catch (err) {
     logger.warn("Could not decode the proof's public outputs: ", err);
     return false;
   }
   if (!publicDataMatches(proof.props.publicData, decoded)) {
-    logger.warn("The proof's publicData does not match its verified public outputs");
-    return false;
+    logger.warn(
+      "The proof's publicData differs from what its verified public outputs decode to; replacing it with the verified values"
+    );
   }
+  proof.props.publicData = decoded;
   return true;
 }
 
